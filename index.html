@@ -3,95 +3,120 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>中文詞語 88 關大挑戰</title>
+    <title>中文詞語 88 關大挑戰 (專業教學版)</title>
     <style>
         :root { 
             --p1-color: #3182ce; 
             --p2-color: #d53f8c; 
+            --cell-size: 140px; /* 大大增加格子大小 */
         }
         
         body { 
             font-family: "Microsoft JhengHei", "Heiti TC", sans-serif; 
-            margin: 0; padding: 20px;
-            display: flex; flex-direction: column; align-items: center;
+            margin: 0; padding: 0;
             background-color: #f7fafc;
+            /* 允許主視窗滾動 */
+            overflow-y: scroll; 
+            padding-bottom: 150px; /* 為底部控制台留空 */
         }
         
-        #game-container { position: relative; width: 100%; max-width: 1100px; margin-bottom: 120px; }
+        #game-container { 
+            position: relative; 
+            width: 95%; max-width: 1400px; 
+            margin: 20px auto;
+        }
         
         #board { 
             display: grid; 
             grid-template-columns: repeat(10, 1fr); 
-            gap: 12px; 
+            gap: 15px; 
             padding: 25px; 
             border-radius: 30px; 
-            background-image: url('board-bg.jpg'); /* 這裡讀取你的 Canva 風景圖 */
+            /* 這裡仍可載入你的 Canva 風景圖 */
+            background-image: url('board-bg.jpg'); 
             background-size: cover;
             background-position: center;
-            background-color: #ffffff; /* 沒底圖時的預設色 */
+            background-color: #ffffff;
             box-shadow: 0 20px 50px rgba(0,0,0,0.1);
             border: 10px solid white;
         }
 
-        /* 核心：自動分組變色的半透明格子 */
+        /* 核心：放大、透明、磨砂格子 */
         .cell { 
-            aspect-ratio: 1/1; 
-            border-radius: 15px; 
+            height: var(--cell-size); /* 固定高度，不再是正方形，更像卡片 */
+            border-radius: 20px; 
             display: flex; flex-direction: column; align-items: center; justify-content: center; 
-            text-align: center; font-size: 16px; font-weight: 800; position: relative; 
+            text-align: center; 
+            font-size: 26px; /* 詞語文字放大 */
+            font-weight: 900; /* 加粗 */
+            position: relative; 
             transition: 0.3s; cursor: pointer;
-            backdrop-filter: blur(4px); /* 磨砂玻璃效果 */
-            border: 2px solid rgba(255,255,255,0.5);
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-            color: #2d3748;
+            backdrop-filter: blur(5px);
+            border: 3px solid rgba(255,255,255,0.6);
+            box-shadow: 0 6px 10px rgba(0,0,0,0.08);
+            color: #1a202c;
+            padding: 10px;
+            box-sizing: border-box;
         }
 
         /* 糖果配色邏輯 (每10格換色) */
-        .cell:nth-child(10n+1), .cell:nth-child(10n+2) { background-color: rgba(190, 227, 248, 0.8); } /* 淡藍 */
-        .cell:nth-child(10n+3), .cell:nth-child(10n+4) { background-color: rgba(198, 246, 213, 0.8); } /* 淡綠 */
-        .cell:nth-child(10n+5), .cell:nth-child(10n+6) { background-color: rgba(254, 252, 191, 0.8); } /* 淡黃 */
-        .cell:nth-child(10n+7), .cell:nth-child(10n+8) { background-color: rgba(254, 215, 226, 0.8); } /* 淡粉 */
-        .cell:nth-child(10n+9), .cell:nth-child(10n+10) { background-color: rgba(233, 216, 253, 0.8); } /* 淡紫 */
+        .cell:nth-child(10n+1), .cell:nth-child(10n+2) { background-color: rgba(190, 227, 248, 0.85); }
+        .cell:nth-child(10n+3), .cell:nth-child(10n+4) { background-color: rgba(198, 246, 213, 0.85); }
+        .cell:nth-child(10n+5), .cell:nth-child(10n+6) { background-color: rgba(254, 252, 191, 0.85); }
+        .cell:nth-child(10n+7), .cell:nth-child(10n+8) { background-color: rgba(254, 215, 226, 0.85); }
+        .cell:nth-child(10n+9), .cell:nth-child(10n+10) { background-color: rgba(233, 216, 253, 0.85); }
 
-        .cell:hover { transform: scale(1.05); background-color: rgba(255,255,255,0.95); z-index: 5; }
-        .cell-index { position: absolute; top: 5px; left: 8px; font-size: 11px; color: rgba(0,0,0,0.3); }
-        .start { background-color: #fff !important; border: 4px solid #3182ce !important; color: #3182ce; }
+        .cell:hover { transform: scale(1.03); background-color: rgba(255,255,255,0.98); z-index: 5; }
+        .cell-index { position: absolute; top: 7px; left: 10px; font-size: 14px; color: rgba(0,0,0,0.4); font-weight: bold;}
+        
+        /* 特殊格子：起點與終點 */
+        .start { background: white !important; border: 5px solid #3182ce !important; color: #3182ce; }
+        .end { 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important; 
+            color: white !important; 
+            border: 5px solid #ed64a6 !important;
+            font-size: 30px;
+        }
 
-        /* 角色圖標 */
+        /* 玩家圖標 - 改小一點以減少擋光 */
         .player { 
-            width: 38px; height: 38px; border-radius: 50%; position: absolute; 
+            width: 32px; height: 32px; border-radius: 50%; position: absolute; 
             transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
-            z-index: 20; border: 4px solid white; box-shadow: 0 8px 15px rgba(0,0,0,0.2);
+            z-index: 20; border: 4px solid white; box-shadow: 0 8px 15px rgba(0,0,0,0.3);
         }
         #p1 { background-color: var(--p1-color); }
         #p2 { background-color: var(--p2-color); }
-        .can-move { animation: bounce 0.6s infinite alternate; box-shadow: 0 0 20px #ecc94b; }
-        @keyframes bounce { from { transform: translateY(0); } to { transform: translateY(-15px); } }
+        .can-move { animation: bounce 0.6s infinite alternate; box-shadow: 0 0 25px #ecc94b; }
+        @keyframes bounce { from { transform: translateY(0) scale(1); } to { transform: translateY(-15px) scale(1.1); } }
 
-        /* 控制台 */
+        /* 控制台 - 固定在底部 */
         #controls { 
-            position: fixed; bottom: 0; width: 100%; background: rgba(255,255,255,0.95); 
+            position: fixed; bottom: 0; left: 0; width: 100%; 
+            background: rgba(255,255,255,0.95); 
             display: flex; justify-content: center; align-items: center; gap: 30px; 
-            padding: 20px; box-shadow: 0 -10px 30px rgba(0,0,0,0.08); z-index: 100;
+            padding: 20px; box-shadow: 0 -10px 40px rgba(0,0,0,0.1); z-index: 100;
+            backdrop-filter: blur(10px);
         }
-        #dice-box { font-size: 50px; background: #edf2f7; padding: 10px 25px; border-radius: 20px; }
+        #dice-box { font-size: 60px; background: #edf2f7; padding: 10px 30px; border-radius: 25px; box-shadow: inset 0 2px 5px rgba(0,0,0,0.05);}
         #btn-roll { 
-            padding: 15px 45px; font-size: 24px; border-radius: 50px; border: none; 
+            padding: 18px 60px; font-size: 28px; border-radius: 50px; border: none; 
             background: #48bb78; color: white; cursor: pointer; font-weight: bold;
-            box-shadow: 0 10px 20px rgba(72, 187, 120, 0.3);
+            box-shadow: 0 10px 25px rgba(72, 187, 120, 0.4); transition: 0.2s;
         }
-        #btn-roll:disabled { background: #cbd5e0; box-shadow: none; }
+        #btn-roll:hover { background: #38a169; transform: translateY(-2px); }
+        #btn-roll:disabled { background: #cbd5e0; box-shadow: none; transform: none; }
 
         /* 彈窗 */
         #modal { 
             display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); 
-            background: white; padding: 50px; border-radius: 40px; z-index: 300; 
-            box-shadow: 0 30px 100px rgba(0,0,0,0.5); text-align: center; border: 10px solid #4299e1;
-            width: 80%; max-width: 500px;
+            background: white; padding: 60px; border-radius: 40px; z-index: 300; 
+            box-shadow: 0 30px 120px rgba(0,0,0,0.6); text-align: center; border: 12px solid #4299e1;
+            width: 85%; max-width: 600px;
         }
-        #modal-text { font-size: 80px; font-weight: 900; margin-bottom: 30px; color: #1a202c; }
-        .btn-speak { background: #ecc94b; border: none; padding: 15px 30px; border-radius: 20px; cursor: pointer; margin-bottom: 30px; font-size: 20px; color: #744210; font-weight: bold; }
-        .btn-close { background: #48bb78; color: white; padding: 20px 60px; border: none; border-radius: 20px; font-size: 28px; cursor: pointer; width: 100%; }
+        #modal-text { font-size: 100px; font-weight: 900; margin-bottom: 40px; color: #1a202c; text-shadow: 2px 2px 0 rgba(0,0,0,0.05); }
+        .btn-speak { background: #ecc94b; border: none; padding: 18px 40px; border-radius: 20px; cursor: pointer; margin-bottom: 40px; font-size: 22px; color: #744210; font-weight: bold; }
+        .btn-speak:hover { background: #d69e2e; }
+        .btn-close { background: #48bb78; color: white; padding: 25px; border: none; border-radius: 25px; font-size: 32px; cursor: pointer; width: 100%; font-weight: bold;}
     </style>
 </head>
 <body>
@@ -103,54 +128,91 @@
 </div>
 
 <div id="controls">
-    <div id="status" style="font-size: 20px; font-weight: bold;">輪到：玩家 1</div>
+    <div id="status" style="font-size: 24px; font-weight: 900; color: #2d3748;">輪到：<span id="player-turn-name" style="color:#3182ce">玩家 1</span></div>
     <div id="dice-box">🎲</div>
     <button id="btn-roll" onclick="roll()">擲骰子</button>
 </div>
 
 <div id="modal">
+    <div style="color:#718096; margin-bottom:20px; font-size: 20px; font-weight:bold;">請大聲讀出：</div>
     <div id="modal-text">詞語</div>
     <button class="btn-speak" onclick="speak()">🔊 聽聽發音</button>
-    <button class="btn-close" onclick="closeModal()">我會讀了！</button>
+    <button class="btn-close" onclick="closeModal()">我會讀了！繼續挑戰</button>
 </div>
 
 <script>
-    const words = ["起點", "學校", "禮堂", "校務處", "操場", "音樂室", "課室", "洗手間", "電腦室", "樓梯", "圖書館", "走廊", "升降機", "教員室", "草地上", "沙灘", "山頂", "運動場", "籃球場", "足球場", "燒烤場", "公園", "家裏", "客廳", "浴室", "睡房", "廚房", "清真寺", "商場", "超市", "街市", "麵包店", "理髮店", "便利店", "藥房", "餐廳", "醫院", "補習社", "博物館", "銀行", "地鐵站", "巴士站", "行人道", "刷牙", "洗澡", "洗手", "喝水", "吃飯", "睡覺", "穿衣服", "戴口罩", "做家務", "倒垃圾", "洗碗", "抹窗戶", "煮飯", "上課", "做功課", "溫習", "看書", "畫畫", "做早操", "跑步", "游泳", "跳繩", "踢足球", "打籃球", "騎單車", "遠足", "拍照", "表演", "唱歌", "跳舞", "慶祝", "排隊", "玩遊戲", "看手機", "打電話", "打招呼", "買水果", "比賽", "說話", "摺紙", "下棋", "玩拼圖"];
+    // 88個詞語清單
+    const baseWords = ["起點", "學校", "禮堂", "校務處", "操場", "音樂室", "課室", "洗手間", "電腦室", "樓梯", "圖書館", "走廊", "升降機", "教員室", "草地上", "沙灘", "山頂", "運動場", "籃球場", "足球場", "燒烤場", "公園", "家裏", "客廳", "浴室", "睡房", "廚房", "清真寺", "商場", "超市", "街市", "麵包店", "理髮店", "便利店", "藥房", "餐廳", "醫院", "補習社", "博物館", "銀行", "地鐵站", "巴士站", "行人道", "刷牙", "洗澡", "洗手", "喝水", "吃飯", "睡覺", "穿衣服", "戴口罩", "做家務", "倒垃圾", "洗碗", "抹窗戶", "煮飯", "上課", "做功課", "溫習", "看書", "畫畫", "做早操", "跑步", "游泳", "跳繩", "踢足球", "打籃球", "騎單車", "遠足", "拍照", "表演", "唱歌", "跳舞", "慶祝", "排隊", "玩遊戲", "看手機", "打電話", "打招呼", "買水果", "比賽", "說話", "摺紙", "下棋", "玩拼圖"];
+    
+    // 3. 補全+終點：生成完整的單詞數組，最後加上「🏆 終點」
+    const words = [...baseWords, "🏆 終點"];
+
     const players = [{pos: 0, el: 'p1'}, {pos: 0, el: 'p2'}];
     let turn = 0, dice = 0, moving = false;
 
+    // 初始化棋盤
     function init() {
         const board = document.getElementById('board');
         words.forEach((w, i) => {
             const cell = document.createElement('div');
-            cell.className = 'cell' + (i===0?' start':'');
+            // 設定樣式類別
+            let className = 'cell';
+            if(i === 0) className += ' start';
+            if(i === words.length - 1) className += ' end';
+            cell.className = className;
             cell.id = 'c' + i;
+            // 填入索引和文字
             cell.innerHTML = `<span class="cell-index">${i}</span>${w}`;
             board.appendChild(cell);
         });
-        updateDisplay();
+        // 確保在所有格子生成後再計算位置
+        setTimeout(updateDisplay, 200);
     }
 
-    function updateDisplay() {
+    // 更新角色位置 (包含遮擋優化和自動滾動)
+    function updateDisplay(isFinalStop = false) {
         players.forEach((p, i) => {
             const cell = document.getElementById('c' + p.pos);
             const rect = cell.getBoundingClientRect();
             const bRect = document.getElementById('board').getBoundingClientRect();
             const pEl = document.getElementById(p.el);
-            const offset = i === 0 ? -12 : 12;
-            pEl.style.left = (rect.left - bRect.left + rect.width/2 - 19 + offset) + 'px';
-            pEl.style.top = (rect.top - bRect.top + rect.height/2 - 19 + offset) + 'px';
+            
+            // 核心邏輯：1. 解決遮擋。
+            // 如果是最終停頓，把棋子移到格子的右下角。
+            // 如果還在移動中，保持在中間偏上以便觀察。
+            let xOffset, yOffset;
+            if(isFinalStop && pid === i){
+                // 最終停頓，偏向右下
+                xOffset = (rect.width / 2) - 25 + (i === 0 ? -15 : 15); // 玩家1/2分開
+                yOffset = (rect.height / 2) - 30; 
+            } else {
+                // 移動中，保持中心偏上
+                xOffset = i === 0 ? -18 : 18; // 玩家1/2分開
+                yOffset = -10;
+            }
+
+            pEl.style.left = (rect.left - bRect.left + rect.width/2 - 16 + xOffset) + 'px';
+            pEl.style.top = (rect.top - bRect.top + rect.height/2 - 16 + yOffset) + 'px';
         });
+
+        // 核心邏輯：2. 自動滾動。
+        // 當移動結束時，滾動視窗讓當前玩家格子處於畫面中心。
+        if(isFinalStop){
+            const cell = document.getElementById('c' + players[turn].pos);
+            cell.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
     }
 
     async function roll() {
         document.getElementById('btn-roll').disabled = true;
         for(let i=0; i<10; i++) {
             dice = Math.floor(Math.random()*6)+1;
-            document.getElementById('dice-box').innerText = dice === 1 ? '⚀' : dice === 2 ? '⚁' : dice === 3 ? '⚂' : dice === 4 ? '⚃' : dice === 5 ? '⚄' : '⚅';
+            const diceIcons = ['⚀', '⚁', '⚂', '⚃', '⚄', '⚅'];
+            document.getElementById('dice-box').innerText = diceIcons[dice-1];
             await new Promise(r => setTimeout(r, 60));
         }
         document.getElementById(players[turn].el).classList.add('can-move');
+        // 擲骰子後，必須點擊棋子才能開始移動
         document.getElementById(players[turn].el).onclick = () => move(turn);
     }
 
@@ -158,27 +220,61 @@
         if(pid !== turn || dice === 0 || moving) return;
         moving = true;
         document.getElementById(players[pid].el).classList.remove('can-move');
-        document.getElementById(players[pid].el).onclick = null;
+        document.getElementById(players[pid].el).onclick = null; // 移除點擊事件
 
+        // 一步一步走
         for(let i=0; i<dice; i++) {
-            players[pid].pos = (players[pid].pos + 1) % words.length;
-            updateDisplay();
+            // 到達終點停止
+            if (players[pid].pos >= words.length - 1) break;
+            
+            players[pid].pos++;
+            updateDisplay(false); // 移動中，棋子保持中心
             await new Promise(r => setTimeout(r, 350));
         }
         
         dice = 0;
-        if(players[pid].pos !== 0) {
+        
+        // 移動結束
+        if(players[pid].pos === words.length - 1) {
+            // 到達「終點」
+            updateDisplay(true); // 最終停頓，棋子移開
+            setTimeout(() => {
+                alert(`🎊 恭喜玩家 ${pid+1} 成功到達終點！`);
+                location.reload(); // 重新開始
+            }, 500);
+        } else if(players[pid].pos !== 0) {
+            // 到達單詞格子
+            updateDisplay(true); // 核心：移動結束，將棋子移到右下角彈開
             document.getElementById('modal-text').innerText = words[players[pid].pos];
             document.getElementById('modal').style.display = 'block';
-            speak();
+            speak(); // 自動讀一次廣東話
         } else { endTurn(); }
     }
 
     function closeModal() { document.getElementById('modal').style.display = 'none'; endTurn(); }
-    function endTurn() { turn = turn === 0 ? 1 : 0; document.getElementById('status').innerText = `輪到：玩家 ${turn+1}`; document.getElementById('btn-roll').disabled = false; moving = false; }
-    function speak() { const text = document.getElementById('modal-text').innerText; const msg = new SpeechSynthesisUtterance(text); msg.lang = 'zh-HK'; window.speechSynthesis.speak(msg); }
+    
+    function endTurn() { 
+        turn = turn === 0 ? 1 : 0; 
+        const turnName = document.getElementById('player-turn-name');
+        turnName.innerText = `玩家 ${turn+1}`; 
+        turnName.style.color = turn === 0 ? '#3182ce' : '#d53f8c';
+        document.getElementById('btn-roll').disabled = false; 
+        moving = false; 
+    }
+    
+    // 語音功能
+    function speak() { 
+        const text = document.getElementById('modal-text').innerText; 
+        // 过滤🏆符號
+        const cleanText = text.replace('🏆 ', '');
+        const msg = new SpeechSynthesisUtterance(cleanText); 
+        msg.lang = 'zh-HK'; // 廣東話
+        window.speechSynthesis.speak(msg); 
+    }
+    
     window.onload = init;
-    window.onresize = updateDisplay;
+    // 核心邏輯：在調整視窗大小時，仍保持自動滾動居中
+    window.onresize = () => updateDisplay(true);
 </script>
 </body>
 </html>
