@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>詞語大富翁 (手動移動版)</title>
+    <style>
+        body { font-family: "Microsoft JhengHei", sans-serif; background-color: #f7fafc; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; margin: 0; }
+        #game-board { display: grid; grid-template-columns: repeat(6, 1fr); grid-template-rows: repeat(5, 1fr); gap: 5px; width: 90%; max-width: 700px; aspect-ratio: 6/5; background-color: #e2e8f0; border: 5px solid #4a5568; border-radius: 15px; padding: 10px; position: relative; }
+        .cell { background-color: white; border: 2px solid #cbd5e0; border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; position: relative; overflow: hidden; }
+        .cell-index { position: absolute; top: 2px; left: 2px; font-size: 10px; color: #a0aec0; }
+        .cell-word { font-size: 16px; font-weight: bold; color: #2d3748; margin-top: 5px; }
+        .cell-pinyin { font-size: 12px; color: #718096; text-transform: uppercase; }
+        .start-cell { background-color: #ebf8ff; border: 3px solid #4299e1; }
+        
+        /* 角色樣式：加上游標與呼吸效果 */
+        .player { width: 30px; height: 30px; border-radius: 50%; position: absolute; transition: all 0.2s ease-out; z-index: 10; border: 3px solid white; box-shadow: 0 4px 6px rgba(0,0,0,0.2); cursor: pointer; }
+        #player-male { background-color: #4299e1; }
+        #player-female { background-color: #f687b3; }
+        
+        /* 當可以點擊時，角色會跳動提醒 */
+        .can-move { animation: bounce 0.5s infinite alternate; border-color: #ffd700; }
+        @keyframes bounce { from { transform: scale(1); } to { transform: scale(1.3); } }
+
+        #control-panel { margin-top: 20px; text-align: center; background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); width: 80%; max-width: 400px; }
+        #turn-indicator { font-size: 18px; font-weight: bold; color: #4a5568; margin-bottom: 10px; }
+        .p1-turn { color: #3182ce; }
+        .p2-turn { color: #d53f8c; }
+        #dice-result { font-size: 48px; font-weight: bold; color: #2d3748; margin: 10px 0; height: 60px; }
+        
+        button { font-size: 18px; padding: 10px 25px; background-color: #48bb78; color: white; border: none; border-radius: 8px; cursor: pointer; }
+        button:disabled { background-color: #cbd5e0; cursor: not-allowed; }
+
+        #word-modal { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 30px; border-radius: 15px; border: 3px solid #3182ce; z-index: 100; box-shadow: 0 10px 25px rgba(0,0,0,0.2); text-align: center; }
+        #modal-word { font-size: 40px; font-weight: bold; color: #e53e3e; }
+    </style>
+</head>
+<body>
+
+    <div id="game-board">
+        <div id="player-male" class="player" onclick="handlePlayerClick(0)"></div>
+        <div id="player-female" class="player" onclick="handlePlayerClick(1)"></div>
+    </div>
+
+    <div id="control-panel">
+        <div id="turn-indicator" class="p1-turn">輪到：玩家 1 (男孩)</div>
+        <div id="dice-result">?</div>
+        <button id="dice-btn" onclick="rollDice()">擲骰子 🎲</button>
+        <p id="hint-msg" style="color: #a0aec0; margin-top: 10px;">請先擲骰子</p>
+    </div>
+
+    <div id="word-modal">
+        <div id="word-modal-title">📣 請讀出以下詞語：</div>
+        <div id="modal-word"></div>
+        <div id="modal-pinyin" style="text-transform: uppercase; color: #4a5568; margin-bottom: 20px;"></div>
+        <button onclick="closeModal()" style="background: #e53e3e; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer;">我讀完了！繼續</button>
+    </div>
+
+    <script>
+        const wordsData = [
+            { id: 0, word: "起點", pinyin: "START" },
+            { id: 1, word: "刷牙", pinyin: "caat3 ngaa4" }, { id: 2, word: "洗澡", pinyin: "sai2 cou3" },
+            { id: 3, word: "洗手", pinyin: "sai2 sau2" }, { id: 4, word: "喝水", pinyin: "hot3 seoi2" },
+            { id: 5, word: "吃飯", pinyin: "hek3 faan6" }, { id: 6, word: "睡覺", pinyin: "seoi6 gaau3" },
+            { id: 7, word: "穿衣服", pinyin: "cyun1 ji1 fuk6" }, { id: 8, word: "戴口罩", pinyin: "daai3 hau2 zaang1" },
+            { id: 9, word: "做家務", pinyin: "zou6 gaa1 mou6" }, { id: 10, word: "倒垃圾", pinyin: "dou2 laap6 saap3" },
+            { id: 11, word: "洗碗", pinyin: "sai2 wun2" }, { id: 12, word: "抹窗戶", pinyin: "maat3 coeng1 wu7" },
+            { id: 13, word: "煮飯", pinyin: "zyu2 faan6" }, { id: 14, word: "上課", pinyin: "soeng5 fo3" },
+            { id: 15, word: "做功課", pinyin: "zou6 gung1 fo3" }, { id: 16, word: "溫習", pinyin: "wan1 zaap6" },
+            { id: 17, word: "看書", pinyin: "hon3 syu1" }, { id: 18, word: "畫畫", pinyin: "waak6 waa2" },
+            { id: 19, word: "做早餐", pinyin: "zou6 zou2 caan1" }
+        ];
+
+        const players = [{ id: 0, name: "男孩", elementId: "player-male", position: 0 }, { id: 1, name: "女孩", elementId: "player-female", position: 0 }];
+        let currentTurn = 0;
+        let pendingRoll = 0; // 儲存擲出的步數
+        let canMove = false; // 是否進入等待移動狀態
+
+        function initBoard() {
+            const board = document.getElementById('game-board');
+            const path = [[0,0], [1,0], [2,0], [3,0], [4,0], [5,0], [5,1], [5,2], [5,3], [5,4], [4,4], [3,4], [2,4], [1,4], [0,4], [0,3], [0,2], [0,1], [1,1], [2,1]];
+            wordsData.forEach((item, index) => {
+                const cell = document.createElement('div');
+                cell.id = `cell-${index}`;
+                cell.className = `cell ${index === 0 ? 'start-cell' : ''}`;
+                const [col, row] = path[index];
+                cell.style.gridColumn = col + 1; cell.style.gridRow = row + 1;
+                cell.innerHTML = `<div class="cell-index">${index}</div><div class="cell-word">${item.word}</div><div class="cell-pinyin">${index === 0 ? '' : item.pinyin}</div>`;
+                board.appendChild(cell);
+            });
+            updatePlayerPosition(0, 0); updatePlayerPosition(1, 0);
+        }
+
+        function updatePlayerPosition(playerId, pos) {
+            const cell = document.getElementById(`cell-${pos}`);
+            const boardRect = document.getElementById('game-board').getBoundingClientRect();
+            const rect = cell.getBoundingClientRect();
+            const offset = playerId === 0 ? -12 : 12;
+            const pEl = document.getElementById(players[playerId].elementId);
+            pEl.style.left = `${rect.left - boardRect.left + (rect.width/2) - 15 + offset}px`;
+            pEl.style.top = `${rect.top - boardRect.top + (rect.height/2) - 15 + offset}px`;
+            players[playerId].position = pos;
+        }
+
+        async function rollDice() {
+            document.getElementById('dice-btn').disabled = true;
+            const diceEl = document.getElementById('dice-result');
+            for (let i = 0; i < 10; i++) { diceEl.innerText = Math.floor(Math.random()*6)+1; await new Promise(r=>setTimeout(r,50)); }
+            pendingRoll = Math.floor(Math.random()*6)+1;
+            diceEl.innerText = pendingRoll;
+            
+            canMove = true;
+            document.getElementById('hint-msg').innerText = "點擊角色開始移動！";
+            document.getElementById(players[currentTurn].elementId).classList.add('can-move');
+        }
+
+        async function handlePlayerClick(playerId) {
+            if (!canMove || playerId !== currentTurn) return;
+            
+            canMove = false;
+            document.getElementById(players[currentTurn].elementId).classList.remove('can-move');
+            document.getElementById('hint-msg').innerText = "正在移動中...";
+
+            const player = players[currentTurn];
+            let oldPos = player.position;
+            let newPos = (oldPos + pendingRoll) % 20;
+
+            // 一步一步走
+            let steps = pendingRoll;
+            let cur = oldPos;
+            for(let i=0; i<steps; i++) {
+                cur = (cur + 1) % 20;
+                updatePlayerPosition(currentTurn, cur);
+                await new Promise(r=>setTimeout(r,300));
+            }
+            
+            showModal(cur);
+        }
+
+        function showModal(pos) {
+            if (pos === 0) { switchTurn(); return; }
+            document.getElementById('modal-word').innerText = wordsData[pos].word;
+            document.getElementById('modal-pinyin').innerText = wordsData[pos].pinyin;
+            document.getElementById('word-modal').style.display = 'block';
+        }
+
+        function closeModal() {
+            document.getElementById('word-modal').style.display = 'none';
+            switchTurn();
+        }
+
+        function switchTurn() {
+            currentTurn = currentTurn === 0 ? 1 : 0;
+            const ind = document.getElementById('turn-indicator');
+            ind.innerText = `輪到：玩家 ${currentTurn+1} (${players[currentTurn].name})`;
+            ind.className = currentTurn === 0 ? 'p1-turn' : 'p2-turn';
+            document.getElementById('dice-btn').disabled = false;
+            document.getElementById('dice-result').innerText = "?";
+            document.getElementById('hint-msg').innerText = "請先擲骰子";
+        }
+
+        window.onload = initBoard;
+    </script>
+</body>
+</html>
