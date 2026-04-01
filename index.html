@@ -3,163 +3,175 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>詞語大富翁 (手動移動版)</title>
+    <title>中文詞語大富翁：88關大挑戰</title>
     <style>
-        body { font-family: "Microsoft JhengHei", sans-serif; background-color: #f7fafc; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; margin: 0; }
-        #game-board { display: grid; grid-template-columns: repeat(6, 1fr); grid-template-rows: repeat(5, 1fr); gap: 5px; width: 90%; max-width: 700px; aspect-ratio: 6/5; background-color: #e2e8f0; border: 5px solid #4a5568; border-radius: 15px; padding: 10px; position: relative; }
-        .cell { background-color: white; border: 2px solid #cbd5e0; border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; position: relative; overflow: hidden; }
-        .cell-index { position: absolute; top: 2px; left: 2px; font-size: 10px; color: #a0aec0; }
-        .cell-word { font-size: 16px; font-weight: bold; color: #2d3748; margin-top: 5px; }
-        .cell-pinyin { font-size: 12px; color: #718096; text-transform: uppercase; }
-        .start-cell { background-color: #ebf8ff; border: 3px solid #4299e1; }
+        :root { --p1-color: #4299e1; --p2-color: #f687b3; }
+        body { font-family: "Microsoft JhengHei", sans-serif; background-color: #f0f7ff; margin: 0; display: flex; flex-direction: column; align-items: center; padding: 20px; }
         
-        /* 角色樣式：加上游標與呼吸效果 */
-        .player { width: 30px; height: 30px; border-radius: 50%; position: absolute; transition: all 0.2s ease-out; z-index: 10; border: 3px solid white; box-shadow: 0 4px 6px rgba(0,0,0,0.2); cursor: pointer; }
-        #player-male { background-color: #4299e1; }
-        #player-female { background-color: #f687b3; }
+        /* 棋盤容器：自動適應寬度 */
+        #game-container { position: relative; width: 100%; max-width: 1000px; margin-bottom: 100px; }
         
-        /* 當可以點擊時，角色會跳動提醒 */
-        .can-move { animation: bounce 0.5s infinite alternate; border-color: #ffd700; }
+        #board { 
+            display: grid; 
+            grid-template-columns: repeat(10, 1fr); /* 固定10欄，寬度均分 */
+            gap: 8px; 
+            background: #fff; 
+            padding: 15px; 
+            border-radius: 15px; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .cell { 
+            aspect-ratio: 1/1; border: 2px solid #e2e8f0; border-radius: 10px; 
+            display: flex; flex-direction: column; align-items: center; justify-content: center; 
+            text-align: center; font-size: 14px; font-weight: bold; position: relative; 
+            background: #fff; transition: 0.3s; cursor: pointer;
+        }
+        .cell:hover { background: #edf2f7; }
+        .cell-index { position: absolute; top: 2px; left: 4px; font-size: 10px; color: #a0aec0; }
+        .start { background: #ebf8ff; border-color: #4299e1; color: #2b6cb0; }
+
+        /* 玩家圖標 */
+        .player { 
+            width: 30px; height: 30px; border-radius: 50%; position: absolute; 
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+            z-index: 10; border: 3px solid white; box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        }
+        #p1 { background: var(--p1-color); }
+        #p2 { background: var(--p2-color); }
+        .can-move { animation: bounce 0.5s infinite alternate; }
         @keyframes bounce { from { transform: scale(1); } to { transform: scale(1.3); } }
 
-        #control-panel { margin-top: 20px; text-align: center; background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); width: 80%; max-width: 400px; }
-        #turn-indicator { font-size: 18px; font-weight: bold; color: #4a5568; margin-bottom: 10px; }
-        .p1-turn { color: #3182ce; }
-        .p2-turn { color: #d53f8c; }
-        #dice-result { font-size: 48px; font-weight: bold; color: #2d3748; margin: 10px 0; height: 60px; }
-        
-        button { font-size: 18px; padding: 10px 25px; background-color: #48bb78; color: white; border: none; border-radius: 8px; cursor: pointer; }
-        button:disabled { background-color: #cbd5e0; cursor: not-allowed; }
+        /* 控制台固定在底部 */
+        #controls { 
+            position: fixed; bottom: 0; width: 100%; background: white; 
+            display: flex; justify-content: center; align-items: center; gap: 20px; 
+            padding: 15px; box-shadow: 0 -5px 20px rgba(0,0,0,0.1); z-index: 100;
+        }
+        #dice-box { font-size: 40px; font-weight: bold; width: 60px; text-align: center; color: #2d3748; }
+        #btn-roll { padding: 12px 30px; font-size: 20px; border-radius: 30px; border: none; background: #48bb78; color: white; cursor: pointer; }
+        #btn-roll:disabled { background: #cbd5e0; }
 
-        #word-modal { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 30px; border-radius: 15px; border: 3px solid #3182ce; z-index: 100; box-shadow: 0 10px 25px rgba(0,0,0,0.2); text-align: center; }
-        #modal-word { font-size: 40px; font-weight: bold; color: #e53e3e; }
+        /* 彈窗 */
+        #modal { 
+            display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); 
+            background: white; padding: 40px; border-radius: 20px; z-index: 200; 
+            box-shadow: 0 20px 60px rgba(0,0,0,0.4); text-align: center; border: 6px solid #4299e1;
+        }
+        #modal-text { font-size: 60px; margin-bottom: 20px; color: #2d3748; }
+        #btn-speak { background: #ecc94b; border: none; padding: 10px 20px; border-radius: 10px; cursor: pointer; margin-bottom: 20px; font-size: 16px; }
     </style>
 </head>
 <body>
 
-    <div id="game-board">
-        <div id="player-male" class="player" onclick="handlePlayerClick(0)"></div>
-        <div id="player-female" class="player" onclick="handlePlayerClick(1)"></div>
-    </div>
+<div id="game-container">
+    <div id="board"></div>
+    <div id="p1" class="player"></div>
+    <div id="p2" class="player"></div>
+</div>
 
-    <div id="control-panel">
-        <div id="turn-indicator" class="p1-turn">輪到：玩家 1 (男孩)</div>
-        <div id="dice-result">?</div>
-        <button id="dice-btn" onclick="rollDice()">擲骰子 🎲</button>
-        <p id="hint-msg" style="color: #a0aec0; margin-top: 10px;">請先擲骰子</p>
-    </div>
+<div id="controls">
+    <div id="status" style="font-weight:bold;">輪到：玩家 1</div>
+    <div id="dice-box">?</div>
+    <button id="btn-roll" onclick="roll()">擲骰子 🎲</button>
+</div>
 
-    <div id="word-modal">
-        <div id="word-modal-title">📣 請讀出以下詞語：</div>
-        <div id="modal-word"></div>
-        <div id="modal-pinyin" style="text-transform: uppercase; color: #4a5568; margin-bottom: 20px;"></div>
-        <button onclick="closeModal()" style="background: #e53e3e; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer;">我讀完了！繼續</button>
-    </div>
+<div id="modal">
+    <div style="color:#718096; margin-bottom:10px;">請大聲讀出：</div>
+    <div id="modal-text">詞語</div>
+    <button id="btn-speak" onclick="speak()">🔊 聽聽發音</button><br>
+    <button onclick="closeModal()" style="background:#48bb78; color:white; padding:15px 40px; border:none; border-radius:10px; font-size:20px; cursor:pointer;">讀好了！</button>
+</div>
 
-    <script>
-        const wordsData = [
-            { id: 0, word: "起點", pinyin: "START" },
-            { id: 1, word: "刷牙", pinyin: "caat3 ngaa4" }, { id: 2, word: "洗澡", pinyin: "sai2 cou3" },
-            { id: 3, word: "洗手", pinyin: "sai2 sau2" }, { id: 4, word: "喝水", pinyin: "hot3 seoi2" },
-            { id: 5, word: "吃飯", pinyin: "hek3 faan6" }, { id: 6, word: "睡覺", pinyin: "seoi6 gaau3" },
-            { id: 7, word: "穿衣服", pinyin: "cyun1 ji1 fuk6" }, { id: 8, word: "戴口罩", pinyin: "daai3 hau2 zaang1" },
-            { id: 9, word: "做家務", pinyin: "zou6 gaa1 mou6" }, { id: 10, word: "倒垃圾", pinyin: "dou2 laap6 saap3" },
-            { id: 11, word: "洗碗", pinyin: "sai2 wun2" }, { id: 12, word: "抹窗戶", pinyin: "maat3 coeng1 wu7" },
-            { id: 13, word: "煮飯", pinyin: "zyu2 faan6" }, { id: 14, word: "上課", pinyin: "soeng5 fo3" },
-            { id: 15, word: "做功課", pinyin: "zou6 gung1 fo3" }, { id: 16, word: "溫習", pinyin: "wan1 zaap6" },
-            { id: 17, word: "看書", pinyin: "hon3 syu1" }, { id: 18, word: "畫畫", pinyin: "waak6 waa2" },
-            { id: 19, word: "做早餐", pinyin: "zou6 zou2 caan1" }
-        ];
+<script>
+    // 你的 88 個詞語清單
+    const words = ["起點", "學校", "禮堂", "校務處", "操場", "音樂室", "課室", "洗手間", "電腦室", "樓梯", "圖書館", "走廊", "升降機", "教員室", "草地上", "沙灘", "山頂", "運動場", "籃球場", "足球場", "燒烤場", "公園", "家裏", "客廳", "浴室", "睡房", "廚房", "清真寺", "商場", "超市", "街市", "麵包店", "理髮店", "便利店", "藥房", "餐廳", "醫院", "補習社", "博物館", "銀行", "地鐵站", "巴士站", "行人道", "刷牙", "洗澡", "洗手", "喝水", "吃飯", "睡覺", "穿衣服", "戴口罩", "做家務", "倒垃圾", "洗碗", "抹窗戶", "煮飯", "上課", "做功課", "溫習", "看書", "畫畫", "做早操", "跑步", "游泳", "跳繩", "踢足球", "打籃球", "騎單車", "遠足", "拍照", "表演", "唱歌", "跳舞", "慶祝", "排隊", "玩遊戲", "看手機", "打電話", "打招呼", "買水果", "比賽", "說話", "摺紙", "下棋", "玩拼圖"];
 
-        const players = [{ id: 0, name: "男孩", elementId: "player-male", position: 0 }, { id: 1, name: "女孩", elementId: "player-female", position: 0 }];
-        let currentTurn = 0;
-        let pendingRoll = 0; // 儲存擲出的步數
-        let canMove = false; // 是否進入等待移動狀態
+    const players = [{pos: 0, el: 'p1'}, {pos: 0, el: 'p2'}];
+    let turn = 0, dice = 0, moving = false;
 
-        function initBoard() {
-            const board = document.getElementById('game-board');
-            const path = [[0,0], [1,0], [2,0], [3,0], [4,0], [5,0], [5,1], [5,2], [5,3], [5,4], [4,4], [3,4], [2,4], [1,4], [0,4], [0,3], [0,2], [0,1], [1,1], [2,1]];
-            wordsData.forEach((item, index) => {
-                const cell = document.createElement('div');
-                cell.id = `cell-${index}`;
-                cell.className = `cell ${index === 0 ? 'start-cell' : ''}`;
-                const [col, row] = path[index];
-                cell.style.gridColumn = col + 1; cell.style.gridRow = row + 1;
-                cell.innerHTML = `<div class="cell-index">${index}</div><div class="cell-word">${item.word}</div><div class="cell-pinyin">${index === 0 ? '' : item.pinyin}</div>`;
-                board.appendChild(cell);
-            });
-            updatePlayerPosition(0, 0); updatePlayerPosition(1, 0);
-        }
+    // 初始化棋盤
+    function init() {
+        const board = document.getElementById('board');
+        words.forEach((w, i) => {
+            const cell = document.createElement('div');
+            cell.className = 'cell' + (i===0?' start':'');
+            cell.id = 'c' + i;
+            cell.innerHTML = `<span class="cell-index">${i}</span>${w}`;
+            board.appendChild(cell);
+        });
+        // 角色點擊事件
+        document.getElementById('p1').onclick = () => move(0);
+        document.getElementById('p2').onclick = () => move(1);
+        setTimeout(updateDisplay, 100);
+    }
 
-        function updatePlayerPosition(playerId, pos) {
-            const cell = document.getElementById(`cell-${pos}`);
-            const boardRect = document.getElementById('game-board').getBoundingClientRect();
+    // 更新角色位置
+    function updateDisplay() {
+        players.forEach((p, i) => {
+            const cell = document.getElementById('c' + p.pos);
             const rect = cell.getBoundingClientRect();
-            const offset = playerId === 0 ? -12 : 12;
-            const pEl = document.getElementById(players[playerId].elementId);
-            pEl.style.left = `${rect.left - boardRect.left + (rect.width/2) - 15 + offset}px`;
-            pEl.style.top = `${rect.top - boardRect.top + (rect.height/2) - 15 + offset}px`;
-            players[playerId].position = pos;
+            const bRect = document.getElementById('board').getBoundingClientRect();
+            const pEl = document.getElementById(p.el);
+            const offset = i === 0 ? -8 : 8;
+            pEl.style.left = (rect.left - bRect.left + rect.width/2 - 15 + offset) + 'px';
+            pEl.style.top = (rect.top - bRect.top + rect.height/2 - 15 + offset) + 'px';
+        });
+    }
+
+    async function roll() {
+        document.getElementById('btn-roll').disabled = true;
+        for(let i=0; i<10; i++) {
+            dice = Math.floor(Math.random()*6)+1;
+            document.getElementById('dice-box').innerText = dice;
+            await new Promise(r => setTimeout(r, 50));
         }
+        document.getElementById(players[turn].el).classList.add('can-move');
+    }
 
-        async function rollDice() {
-            document.getElementById('dice-btn').disabled = true;
-            const diceEl = document.getElementById('dice-result');
-            for (let i = 0; i < 10; i++) { diceEl.innerText = Math.floor(Math.random()*6)+1; await new Promise(r=>setTimeout(r,50)); }
-            pendingRoll = Math.floor(Math.random()*6)+1;
-            diceEl.innerText = pendingRoll;
-            
-            canMove = true;
-            document.getElementById('hint-msg').innerText = "點擊角色開始移動！";
-            document.getElementById(players[currentTurn].elementId).classList.add('can-move');
+    async function move(pid) {
+        if(pid !== turn || dice === 0 || moving) return;
+        moving = true;
+        document.getElementById(players[pid].el).classList.remove('can-move');
+        
+        for(let i=0; i<dice; i++) {
+            players[pid].pos = (players[pid].pos + 1) % words.length;
+            updateDisplay();
+            await new Promise(r => setTimeout(r, 300));
         }
-
-        async function handlePlayerClick(playerId) {
-            if (!canMove || playerId !== currentTurn) return;
-            
-            canMove = false;
-            document.getElementById(players[currentTurn].elementId).classList.remove('can-move');
-            document.getElementById('hint-msg').innerText = "正在移動中...";
-
-            const player = players[currentTurn];
-            let oldPos = player.position;
-            let newPos = (oldPos + pendingRoll) % 20;
-
-            // 一步一步走
-            let steps = pendingRoll;
-            let cur = oldPos;
-            for(let i=0; i<steps; i++) {
-                cur = (cur + 1) % 20;
-                updatePlayerPosition(currentTurn, cur);
-                await new Promise(r=>setTimeout(r,300));
-            }
-            
-            showModal(cur);
+        
+        dice = 0;
+        if(players[pid].pos !== 0) {
+            document.getElementById('modal-text').innerText = words[players[pid].pos];
+            document.getElementById('modal').style.display = 'block';
+            speak(); // 到達時自動讀一次
+        } else {
+            endTurn();
         }
+    }
 
-        function showModal(pos) {
-            if (pos === 0) { switchTurn(); return; }
-            document.getElementById('modal-word').innerText = wordsData[pos].word;
-            document.getElementById('modal-pinyin').innerText = wordsData[pos].pinyin;
-            document.getElementById('word-modal').style.display = 'block';
-        }
+    function closeModal() {
+        document.getElementById('modal').style.display = 'none';
+        endTurn();
+    }
 
-        function closeModal() {
-            document.getElementById('word-modal').style.display = 'none';
-            switchTurn();
-        }
+    function endTurn() {
+        turn = turn === 0 ? 1 : 0;
+        document.getElementById('status').innerText = `輪到：玩家 ${turn+1}`;
+        document.getElementById('btn-roll').disabled = false;
+        document.getElementById('dice-box').innerText = "?";
+        moving = false;
+    }
 
-        function switchTurn() {
-            currentTurn = currentTurn === 0 ? 1 : 0;
-            const ind = document.getElementById('turn-indicator');
-            ind.innerText = `輪到：玩家 ${currentTurn+1} (${players[currentTurn].name})`;
-            ind.className = currentTurn === 0 ? 'p1-turn' : 'p2-turn';
-            document.getElementById('dice-btn').disabled = false;
-            document.getElementById('dice-result').innerText = "?";
-            document.getElementById('hint-msg').innerText = "請先擲骰子";
-        }
+    // 語音功能
+    function speak() {
+        const text = document.getElementById('modal-text').innerText;
+        const msg = new SpeechSynthesisUtterance(text);
+        msg.lang = 'zh-HK'; // 廣東話，如需普通話改為 'zh-CN'
+        window.speechSynthesis.speak(msg);
+    }
 
-        window.onload = initBoard;
-    </script>
+    window.onload = init;
+</script>
 </body>
 </html>
