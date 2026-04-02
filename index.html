@@ -29,23 +29,37 @@
             background-color: #fff; border: 12px solid white; box-shadow: 0 20px 40px rgba(0,0,0,0.1);
         }
 
-        /* 核心：文字在圖案頭上的佈局 */
-        .cell { 
-            height: var(--cell-size); display: flex; flex-direction: column; 
-            align-items: center; justify-content: flex-end; /* 底部對齊，讓圖案在下 */
-            position: relative; transition: 0.3s; padding: 10px; box-sizing: border-box;
-        }
+       /* 1. 修正格子容器：確保高度固定，不被內容撐開 */
+.cell { 
+    height: var(--cell-size); 
+    display: flex; 
+    flex-direction: column; 
+    align-items: center; 
+    justify-content: flex-end; /* 讓圖案沉到底部 */
+    padding: 10px;
+    box-sizing: border-box;    /* 確保 padding 不會增加格子總高度 */
+    position: relative;
+    overflow: hidden;          /* 防止內容溢出 */
+}
 
-        .cell-text { 
-            font-size: 26px; font-weight: 900; color: #2d3748; 
-            margin-bottom: 8px; /* 文字與星星之間的呼吸空間 */
-            z-index: 2; text-shadow: 2px 2px 0 white; /* 增加可讀性 */
-        }
+/* 2. 修正詞語文字：縮小一點點，並確保有空間 */
+.cell-text { 
+    font-size: 22px;           /* 如果還是太擠，可以改成 20px */
+    font-weight: 900; 
+    margin-bottom: 10px;       /* 文字與圖案的間距 */
+    line-height: 1.2;
+    z-index: 2;
+    text-align: center;
+    word-break: break-all;     /* 防止長詞語撐破格子 */
+}
 
-        .item-img { 
-            width: 85px; height: 85px; object-fit: contain; 
-            z-index: 1; transition: transform 0.3s;
-        }
+/* 3. 修正星星圖案：限制最大高度 */
+.item-img { 
+    max-width: 70px;           /* 稍微縮小一點圖案 */
+    max-height: 70px;
+    object-fit: contain; 
+    z-index: 1;
+}
 
         /* 當棋子停在上面時，星星縮放動畫 */
         .cell.active .item-img { transform: scale(1.2); }
