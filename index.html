@@ -10,7 +10,11 @@
         #game-container { position: relative; width: 95%; max-width: 1400px; margin: 20px auto; }
         #board { 
             display: grid; grid-template-columns: repeat(10, 1fr); gap: 15px; padding: 25px; border-radius: 40px; 
-            background-image: url('board-bg.jpg'); background-size: cover; background-position: center;
+            #board { 
+    /* ... 其他代碼 ... */
+    background-image: url('images/board-bg.jpg'); /* 確保前面有 images/ */
+    /* ... 其他代碼 ... */
+}
             background-color: #fff; box-shadow: 0 25px 50px rgba(0,0,0,0.15); border: 12px solid white;
         }
         /* 格子容器：改為垂直排列，內容靠底部對齊 */
@@ -53,8 +57,8 @@
     filter: drop-shadow(0 4px 8px rgba(0,0,0,0.3));
 }
 
-#p1 { background-image: url('p1.png'); }
-#p2 { background-image: url('p2.png'); }
+#p1 { background-image: url('images/p1.png'); }         /* 加上 images/ */
+#p2 { background-image: url('images/p2.png'); }         /* 加上 images/ */
         .can-move { animation: bounce 0.6s infinite alternate; box-shadow: 0 0 30px #ecc94b; cursor: pointer; }
         @keyframes bounce { from { transform: scale(1); } to { transform: scale(1.2) translateY(-10px); } }
 
@@ -115,6 +119,8 @@
     const boosts = [8, 20, 35, 50, 65, 80]; // 火箭位置
 
     function init() {
+        // 找到這行並修改
+    imgHTML = `<img src="images/star.png" class="item-img">`;
     const board = document.getElementById('board');
     words.forEach((w, i) => {
         const cell = document.createElement('div');
