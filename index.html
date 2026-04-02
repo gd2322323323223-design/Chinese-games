@@ -72,6 +72,39 @@
         #modal-text { font-size: 80px; font-weight: 900; margin: 20px 0; }
         .can-move { animation: bounce 0.6s infinite alternate; cursor: pointer; }
         @keyframes bounce { from { transform: translateY(0); } to { transform: translateY(-15px); } }
+        /* --- 彈窗詞語互動功能 --- */
+
+/* 1. 基礎文字設定：增加小手游標與平滑動畫 */
+#modal-text {
+    font-size: 80px;
+    font-weight: 900;
+    margin: 20px 0;
+    cursor: pointer;          /* 讓滑鼠移上去變「手指」，提示可以點擊 */
+    transition: all 0.2s ease; /* 讓變色和放大的動作變得很順滑 */
+    user-select: none;        /* 防止學生快速點擊時選取到文字變藍色塊 */
+    display: inline-block;     /* 確保縮放動畫效果正常 */
+}
+
+/* 2. 滑鼠移上去 (Hover) 的效果：變色 + 微微放大 */
+#modal-text:hover {
+    color: #3182ce;           /* 移上去變成漂亮的藍色 */
+    transform: scale(1.1);    /* 放大 1.1 倍 */
+}
+
+/* 3. 按下去 (Active) 的瞬間：縮小一點點 */
+#modal-text:active {
+    transform: scale(0.95);   /* 按下去時縮小，像按鈕一樣有彈性 */
+    color: #2c5282;           /* 顏色變深一點 */
+}
+
+/* 4. 加個裝飾：在詞語下方提示「點擊聽讀音」 (選加) */
+#modal::after {
+    content: "💡 提示：點擊詞語可重複聽讀音";
+    display: block;
+    font-size: 16px;
+    color: #a0aec0;
+    margin-top: 10px;
+}
     </style>
 </head>
 <body>
@@ -204,19 +237,26 @@ function startRecognition() {
     }
 
     function showModal() {
-    // 1. 先抓取詞語並顯示在彈窗中
     const currentWord = words[players[turn].pos];
-    document.getElementById('modal-text').innerText = currentWord;
+    const modalText = document.getElementById('modal-text'); // 取得文字元素
     
-    // 2. 顯示彈窗
+    // 1. 設定文字內容
+    modalText.innerText = currentWord;
+    
+    // 2. 【新增：點擊功能】讓文字點了會說話，並加上小手手游標
+    modalText.style.cursor = "pointer"; 
+    modalText.onclick = () => speak(); 
+    
+    // 3. 顯示彈窗並立刻讀第一次
     document.getElementById('modal').style.display = 'block';
-
-    // 3. 【這就是發聲器！】彈窗一開，立刻朗讀
-    speak(); 
+    speak();
 
     // 4. 設定倒數計時（60秒）
     let timeLeft = 60;
     document.getElementById('timer').innerText = `⏳ 剩餘時間: ${timeLeft}s`;
+        
+    // 5.在 showModal 函式裡加入這一行
+    document.getElementById('modal-text').onclick = () => speak();
     
     // 清除舊的計時器（如果有），防止時間亂跳
     clearInterval(timerInterval); 
