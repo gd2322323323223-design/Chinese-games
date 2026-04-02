@@ -131,50 +131,7 @@
         <button onclick="closeModal()" style="padding: 20px; font-size: 24px; cursor: pointer; background: #48bb78; color: white; border: none; border-radius: 20px; font-weight: bold;">我讀好了！</button>
     </div>
 </div>
-// 1. 自動朗讀功能 (TTS)
-function speak() {
-    const text = document.getElementById('modal-text').innerText;
-    window.speechSynthesis.cancel(); // 先停止之前的語音
-    const msg = new SpeechSynthesisUtterance(text);
-    msg.lang = 'zh-HK'; // 設定為粵語
-    msg.rate = 0.8;     // 速度稍微慢一點，方便學生聽清楚
-    window.speechSynthesis.speak(msg);
-}
 
-// 2. AI 語音辨識功能 (STT)
-function startRecognition() {
-    const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
-    recognition.lang = 'zh-HK';
-    const btnAi = document.getElementById('btn-ai');
-    
-    btnAi.innerText = "👂 正在聽...請朗讀";
-    btnAi.style.background = "#ed64a6";
-    recognition.start();
-
-    recognition.onresult = (event) => {
-        const result = event.results[0][0].transcript;
-        const target = document.getElementById('modal-text').innerText;
-        
-        // 判斷是否包含目標詞語
-        if(result.includes(target) || target.includes(result)) {
-            alert("✅ 太棒了！讀音正確 \n(識別到: " + result + ")");
-            closeModal(true); // 自動關閉並加分
-        } else {
-            alert("❌ 好像不太對，再試試看？ \n(識別到: " + result + ")");
-        }
-        resetAiBtn();
-    };
-
-    recognition.onerror = () => {
-        alert("🎤 沒聽到聲音，請檢查麥克風權限。");
-        resetAiBtn();
-    };
-    
-    function resetAiBtn() {
-        btnAi.innerText = "🤖 AI 檢查讀音";
-        btnAi.style.background = "#4299e1";
-    }
-}
 <script>
     const words = ["起點", "學校", "禮堂", "校務處", "操場", "音樂室", "課室", "洗手間", "電腦室", "樓梯", "圖書館", "走廊", "升降機", "教員室", "草地上", "沙灘", "山頂", "運動場", "籃球場", "足球場", "燒烤場", "公園", "家裏", "客廳", "浴室", "睡房", "廚房", "清真寺", "商場", "超市", "街市", "麵包店", "理髮店", "便利店", "藥房", "餐廳", "醫院", "補習社", "博物館", "銀行", "地鐵站", "巴士站", "行人道", "刷牙", "洗澡", "洗手", "喝水", "吃飯", "睡覺", "穿衣服", "戴口罩", "做家務", "倒垃圾", "洗碗", "抹窗戶", "煮飯", "上課", "做功課", "溫習", "看書", "畫畫", "做早操", "跑步", "游泳", "跳繩", "踢足球", "打籃球", "騎單車", "遠足", "拍照", "表演", "唱歌", "跳舞", "慶祝", "排隊", "玩遊戲", "看手機", "打電話", "打招呼", "買水果", "比賽", "說話", "摺紙", "下棋", "玩拼圖", "🏆 終點"];
     const players = [{pos: 0, score: 0}, {pos: 0, score: 0}];
