@@ -6,7 +6,21 @@
     <title>中文詞語 88 關：究極挑戰版</title>
     <style>
         :root { --p1-color: #3182ce; --p2-color: #d53f8c; --cell-size: 160px; }
-        body { font-family: "Microsoft JhengHei", sans-serif; margin: 0; background: #f0f4f8; overflow-y: scroll; padding-bottom: 160px; }
+        body { font-family: "Micrfunction speak() {
+    // 取得彈窗裡的文字
+    const text = document.getElementById('modal-text').innerText;
+    
+    // 停止所有正在進行的語音（防止疊音）
+    window.speechSynthesis.cancel(); 
+    
+    const msg = new SpeechSynthesisUtterance(text);
+    msg.lang = 'zh-HK'; // 設定廣東話
+    msg.volume = 1;     // 音量 (0 到 1)
+    msg.rate = 0.9;     // 語速
+    
+    window.speechSynthesis.speak(msg);
+    console.log("正在朗讀：" + text); // 這行是用來除錯的，按 F12 可以看到有沒有跑
+}osoft JhengHei", sans-serif; margin: 0; background: #f0f4f8; overflow-y: scroll; padding-bottom: 160px; }
         
         #game-container { position: relative; width: 95%; max-width: 1400px; margin: 20px auto; }
         
@@ -241,6 +255,21 @@ function startRecognition() {
 } // <--- 記得補上這個大括號！
 
     window.onload = init;
+    function speak() {
+    // 取得彈窗裡的文字
+    const text = document.getElementById('modal-text').innerText;
+    
+    // 停止所有正在進行的語音（防止疊音）
+    window.speechSynthesis.cancel(); 
+    
+    const msg = new SpeechSynthesisUtterance(text);
+    msg.lang = 'zh-HK'; // 設定廣東話
+    msg.volume = 1;     // 音量 (0 到 1)
+    msg.rate = 0.9;     // 語速
+    
+    window.speechSynthesis.speak(msg);
+    console.log("正在朗讀：" + text); // 這行是用來除錯的，按 F12 可以看到有沒有跑
+}
 </script>
 </body>
 </html>
