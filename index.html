@@ -1,89 +1,93 @@
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>中文詞語 88 關：究極挑戰版</title>
-<style>
-:root { --p1-color: #3182ce; --p2-color: #d53f8c; --cell-size: 160px; }
-body { font-family: "Microsoft JhengHei", sans-serif; margin: 0; background: #f0f4f8; overflow-y: scroll; padding-bottom: 160px; }
-#game-container { position: relative; width: 95%; max-width: 1400px; margin: 20px auto; }
-#board { 
-display: grid; grid-template-columns: repeat(10, 1fr); gap: 15px; padding: 25px; border-radius: 40px; 
-background-image: url('board-bg.jpg'); background-size: cover; background-position: center;
-background-color: #fff; box-shadow: 0 25px 50px rgba(0,0,0,0.15); border: 12px solid white;
-}
-        .cell { 
-            height: var(--cell-size); border-radius: 25px; display: flex; flex-direction: column; align-items: center; justify-content: center; 
-            text-align: center; font-size: 28px; font-weight: 900; position: relative; transition: 0.3s; 
-            backdrop-filter: blur(8px); border: 3px solid rgba(255,255,255,0.7); color: #1a202c; padding: 15px; box-sizing: border-box;
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>中文詞語 88 關：究極挑戰版</title>
+    <style>
+        :root { --p1-color: #3182ce; --p2-color: #d53f8c; --cell-size: 160px; }
+        body { font-family: "Microsoft JhengHei", sans-serif; margin: 0; background: #f0f4f8; overflow-y: scroll; padding-bottom: 160px; }
+        
+        #game-container { position: relative; width: 95%; max-width: 1400px; margin: 20px auto; }
+        
+        #board { 
+            display: grid; grid-template-columns: repeat(10, 1fr); gap: 15px; padding: 25px; border-radius: 40px; 
+            background-image: url('images/board-bg.jpg'); background-size: cover; background-position: center;
+            background-color: #fff; box-shadow: 0 25px 50px rgba(0,0,0,0.15); border: 12px solid white;
         }
-        /* 糖果配色 */
-        .cell:nth-child(5n+1) { background-color: rgba(190, 227, 248, 0.9); }
-        .cell:nth-child(5n+2) { background-color: rgba(198, 246, 213, 0.9); }
-        .cell:nth-child(5n+3) { background-color: rgba(254, 252, 191, 0.9); }
-        .cell:nth-child(5n+4) { background-color: rgba(254, 215, 226, 0.9); }
-        .cell:nth-child(5n+5) { background-color: rgba(233, 216, 253, 0.9); }
+
+        .cell { 
+            height: var(--cell-size); border-radius: 25px; display: flex; flex-direction: column; 
+            align-items: center; justify-content: flex-end; 
+            text-align: center; position: relative; transition: 0.3s; 
+            backdrop-filter: blur(8px); border: 3px solid rgba(255,255,255,0.7); color: #1a202c; padding: 15px; box-sizing: border-box;
+            background-color: rgba(255, 255, 255, 0.7);
+        }
 
         .cell-index { position: absolute; top: 10px; left: 12px; font-size: 16px; color: rgba(0,0,0,0.3); }
+        .cell-text { font-size: 24px; font-weight: 900; margin-bottom: 10px; z-index: 2; }
+        .item-img { width: 70px; height: 70px; object-fit: contain; z-index: 1; }
         .event-icon { font-size: 35px; position: absolute; bottom: 5px; right: 5px; opacity: 0.8; }
         
         .start { background: white !important; border: 6px solid #3182ce !important; }
-        .end { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important; color: white !important; font-size: 35px; }
-        /* 格子容器：改為垂直排列，內容靠底部對齊 */
-.cell { 
-    height: var(--cell-size); 
-    display: flex; 
-    flex-direction: column; 
-    align-items: center; 
-    justify-content: flex-end; /* 關鍵：讓水果/星星沉到底部 */
-    padding-bottom: 15px;      /* 底部留點空隙，不貼邊 */
-    position: relative;
-}
+        .end { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important; color: white !important; }
 
         .player { 
-            width: 35px; height: 35px; border-radius: 50%; position: absolute; z-index: 50;
-            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); border: 4px solid white; box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+            width: 60px; height: 60px; position: absolute; z-index: 50;
+            background-size: contain; background-repeat: no-repeat; background-position: center;
+            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            filter: drop-shadow(0 4px 8px rgba(0,0,0,0.3));
         }
-        #p1 { background: var(--p1-color); } #p2 { background: var(--p2-color); }
-/* 詞語文字：在星星頭上，增加 margin 產生呼吸感 */
-.cell-text { 
-    font-size: 26px; 
-    font-weight: 900; 
-    margin-bottom: 15px;       /* 詞語與圖案之間的距離 */
-    z-index: 2; 
-    text-shadow: 2px 2px 0 white; 
-}
+        #p1 { background-image: url('images/p1.png'); }
+        #p2 { background-image: url('images/p2.png'); }
 
-/* 星星/水果圖案 */
-.item-img { 
-    width: 80px; 
-    height: 80px; 
-    object-fit: contain; 
-    z-index: 1; 
-}
+        #controls { 
+            position: fixed; bottom: 0; left: 0; width: 100%; background: rgba(255,255,255,0.95); 
+            display: flex; justify-content: center; align-items: center; gap: 40px; padding: 25px; 
+            box-shadow: 0 -15px 50px rgba(0,0,0,0.1); z-index: 100;
+        }
+        .score-board { font-size: 20px; font-weight: bold; }
+        #dice-box { font-size: 60px; min-width: 80px; text-align: center; background: #eee; border-radius: 15px; }
+        #btn-roll { padding: 15px 40px; font-size: 24px; border-radius: 50px; border: none; background: #48bb78; color: white; cursor: pointer; font-weight: bold; }
+        
+        #modal { 
+            display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); 
+            background: white; padding: 40px; border-radius: 50px; z-index: 300; 
+            box-shadow: 0 40px 150px rgba(0,0,0,0.6); text-align: center; border: 15px solid #4299e1; width: 90%; max-width: 600px;
+        }
+        #modal-text { font-size: 80px; font-weight: 900; margin: 20px 0; }
+        .can-move { animation: bounce 0.6s infinite alternate; cursor: pointer; }
+        @keyframes bounce { from { transform: translateY(0); } to { transform: translateY(-15px); } }
+    </style>
+</head>
+<body>
 
-/* 動物棋子：使用背景圖，取代原本的背景色 */
-.player { 
-    width: 65px; height: 65px; /* 稍微放大動物 */
-    position: absolute; 
-    z-index: 50;
-    background-size: contain;
-    background-repeat: no-repeat;
-    background-position: center;
-    transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    filter: drop-shadow(0 4px 8px rgba(0,0,0,0.3));
-}
+<div id="game-container">
+    <div id="board"></div>
+    <div id="p1" class="player"></div>
+    <div id="p2" class="player"></div>
+</div>
 
-#p1 { background-image: url('p1.png'); }
-#p2 { background-image: url('p2.png'); }
-.can-move { animation: bounce 0.6s infinite alternate; box-shadow: 0 0 30px #ecc94b; cursor: pointer; }
-@keyframes bounce { from { transform: scale(1); } to { transform: scale(1.2) translateY(-10px); } }
+<div id="controls">
+    <div class="score-board">P1: <span id="s1">0</span> | P2: <span id="s2">0</span></div>
+    <div id="status" style="font-size: 20px; font-weight: bold;">輪到：<span id="player-turn-name">玩家 1</span></div>
+    <div id="dice-box">🎲</div>
+    <button id="btn-roll" onclick="roll()">擲骰子</button>
+</div>
 
-@@ -96,145 +115,154 @@
-const boosts = [8, 20, 35, 50, 65, 80]; // 火箭位置
+<div id="modal">
+    <div id="timer" style="font-size: 20px; color: red;">⏳ 剩餘時間: 60s</div>
+    <div id="modal-text">詞語</div>
+    <button onclick="closeModal()" style="padding: 20px 50px; font-size: 24px; cursor: pointer; background: #48bb78; color: white; border: none; border-radius: 20px;">讀好了！</button>
+</div>
 
-function init() {
+<script>
+    const words = ["起點", "學校", "禮堂", "校務處", "操場", "音樂室", "課室", "洗手間", "電腦室", "樓梯", "圖書館", "走廊", "升降機", "教員室", "草地上", "沙灘", "山頂", "運動場", "籃球場", "足球場", "燒烤場", "公園", "家裏", "客廳", "浴室", "睡房", "廚房", "清真寺", "商場", "超市", "街市", "麵包店", "理髮店", "便利店", "藥房", "餐廳", "醫院", "補習社", "博物館", "銀行", "地鐵站", "巴士站", "行人道", "刷牙", "洗澡", "洗手", "喝水", "吃飯", "睡覺", "穿衣服", "戴口罩", "做家務", "倒垃圾", "洗碗", "抹窗戶", "煮飯", "上課", "做功課", "溫習", "看書", "畫畫", "做早操", "跑步", "游泳", "跳繩", "踢足球", "打籃球", "騎單車", "遠足", "拍照", "表演", "唱歌", "跳舞", "慶祝", "排隊", "玩遊戲", "看手機", "打電話", "打招呼", "買水果", "比賽", "說話", "摺紙", "下棋", "玩拼圖", "🏆 終點"];
+    const players = [{pos: 0, score: 0}, {pos: 0, score: 0}];
+    const traps = [5, 12, 25, 40, 55, 70], boosts = [8, 20, 35, 50, 65, 80];
+    let turn = 0, dice = 0, moving = false, timerInterval;
+
+    function init() {
         const board = document.getElementById('board');
         words.forEach((w, i) => {
             const cell = document.createElement('div');
@@ -92,159 +96,74 @@ function init() {
             let icon = "";
             if(traps.includes(i)) icon = "<span class='event-icon'>🍌</span>";
             if(boosts.includes(i)) icon = "<span class='event-icon'>🚀</span>";
-            cell.innerHTML = `<span class="cell-index">${i}</span>${w}${icon}`;
+            
+            let imgHTML = (i > 0 && i < words.length - 1) ? `<img src="images/star.png" class="item-img">` : "";
+            cell.innerHTML = `<span class="cell-index">${i}</span><div class="cell-text">${w}</div>${imgHTML}${icon}`;
             board.appendChild(cell);
         });
-        setTimeout(() => updateDisplay(true), 300);
+        updateDisplay(true);
     }
-    const board = document.getElementById('board');
-    words.forEach((w, i) => {
-        const cell = document.createElement('div');
-        cell.className = 'cell' + (i===0 ? ' start' : (i===words.length-1 ? ' end' : ''));
-        cell.id = 'c' + i;
-        
-        // 除了起點和終點，中間格子都塞入星星圖案
-        let imgHTML = "";
-        if (i > 0 && i < words.length - 1) {
-            imgHTML = `<img src="star.png" class="item-img">`;
+
+    function updateDisplay(isFinal = false) {
+        players.forEach((p, i) => {
+            const cell = document.getElementById('c' + p.pos);
+            const rect = cell.getBoundingClientRect(), bRect = document.getElementById('board').getBoundingClientRect();
+            const pEl = document.getElementById('p' + (i+1));
+            pEl.style.left = (rect.left - bRect.left + rect.width/2 - 30 + (i===0?-25:25)) + 'px';
+            pEl.style.top = (rect.top - bRect.top + rect.height/2 - 10) + 'px';
+        });
+        if(isFinal) document.getElementById('c' + players[turn].pos).scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+
+    async function roll() {
+        document.getElementById('btn-roll').disabled = true;
+        for(let i=0; i<8; i++) {
+            dice = Math.floor(Math.random()*6)+1;
+            document.getElementById('dice-box').innerText = dice;
+            await new Promise(r => setTimeout(r, 60));
         }
+        document.getElementById('p' + (turn+1)).classList.add('can-move');
+        document.getElementById('p' + (turn+1)).onclick = () => move(turn);
+    }
 
-        // 順序：索引 -> 詞語文字 -> 星星圖案 (CSS 會自動垂直排列)
-        cell.innerHTML = `
-            <span class="cell-index">${i}</span>
-            <div class="cell-text">${w}</div>
-            ${imgHTML}
-        `;
-        board.appendChild(cell);
-    });
-    setTimeout(() => updateDisplay(true), 300);
-}
+    async function move(pid) {
+        if(moving) return; moving = true;
+        document.getElementById('p' + (pid+1)).classList.remove('can-move');
+        for(let i=0; i<dice; i++) {
+            if (players[pid].pos < words.length - 1) {
+                players[pid].pos++;
+                updateDisplay(false);
+                await new Promise(r => setTimeout(r, 250));
+            }
+        }
+        if(traps.includes(players[pid].pos)) { alert("🍌 滑倒後退 3 格！"); players[pid].pos = Math.max(0, players[pid].pos - 3); }
+        if(boosts.includes(players[pid].pos)) { alert("🚀 火箭前進 5 格！"); players[pid].pos = Math.min(words.length-1, players[pid].pos + 5); }
+        updateDisplay(true);
+        if(players[pid].pos === words.length-1) { alert("🏆 奪冠！"); location.reload(); } else { showModal(); }
+    }
 
-function updateDisplay(isFinal = false) {
-players.forEach((p, i) => {
-const cell = document.getElementById('c' + p.pos);
-const rect = cell.getBoundingClientRect();
-const bRect = document.getElementById('board').getBoundingClientRect();
-const pEl = document.getElementById('p' + (i+1));
-const xOff = isFinal ? (rect.width/2 - 25) : 0;
-const yOff = isFinal ? (rect.height/2 - 25) : -20;
-pEl.style.left = (rect.left - bRect.left + rect.width/2 - 18 + xOff + (i===0?-20:20)) + 'px';
-pEl.style.top = (rect.top - bRect.top + rect.height/2 - 18 + yOff) + 'px';
-});
-if(isFinal) document.getElementById('c' + players[turn].pos).scrollIntoView({ behavior: 'smooth', block: 'center' });
-}
+    function showModal() {
+        document.getElementById('modal-text').innerText = words[players[turn].pos];
+        document.getElementById('modal').style.display = 'block';
+        let timeLeft = 60;
+        document.getElementById('timer').innerText = `⏳ 剩餘時間: ${timeLeft}s`;
+        timerInterval = setInterval(() => {
+            timeLeft--;
+            document.getElementById('timer').innerText = `⏳ 剩餘時間: ${timeLeft}s`;
+            if(timeLeft <= 0) { clearInterval(timerInterval); closeModal(false); }
+        }, 1000);
+    }
 
-async function roll() {
-document.getElementById('btn-roll').disabled = true;
-const diceIcons = ['⚀', '⚁', '⚂', '⚃', '⚄', '⚅'];
-for(let i=0; i<8; i++) {
-dice = Math.floor(Math.random()*6)+1;
-document.getElementById('dice-box').innerText = diceIcons[dice-1];
-await new Promise(r => setTimeout(r, 60));
-}
-document.getElementById('p' + (turn+1)).classList.add('can-move');
-document.getElementById('p' + (turn+1)).onclick = () => move(turn);
-}
+    function closeModal(addScore = true) {
+        clearInterval(timerInterval);
+        if(addScore) { players[turn].score += 10; document.getElementById('s' + (turn+1)).innerText = players[turn].score; }
+        document.getElementById('modal').style.display = 'none';
+        turn = turn === 0 ? 1 : 0;
+        document.getElementById('player-turn-name').innerText = `玩家 ${turn+1}`;
+        document.getElementById('btn-roll').disabled = false; moving = false;
+    }
 
-async function move(pid) {
-if(moving) return; moving = true;
-document.getElementById('p' + (pid+1)).classList.remove('can-move');
-for(let i=0; i<dice; i++) {
-if (players[pid].pos < words.length - 1) {
-players[pid].pos++;
-updateDisplay(false);
-await new Promise(r => setTimeout(r, 250));
-}
-}
-
-// 檢查事件
-if(traps.includes(players[pid].pos)) {
-alert("🍌 踩到香蕉皮！後退 3 格！");
-players[pid].pos = Math.max(0, players[pid].pos - 3);
-} else if(boosts.includes(players[pid].pos)) {
-alert("🚀 坐上火箭！前進 5 格！");
-players[pid].pos = Math.min(words.length-1, players[pid].pos + 5);
-players[pid].score += 50;
-}
-
-updateDisplay(true);
-if(players[pid].pos === words.length - 1) {
-alert("🏆 恭喜玩家 " + (pid+1) + " 奪冠！"); location.reload();
-} else {
-showModal();
-}
-}
-
-function showModal() {
-const word = words[players[turn].pos];
-document.getElementById('modal-text').innerText = word;
-document.getElementById('modal').style.display = 'block';
-speak();
-
-let timeLeft = 60;
-document.getElementById('timer').innerText = `⏳ 剩餘時間: ${timeLeft}s`;
-timerInterval = setInterval(() => {
-timeLeft--;
-document.getElementById('timer').innerText = `⏳ 剩餘時間: ${timeLeft}s`;
-if(timeLeft <= 0) {
-clearInterval(timerInterval);
-alert("⏰ 時間到！沒有加分喔。");
-closeModal(false);
-}
-}, 1000);
-}
-
-function closeModal(addScore = true) {
-clearInterval(timerInterval);
-if(addScore) {
-players[turn].score += 10;
-document.getElementById('s' + (turn+1)).innerText = players[turn].score;
-}
-document.getElementById('modal').style.display = 'none';
-endTurn();
-}
-
-function endTurn() {
-turn = turn === 0 ? 1 : 0;
-document.getElementById('player-turn-name').innerText = `玩家 ${turn+1}`;
-document.getElementById('player-turn-name').style.color = turn===0?'#3182ce':'#d53f8c';
-document.getElementById('btn-roll').disabled = false; moving = false;
-}
-
-function speak() {
-const text = document.getElementById('modal-text').innerText;
-window.speechSynthesis.cancel();
-const msg = new SpeechSynthesisUtterance(text);
-msg.lang = 'zh-HK';
-window.speechSynthesis.speak(msg);
-}
-
-// AI 語音辨識功能
-function startRecognition() {
-const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
-recognition.lang = 'zh-HK';
-document.getElementById('btn-ai').innerText = "👂 正在聽...請朗讀";
-recognition.start();
-
-recognition.onresult = (event) => {
-const result = event.results[0][0].transcript;
-const target = words[players[turn].pos];
-if(result.includes(target) || target.includes(result)) {
-alert("✅ 太棒了！讀音正確 [識別到: " + result + "]");
-players[turn].score += 10; // AI 額外加分
-closeModal(true);
-} else {
-alert("❌ 好像不太對，再試試看？ [識別到: " + result + "]");
-}
-document.getElementById('btn-ai').innerText = "🤖 AI 檢查讀音";
-};
-recognition.onerror = () => {
-alert("🎤 沒聽到聲音，請檢查麥克風。");
-document.getElementById('btn-ai').innerText = "🤖 AI 檢查讀音";
-};
-}
-
-window.onload = init;
+    window.onload = init;
 </script>
 </body>
 </html>
