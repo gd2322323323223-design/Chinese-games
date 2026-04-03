@@ -258,6 +258,8 @@ body {
 } // <--- 記得補上這個大括號！
 
     window.onload = init;
+    
+</script>
     function speak() {
     // 取得彈窗裡的文字
     const text = document.getElementById('modal-text').innerText;
@@ -273,6 +275,5 @@ body {
     window.speechSynthesis.speak(msg);
     console.log("正在朗讀：" + text); // 這行是用來除錯的，按 F12 可以看到有沒有跑
 }
-</script>
 </body>
 </html>
