@@ -167,7 +167,7 @@ body {
             const rect = cell.getBoundingClientRect(), bRect = document.getElementById('board').getBoundingClientRect();
             const pEl = document.getElementById('p' + (i+1));
             pEl.style.left = (rect.left - bRect.left + rect.width/2 - 30 + (i===0?-25:25)) + 'px';
-            pEl.style.top = (rect.top - bRect.top + rect.height/2 - 10) + 'px';
+            pEl.style.top = (rect.top - bRect.top + rect.height/2 - 45) + 'px';
         });
         if(isFinal) document.getElementById('c' + players[turn].pos).scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
