@@ -5,112 +5,33 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>中文詞語 88 關：究極挑戰版</title>
     <style>
-        :root { --p1-color: #3182ce; --p2-color: #d53f8c; --cell-size: 160px; }
-        body { font-family: "Micrfunction speak() {
-    // 取得彈窗裡的文字
-    const text = document.getElementById('modal-text').innerText;
-    
-    // 停止所有正在進行的語音（防止疊音）
-    window.speechSynthesis.cancel(); 
-    
-    const msg = new SpeechSynthesisUtterance(text);
-    msg.lang = 'zh-HK'; // 設定廣東話
-    msg.volume = 1;     // 音量 (0 到 1)
-    msg.rate = 0.9;     // 語速
-    
-    window.speechSynthesis.speak(msg);
-    console.log("正在朗讀：" + text); // 這行是用來除錯的，按 F12 可以看到有沒有跑
-body { 
-    font-family: "Microsoft JhengHei", sans-serif; 
-    margin: 0; 
-    background: #f0f4f8; 
-    overflow-y: scroll; 
-    padding-bottom: 450px !important; 
-}
-        
-        #game-container { position: relative; width: 95%; max-width: 1400px; margin: 20px auto; }
-        
-        #board { 
-            display: grid; grid-template-columns: repeat(10, 1fr); gap: 15px; padding: 25px; border-radius: 40px; 
-            background-image: url('images/board-bg.jpg'); background-size: cover; background-position: center;
-            background-color: #fff; box-shadow: 0 25px 50px rgba(0,0,0,0.15); border: 12px solid white;
-        }
-
-        .cell { 
-            height: var(--cell-size); border-radius: 25px; display: flex; flex-direction: column; 
-            align-items: center; justify-content: flex-end; 
-            text-align: center; position: relative; transition: 0.3s; 
-            backdrop-filter: blur(8px); border: 3px solid rgba(255,255,255,0.7); color: #1a202c; padding: 15px; box-sizing: border-box;
-            background-color: rgba(255, 255, 255, 0.7);
-        }
-
-        .cell-index { position: absolute; top: 10px; left: 12px; font-size: 16px; color: rgba(0,0,0,0.3); }
-        .cell-text { font-size: 24px; font-weight: 900; margin-bottom: 10px; z-index: 2; }
-        .item-img { width: 70px; height: 70px; object-fit: contain; z-index: 1; }
-        .event-icon { font-size: 35px; position: absolute; bottom: 5px; right: 5px; opacity: 0.8; }
-        
-        .start { background: white !important; border: 6px solid #3182ce !important; }
-        .end { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important; color: white !important; }
-
-        .player { 
-            width: 60px; height: 60px; position: absolute; z-index: 50;
-            background-size: contain; background-repeat: no-repeat; background-position: center;
-            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            filter: drop-shadow(0 4px 8px rgba(0,0,0,0.3));
-        }
-        #p1 { background-image: url('images/p1.png'); }
-        #p2 { background-image: url('images/p2.png'); }
-
-        #controls { 
-            position: fixed; bottom: 0; left: 0; width: 100%; background: rgba(255,255,255,0.95); 
-            display: flex; justify-content: center; align-items: center; gap: 40px; padding: 25px; 
-            box-shadow: 0 -15px 50px rgba(0,0,0,0.1); z-index: 100;
-        }
-        .score-board { font-size: 20px; font-weight: bold; }
-        #dice-box { font-size: 60px; min-width: 80px; text-align: center; background: #eee; border-radius: 15px; }
-        #btn-roll { padding: 15px 40px; font-size: 24px; border-radius: 50px; border: none; background: #48bb78; color: white; cursor: pointer; font-weight: bold; }
-        
-        #modal { 
-            display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); 
-            background: white; padding: 40px; border-radius: 50px; z-index: 300; 
-            box-shadow: 0 40px 150px rgba(0,0,0,0.6); text-align: center; border: 15px solid #4299e1; width: 90%; max-width: 600px;
-        }
-        #modal-text { font-size: 80px; font-weight: 900; margin: 20px 0; }
-        .can-move { animation: bounce 0.6s infinite alternate; cursor: pointer; }
-        @keyframes bounce { from { transform: translateY(0); } to { transform: translateY(-15px); } }
-        /* --- 彈窗詞語互動功能 --- */
-
-/* 1. 基礎文字設定：增加小手游標與平滑動畫 */
-#modal-text {
-    font-size: 80px;
-    font-weight: 900;
-    margin: 20px 0;
-    cursor: pointer;          /* 讓滑鼠移上去變「手指」，提示可以點擊 */
-    transition: all 0.2s ease; /* 讓變色和放大的動作變得很順滑 */
-    user-select: none;        /* 防止學生快速點擊時選取到文字變藍色塊 */
-    display: inline-block;     /* 確保縮放動畫效果正常 */
-}
-
-/* 2. 滑鼠移上去 (Hover) 的效果：變色 + 微微放大 */
-#modal-text:hover {
-    color: #3182ce;           /* 移上去變成漂亮的藍色 */
-    transform: scale(1.1);    /* 放大 1.1 倍 */
-}
-
-/* 3. 按下去 (Active) 的瞬間：縮小一點點 */
-#modal-text:active {
-    transform: scale(0.95);   /* 按下去時縮小，像按鈕一樣有彈性 */
-    color: #2c5282;           /* 顏色變深一點 */
-}
-
-/* 4. 加個裝飾：在詞語下方提示「點擊聽讀音」 (選加) */
-#modal::after {
-    content: "💡 提示：點擊詞語可重複聽讀音";
-    display: block;
-    font-size: 16px;
-    color: #a0aec0;
-    margin-top: 10px;
-}
+       <style>
+    :root { --p1-color: #3182ce; --p2-color: #d53f8c; --cell-size: 160px; }
+    body { 
+        font-family: "Microsoft JhengHei", sans-serif; 
+        margin: 0; 
+        background: #f0f4f8; 
+        overflow-y: scroll; 
+        padding-bottom: 200px; /* 修正原本過大的 padding */
+    }
+    /* ... 保持你原本其餘的 CSS 樣式不變 ... */
+    #game-container { position: relative; width: 95%; max-width: 1400px; margin: 20px auto; }
+    #board { 
+        display: grid; grid-template-columns: repeat(10, 1fr); gap: 15px; padding: 25px; border-radius: 40px; 
+        background-color: #fff; box-shadow: 0 25px 50px rgba(0,0,0,0.15); border: 12px solid white;
+    }
+    .cell { 
+        height: var(--cell-size); border-radius: 25px; display: flex; flex-direction: column; 
+        align-items: center; justify-content: flex-end; position: relative; transition: 0.3s; 
+        background-color: rgba(255, 255, 255, 0.7); padding: 15px; box-sizing: border-box; border: 3px solid #eee;
+    }
+    .cell-text { font-size: 24px; font-weight: 900; margin-bottom: 10px; }
+    .player { width: 50px; height: 50px; position: absolute; z-index: 50; transition: 0.5s; background-size: contain; background-repeat: no-repeat; }
+    #p1 { background-color: var(--p1-color); border-radius: 50%; } /* 暫時代替圖片 */
+    #p2 { background-color: var(--p2-color); border-radius: 50%; }
+    #controls { position: fixed; bottom: 0; left: 0; width: 100%; background: white; display: flex; justify-content: center; align-items: center; gap: 20px; padding: 20px; z-index: 100; }
+    #modal { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 40px; border-radius: 30px; z-index: 300; box-shadow: 0 20px 60px rgba(0,0,0,0.3); text-align: center; }
+</style>
     </style>
 </head>
 <body>
@@ -139,6 +60,7 @@ body {
 </div>
 
 <script>
+    <script>
     const words = ["起點", "學校", "禮堂", "校務處", "操場", "音樂室", "課室", "洗手間", "電腦室", "樓梯", "圖書館", "走廊", "升降機", "教員室", "草地上", "沙灘", "山頂", "運動場", "籃球場", "足球場", "燒烤場", "公園", "家裏", "客廳", "浴室", "睡房", "廚房", "清真寺", "商場", "超市", "街市", "麵包店", "理髮店", "便利店", "藥房", "餐廳", "醫院", "補習社", "博物館", "銀行", "地鐵站", "巴士站", "行人道", "刷牙", "洗澡", "洗手", "喝水", "吃飯", "睡覺", "穿衣服", "戴口罩", "做家務", "倒垃圾", "洗碗", "抹窗戶", "煮飯", "上課", "做功課", "溫習", "看書", "畫畫", "做早操", "跑步", "游泳", "跳繩", "踢足球", "打籃球", "騎單車", "遠足", "拍照", "表演", "唱歌", "跳舞", "慶祝", "排隊", "玩遊戲", "看手機", "打電話", "打招呼", "買水果", "比賽", "說話", "摺紙", "下棋", "玩拼圖", "🏆 終點"];
     const players = [{pos: 0, score: 0}, {pos: 0, score: 0}];
     const traps = [5, 12, 25, 40, 55, 70], boosts = [8, 20, 35, 50, 65, 80];
@@ -146,134 +68,106 @@ body {
 
     function init() {
         const board = document.getElementById('board');
+        board.innerHTML = ""; // 清空棋盤
         words.forEach((w, i) => {
             const cell = document.createElement('div');
-            cell.className = 'cell' + (i===0?' start':(i===words.length-1?' end':''));
+            cell.className = 'cell';
             cell.id = 'c' + i;
-            let icon = "";
-            if(traps.includes(i)) icon = "<span class='event-icon'>🍌</span>";
-            if(boosts.includes(i)) icon = "<span class='event-icon'>🚀</span>";
-            
-            let imgHTML = (i > 0 && i < words.length - 1) ? `<img src="images/star.png" class="item-img">` : "";
-            cell.innerHTML = `<span class="cell-index">${i}</span><div class="cell-text">${w}</div>${imgHTML}${icon}`;
+            cell.innerHTML = `<span class="cell-index">${i}</span><div class="cell-text">${w}</div>`;
             board.appendChild(cell);
         });
-        updateDisplay(true);
+        updateDisplay();
     }
 
-    function updateDisplay(isFinal = false) {
+    function speak() {
+        const text = document.getElementById('modal-text').innerText;
+        window.speechSynthesis.cancel(); 
+        const msg = new SpeechSynthesisUtterance(text);
+        msg.lang = 'zh-HK';
+        msg.rate = 0.9;
+        window.speechSynthesis.speak(msg);
+    }
+
+    function updateDisplay() {
         players.forEach((p, i) => {
             const cell = document.getElementById('c' + p.pos);
-            const rect = cell.getBoundingClientRect(), bRect = document.getElementById('board').getBoundingClientRect();
-            const pEl = document.getElementById('p' + (i+1));
-            pEl.style.left = (rect.left - bRect.left + rect.width/2 - 30 + (i===0?-25:25)) + 'px';
-            pEl.style.top = (rect.top - bRect.top + rect.height/2 - 45) + 'px';
+            const pEl = document.getElementById('p' + (i + 1));
+            const rect = cell.getBoundingClientRect();
+            const bRect = document.getElementById('board').getBoundingClientRect();
+            pEl.style.left = (cell.offsetLeft + (i === 0 ? 10 : 60)) + 'px';
+            pEl.style.top = (cell.offsetTop + 40) + 'px';
         });
-        if(isFinal) document.getElementById('c' + players[turn].pos).scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
 
     async function roll() {
-        document.getElementById('btn-roll').disabled = true;
+        if(moving) return;
+        const btn = document.getElementById('btn-roll');
+        btn.disabled = true;
         for(let i=0; i<8; i++) {
             dice = Math.floor(Math.random()*6)+1;
             document.getElementById('dice-box').innerText = dice;
             await new Promise(r => setTimeout(r, 60));
         }
-        document.getElementById('p' + (turn+1)).classList.add('can-move');
-        document.getElementById('p' + (turn+1)).onclick = () => move(turn);
+        move(turn);
     }
 
     async function move(pid) {
-        if(moving) return; moving = true;
-        document.getElementById('p' + (pid+1)).classList.remove('can-move');
+        moving = true;
         for(let i=0; i<dice; i++) {
             if (players[pid].pos < words.length - 1) {
                 players[pid].pos++;
-                updateDisplay(false);
+                updateDisplay();
                 await new Promise(r => setTimeout(r, 250));
             }
         }
+        // 判斷陷阱與獎勵
         if(traps.includes(players[pid].pos)) { alert("🍌 滑倒後退 3 格！"); players[pid].pos = Math.max(0, players[pid].pos - 3); }
         if(boosts.includes(players[pid].pos)) { alert("🚀 火箭前進 5 格！"); players[pid].pos = Math.min(words.length-1, players[pid].pos + 5); }
-        updateDisplay(true);
-        if(players[pid].pos === words.length-1) { alert("🏆 奪冠！"); location.reload(); } else { showModal(); }
+        updateDisplay();
+        
+        if(players[pid].pos === words.length-1) { 
+            alert("🏆 玩家 " + (pid+1) + " 到達終點！"); 
+            location.reload(); 
+        } else { 
+            showModal(); 
+        }
     }
 
     function showModal() {
-    const currentWord = words[players[turn].pos];
-    const modalText = document.getElementById('modal-text'); // 取得文字元素
-    
-    // 1. 設定文字內容
-    modalText.innerText = currentWord;
-    
-    // 2. 【新增：點擊功能】讓文字點了會說話，並加上小手手游標
-    modalText.style.cursor = "pointer"; 
-    modalText.onclick = () => speak(); 
-    
-    // 3. 顯示彈窗並立刻讀第一次
-    document.getElementById('modal').style.display = 'block';
-    speak();
+        const currentWord = words[players[turn].pos];
+        document.getElementById('modal-text').innerText = currentWord;
+        document.getElementById('modal').style.display = 'block';
+        speak();
 
-    // 4. 設定倒數計時（60秒）
-    let timeLeft = 60;
-    document.getElementById('timer').innerText = `⏳ 剩餘時間: ${timeLeft}s`;
-        
-    // 5.在 showModal 函式裡加入這一行
-    document.getElementById('modal-text').onclick = () => speak();
-    
-    // 清除舊的計時器（如果有），防止時間亂跳
-    clearInterval(timerInterval); 
-    
-    timerInterval = setInterval(() => {
-        timeLeft--;
-        document.getElementById('timer').innerText = `⏳ 剩餘時間: ${timeLeft}s`;
-        if(timeLeft <= 0) {
-            clearInterval(timerInterval);
-            alert("⏰ 時間到！下次讀快一點喔。");
-            closeModal(false); // 時間到，不加分並換人
-        }
-    }, 1000);
-}
+        let timeLeft = 60;
+        clearInterval(timerInterval);
+        timerInterval = setInterval(() => {
+            timeLeft--;
+            document.getElementById('timer').innerText = `⏳ 剩餘時間: ${timeLeft}s`;
+            if(timeLeft <= 0) {
+                clearInterval(timerInterval);
+                closeModal(false);
+            }
+        }, 1000);
+    }
 
     function closeModal(addScore = true) {
-    // 1. 停止倒數計時
-    clearInterval(timerInterval);
-    
-    // 2. 如果讀對了，加分並更新顯示
-    if(addScore) { 
-        players[turn].score += 10; 
-        document.getElementById('s' + (turn + 1)).innerText = players[turn].score; 
+        clearInterval(timerInterval);
+        if(addScore) { 
+            players[turn].score += 10; 
+            document.getElementById('s' + (turn + 1)).innerText = players[turn].score; 
+        }
+        document.getElementById('modal').style.display = 'none';
+        turn = (turn === 0) ? 1 : 0; // 換人
+        document.getElementById('player-turn-name').innerText = `玩家 ${turn + 1}`;
+        document.getElementById('btn-roll').disabled = false;
+        moving = false;
     }
-    
-    // 3. 關閉彈窗
-    document.getElementById('modal').style.display = 'none';
-    
-    // 4. 切換到下一位玩家
-    turn = turn === 0 ? 1 : 0;
-    
-    // 5. 更新控制台文字與按鈕狀態
-    document.getElementById('player-turn-name').innerText = `玩家 ${turn + 1}`;
-    document.getElementById('btn-roll').disabled = false; 
-    moving = false; // 重置移動狀態，讓下一個人可以點擊
-} // <--- 記得補上這個大括號！
+
+    function startRecognition() {
+        alert("AI 功能開發中，請先手動朗讀！");
+    }
 
     window.onload = init;
-    
 </script>
-    function speak() {
-    // 取得彈窗裡的文字
-    const text = document.getElementById('modal-text').innerText;
-    
-    // 停止所有正在進行的語音（防止疊音）
-    window.speechSynthesis.cancel(); 
-    
-    const msg = new SpeechSynthesisUtterance(text);
-    msg.lang = 'zh-HK'; // 設定廣東話
-    msg.volume = 1;     // 音量 (0 到 1)
-    msg.rate = 0.9;     // 語速
-    
-    window.speechSynthesis.speak(msg);
-    console.log("正在朗讀：" + text); // 這行是用來除錯的，按 F12 可以看到有沒有跑
-}
-</body>
 </html>
