@@ -5,7 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>中文詞語 88 關：究極挑戰版</title>
     <style>
-        :root { --p1-color: #3182ce; --p2-color: #d53f8c; --cell-size: 140px; }
+        :root { 
+            --p1-color: #3182ce; 
+            --p2-color: #d53f8c; 
+            --cell-size: 100px; /* 1. 縮小格子高度 (原本是 140px) */
+            --road-height: 40px; /* 新增：路軌的高度 */
+        }
         
         body { 
             font-family: "Microsoft JhengHei", sans-serif; 
@@ -20,8 +25,8 @@
         #board { 
             display: grid; 
             grid-template-columns: repeat(10, 1fr); 
-            gap: 15px; 
-            padding: 25px; 
+            gap: 50px 15px; 
+            padding: 40px; 
             border-radius: 40px; 
             /* 修正：加入你的背景圖 */
             background-image: url('images/board-bg.jpg');
@@ -33,7 +38,8 @@
         }
 
         .cell { 
-            height: var(--cell-size); 
+            height: var(--cell-size);
+            margin-bottom: var(--road-height); /* 為下方的路留出空間 */
             border-radius: 25px; 
             display: flex; 
             flex-direction: column; 
@@ -46,6 +52,29 @@
             box-sizing: border-box; 
             border: 2px solid #e2e8f0;
             backdrop-filter: blur(5px);
+        }
+        .cell::after {
+            content: "";
+            position: absolute;
+            bottom: calc(-1 * var(--road-height) - 8px); /* 貼在格子下方 */
+            left: -8px; 
+            right: -8px;
+            height: var(--road-height);
+            background: #4a5568; /* 深灰色馬路 */
+            border-bottom: 4px solid #cbd5e0; /* 路邊石 */
+            z-index: 1;
+        }
+
+        /* 加上馬路白線 */
+        .cell::before {
+            content: "";
+            position: absolute;
+            bottom: calc(-1 * var(--road-height) / 2 - 8px);
+            left: 10%;
+            right: 10%;
+            height: 2px;
+            border-top: 2px dashed rgba(255,255,255,0.3);
+            z-index: 2;
         }
 
         .cell-text { font-size: 22px; font-weight: 900; color: #2d3748; z-index: 2; }
@@ -175,11 +204,17 @@
     }
 
     function updateDisplay() {
+        function updateDisplay() {
         players.forEach((p, i) => {
             const cell = document.getElementById('c' + p.pos);
             const pEl = document.getElementById('p' + (i + 1));
+            
+            // 左右位置：保持在格子中間稍微偏移，避免兩隻重疊
             pEl.style.left = (cell.offsetLeft + (i === 0 ? 10 : 60)) + 'px';
-            pEl.style.top = (cell.offsetTop + 35) + 'px';
+            
+            // 上下位置：強制移到格子底部再往下 15px (也就是路軌的位置)
+            // cell.offsetTop 是格子頂部，加上 cell.offsetHeight 剛好是格子底部
+            pEl.style.top = (cell.offsetTop + cell.offsetHeight + 5) + 'px';
         });
     }
 
