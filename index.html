@@ -204,23 +204,28 @@
     }
 
         function updateDisplay() {
-        players.forEach((p, i) => {
-            const cell = document.getElementById('c' + p.pos);
-            const pEl = document.getElementById('p' + (i + 1));
-            
-            // 🔍 調整 1：解決「不是在正下面」的問題
-            // 我們把 cell.offsetLeft (格子的左側) 加上 cell.offsetWidth / 2 (格子的半寬)
-            // 這樣棋子就會從格子的中央為準。
-            // 再根據玩家編號 (i) 微調，讓 P1 在左 P2 在右，且整體居中。
-            pEl.style.left = (cell.offsetLeft + (cell.offsetWidth / 2) + (i === 0 ? -30 : 5)) + 'px';
-            
-            // 🔍 調整 2：解決「沒有踩在行人道上」的問題
-            // cell.offsetTop 是格子頂部，cell.offsetHeight 是格子高度。
-            // 兩者相加是格子的底部。我們往下加 15px (原本可能是 +5px)，
-            // 這個 15px 應該剛好落在深灰色行人道的中央。
-            pEl.style.top = (cell.offsetTop + cell.offsetHeight + 15) + 'px';
-        });
-    }
+    players.forEach((p, i) => {
+        const cell = document.getElementById('c' + p.pos);
+        const pEl = document.getElementById('p' + (i + 1));
+        
+        // 1. 找到格子的水平中心點
+        // cell.offsetLeft (左邊位置) + (cell.offsetWidth / 2) (格子寬度的一半)
+        const cellCenterX = cell.offsetLeft + (cell.offsetWidth / 2);
+        
+        // 2. 找到格子的底部位置（即行人道的起點）
+        const cellBottomY = cell.offsetTop + cell.offsetHeight;
+
+        // 3. 設定左右位置 (Left)
+        // 邏輯：從中心點出發，P1(index 0) 往左移 35px，P2(index 1) 往右移 5px
+        // 這樣兩隻棋子會以中心線為準，均勻分布在馬路上
+        const offsetX = (i === 0) ? -35 : 5; 
+        pEl.style.left = (cellCenterX + offsetX) + 'px';
+        
+        // 4. 設定上下位置 (Top)
+        // 落在行人道中央：底部 + 15px
+        pEl.style.top = (cellBottomY + 15) + 'px';
+    });
+}
 
     async function roll() {
         if(moving || waitingForClick) return; 
