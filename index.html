@@ -140,7 +140,10 @@
     const words = ["起點", "學校", "禮堂", "校務處", "操場", "音樂室", "課室", "洗手間", "電腦室", "樓梯", "圖書館", "走廊", "升降機", "教員室", "草地上", "沙灘", "山頂", "運動場", "籃球場", "足球場", "燒烤場", "公園", "家裏", "客廳", "浴室", "睡房", "廚房", "清真寺", "商場", "超市", "街市", "麵包店", "理髮店", "便利店", "藥房", "餐廳", "醫院", "補習社", "博物館", "銀行", "地鐵站", "巴士站", "行人道", "刷牙", "洗澡", "洗手", "喝水", "吃飯", "睡覺", "穿衣服", "戴口罩", "做家務", "倒垃圾", "洗碗", "抹窗戶", "煮飯", "上課", "做功課", "溫習", "看書", "畫畫", "做早操", "跑步", "游泳", "跳繩", "踢足球", "打籃球", "騎單車", "遠足", "拍照", "表演", "唱歌", "跳舞", "慶祝", "排隊", "玩遊戲", "看手機", "打電話", "打招呼", "買水果", "比賽", "說話", "摺紙", "下棋", "玩拼圖", "🏆 終點"];
     const players = [{pos: 0, score: 0}, {pos: 0, score: 0}];
     const traps = [5, 12, 25, 40, 55, 70], boosts = [8, 20, 35, 50, 65, 80];
+    
+    // ✅ 修正 1：定義缺少的變數
     let turn = 0, dice = 0, moving = false, timerInterval;
+    let waitingForClick = false; 
 
     function init() {
         const board = document.getElementById('board');
@@ -149,58 +152,49 @@
             const cell = document.createElement('div');
             cell.className = 'cell';
             cell.id = 'c' + i;
-            
-            let icon = "";
-            if(traps.includes(i)) icon = "<span class='event-icon'>🍌</span>";
-            else if(boosts.includes(i)) icon = "<span class='event-icon'>🚀</span>";
-
-            cell.innerHTML = `
-                <span class="cell-index">${i}</span>
-                <div class="cell-text">${w}</div>
-                ${icon}
-            `;
+            let icon = traps.includes(i) ? "🍌" : (boosts.includes(i) ? "🚀" : "");
+            cell.innerHTML = `<span class="cell-index">${i}</span><div class="cell-text">${w}</div><span class='event-icon'>${icon}</span>`;
             board.appendChild(cell);
         });
         setTimeout(updateDisplay, 200);
-    }
-
-    function speak() {
-        const text = document.getElementById('modal-text').innerText;
-        window.speechSynthesis.cancel();
-        const msg = new SpeechSynthesisUtterance(text);
-        msg.lang = 'zh-HK';
-        msg.rate = 0.85;
-        window.speechSynthesis.speak(msg);
     }
 
     function updateDisplay() {
         players.forEach((p, i) => {
             const cell = document.getElementById('c' + p.pos);
             const pEl = document.getElementById('p' + (i + 1));
-            // 修正定位：確保大圖片棋子在格子中居中且不重疊
             pEl.style.left = (cell.offsetLeft + (i === 0 ? 10 : 60)) + 'px';
             pEl.style.top = (cell.offsetTop + 35) + 'px';
         });
     }
 
     async function roll() {
-    // 檢查：如果正在移動或正在等待點擊，就不能再擲骰子
-    if(moving || waitingForClick) return; 
-    
-    document.getElementById('btn-roll').disabled = true;
+        if(moving || waitingForClick) return; 
+        document.getElementById('btn-roll').disabled = true;
 
-    // 骰子滾動動畫
-    for(let i=0; i<8; i++) {
-        dice = Math.floor(Math.random()*6)+1;
-        document.getElementById('dice-box').innerText = dice;
-        await new Promise(r => setTimeout(r, 60));
+        for(let i=0; i<8; i++) {
+            dice = Math.floor(Math.random()*6)+1;
+            document.getElementById('dice-box').innerText = dice;
+            await new Promise(r => setTimeout(r, 60));
+        }
+
+        // ✅ 進入等待點擊狀態
+        waitingForClick = true; 
+        document.getElementById('p' + (turn + 1)).classList.add('can-move'); 
+        document.getElementById('player-turn-name').innerText = "👈 請點擊棋子行走！";
     }
 
-    // --- ✨ 重點修改：刪掉原本的 move(turn)，換成下面這三行 ---
-    waitingForClick = true; // 開啟「等待點擊」狀態
-    document.getElementById('p' + (turn + 1)).classList.add('can-move'); // 讓當前玩家的棋子開始跳動
-    document.getElementById('player-turn-name').innerText = "👈 請點擊棋子行走！"; // 更改提示文字
-}
+    // ✅ 修正 2：補上處理棋子點擊的函數
+    async function handlePlayerClick(pid) {
+        if (!waitingForClick || pid !== turn || moving) return;
+
+        waitingForClick = false;
+        document.getElementById('p' + (turn + 1)).classList.remove('can-move');
+        document.getElementById('player-turn-name').innerText = "正在行走...";
+        
+        await move(pid); 
+    }
+
     async function move(pid) {
         moving = true;
         for(let i=0; i<dice; i++) {
@@ -211,15 +205,18 @@
             }
         }
         
+        // 檢查特殊事件
         if(traps.includes(players[pid].pos)) { 
             alert("🍌 踩到香蕉皮後退 3 格！"); 
             players[pid].pos = Math.max(0, players[pid].pos - 3); 
             updateDisplay();
+            await new Promise(r => setTimeout(r, 400));
         }
         if(boosts.includes(players[pid].pos)) { 
             alert("🚀 坐上火箭前進 5 格！"); 
             players[pid].pos = Math.min(words.length-1, players[pid].pos + 5); 
             updateDisplay();
+            await new Promise(r => setTimeout(r, 400));
         }
         
         if(players[pid].pos === words.length-1) {
@@ -230,21 +227,17 @@
         }
     }
 
+    // 彈窗與語音功能
     function showModal() {
-        const currentWord = words[players[turn].pos];
-        document.getElementById('modal-text').innerText = currentWord;
+        document.getElementById('modal-text').innerText = words[players[turn].pos];
         document.getElementById('modal').style.display = 'block';
         speak();
-
         let timeLeft = 60;
         clearInterval(timerInterval);
         timerInterval = setInterval(() => {
             timeLeft--;
             document.getElementById('timer').innerText = `⏳ 剩餘時間: ${timeLeft}s`;
-            if(timeLeft <= 0) {
-                clearInterval(timerInterval);
-                closeModal(false);
-            }
+            if(timeLeft <= 0) closeModal(false);
         }, 1000);
     }
 
@@ -263,8 +256,15 @@
         moving = false;
     }
 
-    function startRecognition() { alert("AI 檢查功能需要權限。"); }
+    function speak() {
+        window.speechSynthesis.cancel();
+        const msg = new SpeechSynthesisUtterance(document.getElementById('modal-text').innerText);
+        msg.lang = 'zh-HK';
+        msg.rate = 0.85;
+        window.speechSynthesis.speak(msg);
+    }
 
+    function startRecognition() { alert("AI 檢查功能需要權限。"); }
     window.onload = init;
     window.onresize = updateDisplay;
 </script>
