@@ -204,28 +204,27 @@
     }
 
         function updateDisplay() {
-    players.forEach((p, i) => {
-        const cell = document.getElementById('c' + p.pos);
-        const pEl = document.getElementById('p' + (i + 1));
-        
-        // 1. 找到格子的水平中心點
-        // cell.offsetLeft (左邊位置) + (cell.offsetWidth / 2) (格子寬度的一半)
-        const cellCenterX = cell.offsetLeft + (cell.offsetWidth / 2);
-        
-        // 2. 找到格子的底部位置（即行人道的起點）
-        const cellBottomY = cell.offsetTop + cell.offsetHeight;
-
-        // 3. 設定左右位置 (Left)
-        // 邏輯：從中心點出發，P1(index 0) 往左移 35px，P2(index 1) 往右移 5px
-        // 這樣兩隻棋子會以中心線為準，均勻分布在馬路上
-        const offsetX = (i === 0) ? -35 : 5; 
-        pEl.style.left = (cellCenterX + offsetX) + 'px';
-        
-        // 4. 設定上下位置 (Top)
-        // 落在行人道中央：底部 + 15px
-        pEl.style.top = (cellBottomY + 15) + 'px';
-    });
-}
+        players.forEach((p, i) => {
+            const cell = document.getElementById('c' + p.pos);
+            const pEl = document.getElementById('p' + (i + 1));
+            
+            // 1. 找到格子的水平中心點 (offsetLeft + 一半寬度)
+            const cellMid = cell.offsetLeft + (cell.offsetWidth / 2);
+            
+            // 2. 修正左右位置：以中心點為準，P1 往左移，P2 往右移
+            // 把原本固定的 +10, +60 改成下面這樣：
+            if (i === 0) {
+                // P1 (小貓)：中心點往左移 35 像素
+                pEl.style.left = (cellMid - 35) + 'px';
+            } else {
+                // P2 (小狗)：中心點往右移 5 像素
+                pEl.style.left = (cellMid + 5) + 'px';
+            }
+            
+            // 3. 上下位置 (Top)：維持在行人道中央
+            pEl.style.top = (cell.offsetTop + cell.offsetHeight + 15) + 'px';
+        });
+    }
 
     async function roll() {
         if(moving || waitingForClick) return; 
