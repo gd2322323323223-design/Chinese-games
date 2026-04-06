@@ -206,19 +206,45 @@
         }
         
         // 檢查特殊事件
-        if(traps.includes(players[pid].pos)) { 
-            alert("🍌 踩到香蕉皮後退 3 格！"); 
+      if(traps.includes(players[pid].pos)) { 
+            // 1. 先跳出提示
+            alert("🍌 哎呀！踩到香蕉皮滑倒了！\n點擊棋子後退 3 格。"); 
+            
+            // 2. 準備後退的邏輯
             players[pid].pos = Math.max(0, players[pid].pos - 3); 
-            updateDisplay();
-            await new Promise(r => setTimeout(r, 400));
+            
+            // 3. 進入「等待點擊」狀態，讓玩家點了才執行移動
+            prepareSpecialClick(pid);
+            return; // 結束 move 函數，不要進入 showModal
         }
+
         if(boosts.includes(players[pid].pos)) { 
-            alert("🚀 坐上火箭前進 5 格！"); 
+            // 1. 先跳出提示
+            alert("🚀 太棒了！坐上火箭衝刺！\n點擊棋子前進 5 格。"); 
+            
+            // 2. 準備前進的邏輯
             players[pid].pos = Math.min(words.length-1, players[pid].pos + 5); 
-            updateDisplay();
-            await new Promise(r => setTimeout(r, 400));
+            
+            // 3. 進入「等待點擊」狀態
+            prepareSpecialClick(pid);
+            return; // 結束 move 函數，不要進入 showModal
         }
         
+        // 如果沒有觸發事件，則正常檢查終點或顯示詞語
+        checkEndOrModal(pid);
+    }
+
+    // 💡 新增：專門處理「特殊移動前」的點擊準備
+    function prepareSpecialClick(pid) {
+        moving = false; 
+        waitingForClick = true; 
+        document.getElementById('p' + (pid + 1)).classList.add('can-move');
+        document.getElementById('player-turn-name').innerText = "👈 再次點擊執行特殊移動！";
+    }
+
+    // 💡 新增：將原本 move 結尾的判斷抽出來
+    function checkEndOrModal(pid) {
+        moving = false;
         if(players[pid].pos === words.length-1) {
             alert(`🏆 恭喜玩家 ${pid + 1} 成功挑戰 88 關！`);
             location.reload();
