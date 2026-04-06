@@ -9,7 +9,7 @@
             --p1-color: #3182ce; 
             --p2-color: #d53f8c; 
             --cell-size: 100px; /* 1. 縮小格子高度 (原本是 140px) */
-            --road-height: 40px; /* 新增：路軌的高度 */
+            --road-height: 90px; /* 新增：路軌的高度 */
         }
         
         body { 
@@ -56,7 +56,7 @@
         .cell::after {
             content: "";
             position: absolute;
-            bottom: calc(-1 * var(--road-height) - 8px); /* 貼在格子下方 */
+            bottom: calc(-1 * var(--road-height) - 10px); /* 貼在格子下方 */
             left: -10px; 
             right: -10px;
             height: var(--road-height);
@@ -204,27 +204,28 @@
     }
 
         function updateDisplay() {
-        players.forEach((p, i) => {
-            const cell = document.getElementById('c' + p.pos);
-            const pEl = document.getElementById('p' + (i + 1));
-            
-            // 1. 找到格子的水平中心點 (offsetLeft + 一半寬度)
-            const cellMid = cell.offsetLeft + (cell.offsetWidth / 2);
-            
-            // 2. 修正左右位置：以中心點為準，P1 往左移，P2 往右移
-            // 把原本固定的 +10, +60 改成下面這樣：
-            if (i === 0) {
-                // P1 (小貓)：中心點往左移 35 像素
-                pEl.style.left = (cellMid - 35) + 'px';
-            } else {
-                // P2 (小狗)：中心點往右移 5 像素
-                pEl.style.left = (cellMid + 5) + 'px';
-            }
-            
-            // 3. 上下位置 (Top)：維持在行人道中央
-            pEl.style.top = (cell.offsetTop + cell.offsetHeight + 15) + 'px';
-        });
-    }
+    players.forEach((p, i) => {
+        const cell = document.getElementById('c' + p.pos);
+        const pEl = document.getElementById('p' + (i + 1));
+        
+        // 1. 左右位置：兩隻都鎖定在格子中心
+        // cell.offsetWidth / 2 是中心，再減去棋子寬度的一半 (約 32px)
+        const centerX = cell.offsetLeft + (cell.offsetWidth / 2) - 32;
+        pEl.style.left = centerX + 'px';
+        
+        // 2. 上下位置：根據玩家編號 (i) 分上下兩層
+        // cell.offsetTop + cell.offsetHeight 是格子底部
+        const baseTop = cell.offsetTop + cell.offsetHeight;
+        
+        if (i === 0) {
+            // 玩家 1 (小貓)：站在馬路的上半部
+            pEl.style.top = (baseTop + 5) + 'px';
+        } else {
+            // 玩家 2 (小狗)：站在馬路的下半部 (往下移 40px)
+            pEl.style.top = (baseTop + 45) + 'px';
+        }
+    });
+}
 
     async function roll() {
         if(moving || waitingForClick) return; 
