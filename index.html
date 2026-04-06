@@ -77,7 +77,7 @@
             z-index: 2;
         }
 
-        .cell-text { font-size: 22px; font-weight: 900; color: #2d3748; z-index: 2; }
+        .cell-text { font-size: 22px; font-weight: 900; color: #2d3748; z-index: 3; }
         .cell-index { position: absolute; top: 8px; left: 10px; font-size: 14px; color: #a0aec0; }
         
         /* 修正：換回你的小狗小貓圖片 */
@@ -85,7 +85,7 @@
             width: 65px; 
             height: 65px; 
             position: absolute; 
-            z-index: 50; 
+            z-index: 100; 
             transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
             background-size: contain;
             background-repeat: no-repeat;
@@ -203,7 +203,6 @@
         setTimeout(updateDisplay, 200);
     }
 
-    function updateDisplay() {
         function updateDisplay() {
         players.forEach((p, i) => {
             const cell = document.getElementById('c' + p.pos);
@@ -216,7 +215,6 @@
             // cell.offsetTop 是格子頂部，加上 cell.offsetHeight 剛好是格子底部
             pEl.style.top = (cell.offsetTop + cell.offsetHeight + 5) + 'px';
         });
-    }
 
     async function roll() {
         if(moving || waitingForClick) return; 
@@ -261,7 +259,9 @@
             alert("🍌 哎呀！踩到香蕉皮滑倒了！\n點擊棋子後退 3 格。"); 
             
             // 2. 準備後退的邏輯
-            players[pid].pos = Math.max(0, players[pid].pos - 3); 
+            players[pid].pos = Math.max(0, players[pid].pos - 3);
+
+          updateDisplay();
             
             // 3. 進入「等待點擊」狀態，讓玩家點了才執行移動
             prepareSpecialClick(pid);
@@ -273,7 +273,9 @@
             alert("🚀 太棒了！坐上火箭衝刺！\n點擊棋子前進 5 格。"); 
             
             // 2. 準備前進的邏輯
-            players[pid].pos = Math.min(words.length-1, players[pid].pos + 5); 
+            players[pid].pos = Math.min(words.length-1, players[pid].pos + 5);
+
+            updateDisplay();
             
             // 3. 進入「等待點擊」狀態
             prepareSpecialClick(pid);
@@ -287,6 +289,8 @@
             
             // 預設好後退後的位置
             players[pid].pos = Math.max(0, players[pid].pos - 1); 
+
+            updateDisplay();
             
             // 使用你寫好的 prepareSpecialClick 讓棋子開始跳動等待點擊
             prepareSpecialClick(pid);
@@ -348,6 +352,7 @@
 
     function speak() {
         window.speechSynthesis.cancel();
+        const textToSpeak = document.getElementById('modal-text').innerText.trim();
         const msg = new SpeechSynthesisUtterance(document.getElementById('modal-text').innerText);
         msg.lang = 'zh-HK';
         msg.rate = 0.85;
