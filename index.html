@@ -57,8 +57,8 @@
             content: "";
             position: absolute;
             bottom: calc(-1 * var(--road-height) - 8px); /* 貼在格子下方 */
-            left: -8px; 
-            right: -8px;
+            left: -10px; 
+            right: -10px;
             height: var(--road-height);
             background: #4a5568; /* 深灰色馬路 */
             border-bottom: 4px solid #cbd5e0; /* 路邊石 */
@@ -215,6 +215,7 @@
             // cell.offsetTop 是格子頂部，加上 cell.offsetHeight 剛好是格子底部
             pEl.style.top = (cell.offsetTop + cell.offsetHeight + 5) + 'px';
         });
+     }
 
     async function roll() {
         if(moving || waitingForClick) return; 
@@ -242,7 +243,7 @@
         
         await move(pid); 
     }
-
+        
     async function move(pid) {
         moving = true;
         for(let i=0; i<dice; i++) {
@@ -353,7 +354,8 @@
     function speak() {
         window.speechSynthesis.cancel();
         const textToSpeak = document.getElementById('modal-text').innerText.trim();
-        const msg = new SpeechSynthesisUtterance(document.getElementById('modal-text').innerText);
+        // ✨ 下一行要把括號裡的內容換成 textToSpeak
+        const msg = new SpeechSynthesisUtterance(textToSpeak); 
         msg.lang = 'zh-HK';
         msg.rate = 0.85;
         window.speechSynthesis.speak(msg);
