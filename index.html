@@ -65,6 +65,15 @@
         }
         #p1 { background-image: url('images/p1.png'); }
         #p2 { background-image: url('images/p2.png'); }
+        /* 當可以移動時，讓棋子跳動並發光 */
+        .can-move { 
+            animation: bounce 0.6s infinite alternate; 
+            cursor: pointer; 
+            filter: drop-shadow(0 0 15px #48bb78) brightness(1.2) !important; }
+        @keyframes bounce { 
+            from { transform: translateY(0); } 
+            to { transform: translateY(-20px); }
+        }
 
         #controls { 
             position: fixed; bottom: 0; left: 0; width: 100%; 
@@ -103,8 +112,8 @@
 
 <div id="game-container">
     <div id="board"></div>
-    <div id="p1" class="player"></div>
-    <div id="p2" class="player"></div>
+    <div id="p1" class="player" onclick="handlePlayerClick(0)"></div>
+    <div id="p2" class="player" onclick="handlePlayerClick(1)"></div>
 </div>
 
 <div id="controls">
@@ -175,16 +184,23 @@
     }
 
     async function roll() {
-        if(moving) return;
-        document.getElementById('btn-roll').disabled = true;
-        for(let i=0; i<8; i++) {
-            dice = Math.floor(Math.random()*6)+1;
-            document.getElementById('dice-box').innerText = dice;
-            await new Promise(r => setTimeout(r, 60));
-        }
-        move(turn);
+    // 檢查：如果正在移動或正在等待點擊，就不能再擲骰子
+    if(moving || waitingForClick) return; 
+    
+    document.getElementById('btn-roll').disabled = true;
+
+    // 骰子滾動動畫
+    for(let i=0; i<8; i++) {
+        dice = Math.floor(Math.random()*6)+1;
+        document.getElementById('dice-box').innerText = dice;
+        await new Promise(r => setTimeout(r, 60));
     }
 
+    // --- ✨ 重點修改：刪掉原本的 move(turn)，換成下面這三行 ---
+    waitingForClick = true; // 開啟「等待點擊」狀態
+    document.getElementById('p' + (turn + 1)).classList.add('can-move'); // 讓當前玩家的棋子開始跳動
+    document.getElementById('player-turn-name').innerText = "👈 請點擊棋子行走！"; // 更改提示文字
+}
     async function move(pid) {
         moving = true;
         for(let i=0; i<dice; i++) {
