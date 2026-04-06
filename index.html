@@ -208,14 +208,19 @@
             const cell = document.getElementById('c' + p.pos);
             const pEl = document.getElementById('p' + (i + 1));
             
-            // 左右位置：保持在格子中間稍微偏移，避免兩隻重疊
-            pEl.style.left = (cell.offsetLeft + (i === 0 ? 10 : 60)) + 'px';
+            // 🔍 調整 1：解決「不是在正下面」的問題
+            // 我們把 cell.offsetLeft (格子的左側) 加上 cell.offsetWidth / 2 (格子的半寬)
+            // 這樣棋子就會從格子的中央為準。
+            // 再根據玩家編號 (i) 微調，讓 P1 在左 P2 在右，且整體居中。
+            pEl.style.left = (cell.offsetLeft + (cell.offsetWidth / 2) + (i === 0 ? -30 : 5)) + 'px';
             
-            // 上下位置：強制移到格子底部再往下 15px (也就是路軌的位置)
-            // cell.offsetTop 是格子頂部，加上 cell.offsetHeight 剛好是格子底部
-            pEl.style.top = (cell.offsetTop + cell.offsetHeight + 5) + 'px';
+            // 🔍 調整 2：解決「沒有踩在行人道上」的問題
+            // cell.offsetTop 是格子頂部，cell.offsetHeight 是格子高度。
+            // 兩者相加是格子的底部。我們往下加 15px (原本可能是 +5px)，
+            // 這個 15px 應該剛好落在深灰色行人道的中央。
+            pEl.style.top = (cell.offsetTop + cell.offsetHeight + 15) + 'px';
         });
-     }
+    }
 
     async function roll() {
         if(moving || waitingForClick) return; 
