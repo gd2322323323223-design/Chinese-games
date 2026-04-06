@@ -153,8 +153,22 @@
             const cell = document.createElement('div');
             cell.className = 'cell';
             cell.id = 'c' + i;
-            let icon = traps.includes(i) ? "🍌" : (boosts.includes(i) ? "🚀" : "");else if(dinosaurs.includes(i)) icon = "<span class='event-icon'>🦖</span>"; // ✨ 新增恐龍圖標
-            cell.innerHTML = `<span class="cell-index">${i}</span><div class="cell-text">${w}</div><span class='event-icon'>${icon}</span>`;
+            
+            // --- 修正後的圖標判斷邏輯 ---
+            let iconText = "";
+            if(traps.includes(i)) {
+                iconText = "🍌";
+            } else if(boosts.includes(i)) {
+                iconText = "🚀";
+            } else if(dinosaurs.includes(i)) {
+                iconText = "🦖";
+            }
+
+            cell.innerHTML = `
+                <span class="cell-index">${i}</span>
+                <div class="cell-text">${w}</div>
+                <span class='event-icon'>${iconText}</span>
+            `;
             board.appendChild(cell);
         });
         setTimeout(updateDisplay, 200);
@@ -230,21 +244,19 @@
             prepareSpecialClick(pid);
             return; // 結束 move 函數，不要進入 showModal
         }
+        
         // --- 🦖 處理恐龍事件 ---
-           if(dinosaurs.includes(players[pid].pos)) { 
-               // 1. 彈出提示
-               alert("🦖 糟了！遇到大恐龍！\n請點擊棋子後退 1 格。"); 
-    
-               // 2. 預設好後退後的位置
-               players[pid].pos = Math.max(0, players[pid].pos - 1); 
-               
-               // 3. 讓棋子跳動，等待點擊執行移動
-               moving = false; 
-               waitingForClick = true; 
-               document.getElementById('p' + (pid + 1)).classList.add('can-move');
-               document.getElementById('player-turn-name').innerText = "👈 點擊棋子避開恐龍！";
-               return; // 結束函數，不進入詞語彈窗
-           }
+           // --- 🦖 處理恐龍事件 ---
+        if(dinosaurs.includes(players[pid].pos)) { 
+            alert("🦖 糟了！遇到大恐龍！\n請點擊棋子後退 1 格。"); 
+            
+            // 預設好後退後的位置
+            players[pid].pos = Math.max(0, players[pid].pos - 1); 
+            
+            // 使用你寫好的 prepareSpecialClick 讓棋子開始跳動等待點擊
+            prepareSpecialClick(pid);
+            return; 
+        }
         
         // 如果沒有觸發事件，則正常檢查終點或顯示詞語
         checkEndOrModal(pid);
@@ -255,7 +267,8 @@
         moving = false; 
         waitingForClick = true; 
         document.getElementById('p' + (pid + 1)).classList.add('can-move');
-        document.getElementById('player-turn-name').innerText = "👈 再次點擊執行特殊移動！";
+        // 提示玩家再次點擊
+        document.getElementById('player-turn-name').innerText = "👈 請點擊棋子執行移動！";
     }
 
     // 💡 新增：將原本 move 結尾的判斷抽出來
