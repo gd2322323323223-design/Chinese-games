@@ -232,38 +232,48 @@
             `;
             board.appendChild(cell);
         });
-        setTimeout(updateDisplay, 200);
+        setTimeout(updateDisplay, 50);
     }
 
     function updateDisplay() {
-        players.forEach((p, i) => {
-            const cell = document.getElementById('c' + p.pos);
-            const pEl = document.getElementById('p' + (i + 1));
-            
-            // 1. 左右位置：保持置中
-            const centerX = cell.offsetLeft + (cell.offsetWidth / 2) - 32;
-            pEl.style.left = centerX + 'px';
-            
-            // 2. 上下位置：重新計算 (使棋子踩在馬路中央)
-            // 直接抓取格子的 offsetTop (頂部位置) + 格子高度 (85px) + 馬路偏移量
-            const cellTop = cell.offsetTop;
-            const cellHeight = cell.offsetHeight;
-            const roadOffset = 100;      // ✨ 必須對應 CSS 的 bottom: -100px
-            
-            // ✨ 修改：計算棋子的腳底 Top。
-            // 我們把 cellBottomY 加上馬路相對於格子底部的偏移 (例如 +105px, 要對應CSS里的::after bottom)
-            // 再加上馬路高度的一半 (45px)，減去棋子高度的一半 (32px)，使兩者並排置中
-            const roadAreaTop = cellTop + CellHeight + (roadOffset - 90); // 馬路頂部
-            
-            if (i === 0) {
-                // 玩家 1 (小貓)：站在馬路的上半部
-                pEl.style.top = (roadAreaTop + 10) + 'px';
-            } else {
-                // 玩家 2 (小狗)：站在馬路的下半部 (往下移 40px)
-                pEl.style.top = (roadAreaTop + 45) + 'px';
-            }
-        });
-    }
+    players.forEach((p, i) => {
+        // 抓取當前棋子所在的格子元素
+        const cell = document.getElementById('c' + p.pos);
+        
+        // ✨ 保險措施：如果找不到格子，不執行定位，防止掉到左下角
+        if (!cell) {
+            console.error("找不到格子:", p.pos);
+            return; 
+        }
+
+        const pEl = document.getElementById('p' + (i + 1));
+        
+        // 1. 左右位置：置中對齊格子
+        // offsetLeft 是格子相對於容器的左側距離
+        const centerX = cell.offsetLeft + (cell.offsetWidth / 2) - 32;
+        pEl.style.left = centerX + 'px';
+        
+        // 2. 上下位置：精確踩在馬路上
+        // 我們用格子的頂部 (offsetTop) + 格子高度 (85px) 
+        // 加上我們在 CSS 中設的偏移量 (100px - 90px = 10px縫隙)
+        // 這樣能得到每一行馬路的頂部位置。
+        
+        const cellTop = cell.offsetTop;       // 格子頂部
+        const cellHeight = cell.offsetHeight; // 格子高度 (85px)
+        const roadOffset = 100;               // ✨ 對應CSS：bottom: -100px
+        
+        // 計算馬路區域的頂部座標 (格子底線向下 10px 的位置)
+        const roadAreaTop = cellTop + cellHeight + (roadOffset - 90);
+
+        if (i === 0) {
+            // 玩家 1 (貓)：站在馬路偏上方 (靠近格子)
+            pEl.style.top = (roadAreaTop + 10) + 'px';
+        } else {
+            // 玩家 2 (狗)：站在馬路偏下方 (靠近路邊石)
+            pEl.style.top = (roadAreaTop + 45) + 'px'; // 往下移 35px，拉開距離
+        }
+    });
+}
 
     async function roll() {
         if(moving || waitingForClick) return; 
@@ -429,7 +439,9 @@
 
     function startRecognition() { alert("AI 檢查功能需要權限。"); }
     window.onload = init;
-    window.onresize = updateDisplay;
+    // window.onload = function() { init(); }; // 這也是可以的
+    
+    // 不要直接執行 init();，必須放在 onload 裡面。
 </script>
 
 </body>
