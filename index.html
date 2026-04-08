@@ -227,7 +227,7 @@
             // ✨ 修改這裡：直接顯示 i，不再判斷 w 是否為空
             cell.innerHTML = `
                 <span class="cell-index">${i}</span>
-                <div class="cell-text" style="display: ${w === "" ? 'none' : 'block'}">${w}</div>
+                ${w !== "" ? `<div class="cell-text">${w}</div>` : `<div class="event-icon">${iconText}</div>`}
                 <span class='event-icon' style="${w === "" ? 'position: relative; margin-top: 10px;' : 'position: absolute; bottom: 5px; right: 5px; font-size: 35px;'}">${iconText}</span>
             `;
             board.appendChild(cell);
