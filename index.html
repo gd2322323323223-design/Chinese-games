@@ -268,13 +268,14 @@
         cell.innerHTML = `
             <span class="cell-index">${i}</span>
             ${i === words.length - 1 ? 
-                `<div class="event-icon" style="font-size: 120px; position: static;">🏆</div>
-                 <div class="cell-text" style="font-size: 30px;">終點</div>` 
+                `<div class="event-icon" style="font-size: 120px; position: static; display: block;">🏆</div>
+                 <div class="cell-text" style="font-size: 30px; position: static;">終點</div>`
                 : 
                 (w !== "" ? 
                     `<div class="cell-text">${w}</div>
                      <span class="event-icon" style="position: absolute; bottom: 5px; right: 8px; font-size: 30px;">${iconText}</span>` 
-                    : `<div class="event-icon" style="font-size: 70px;">${iconText}</div>`
+                    : 
+                    `<div class="event-icon" style="font-size: 70px;">${iconText}</div>`
                 )
             }
         `;
