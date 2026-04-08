@@ -218,11 +218,11 @@
                 cell.style.backgroundColor = "rgba(255, 235, 200, 0.9)";
             }
 
-            // ✨ 修改：如果 w 是空的（特殊格），不顯示數字索引
+            // ✨ 修改這裡：直接顯示 i，不再判斷 w 是否為空
             cell.innerHTML = `
-                <span class="cell-index">${w === "" ? "" : i}</span>
+                <span class="cell-index">${i}</span>
                 <div class="cell-text" style="font-size: ${w.length > 3 ? '18px' : '22px'}">${w}</div>
-                <span class='event-icon' style="font-size: 40px;">${iconText}</span>
+                <span class='event-icon' style="font-size: 40px; position: absolute; bottom: 10px; right: 10px;">${iconText}</span>
             `;
             board.appendChild(cell);
         });
