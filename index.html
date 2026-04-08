@@ -249,66 +249,77 @@
 
         waitingForClick = false;
         document.getElementById('p' + (turn + 1)).classList.remove('can-move');
-        document.getElementById('player-turn-name').innerText = "正在行走...";
         
-        await move(pid); 
+        // ✅ 核心邏輯：如果是特殊事件後的點擊
+        // 我們直接更新座標，然後直接換下一位玩家，不顯示彈窗
+        updateDisplay(); 
+        
+        // 這裡判斷：如果剛剛是在特殊事件狀態，就直接「結算並換人」
+        // 我們可以在 prepareSpecialClick 裡加個標記
+        if (specialEventActive) {
+            specialEventActive = false; // 重置標記
+            finishTurn(); // 直接換人的函數
+        } else {
+            // 如果是正常擲骰子後的第一次點擊，才執行 move
+            await move(pid); 
+        }
+    }
+
+    // 💡 新增一個標記變數在 script 開頭
+    let specialEventActive = false;
+
+    function prepareSpecialClick(pid) {
+        moving = false; 
+        waitingForClick = true; 
+        specialEventActive = true; // ✨ 標記現在是事件點擊
+        document.getElementById('p' + (pid + 1)).classList.add('can-move');
+        document.getElementById('player-turn-name').innerText = "👈 請點擊棋子執行事件移動！";
+    }
+
+    // 💡 新增：強制結束回合的函數
+    function finishTurn() {
+        // 直接切換到下一位，不給分數（或根據你需求給分）
+        turn = (turn === 0) ? 1 : 0;
+        const turnName = document.getElementById('player-turn-name');
+        turnName.innerText = `輪到：玩家 ${turn + 1}`;
+        turnName.style.color = turn === 0 ? 'var(--p1-color)' : 'var(--p2-color)';
+        document.getElementById('btn-roll').disabled = false;
+        moving = false;
     }
         
-    async function move(pid) {
-        moving = true;
-        for(let i=0; i<dice; i++) {
-            if (players[pid].pos < words.length - 1) {
-                players[pid].pos++;
-                updateDisplay();
-                await new Promise(r => setTimeout(r, 300));
-            }
-        }
+        // --- 檢查特殊事件 ---
         
-        // 檢查特殊事件
-      if(traps.includes(players[pid].pos)) { 
-            // 1. 先跳出提示
-            alert("🍌 哎呀！踩到香蕉皮滑倒了！\n點擊棋子後退 3 格。"); 
+        // 🍌 香蕉皮事件
+        if(traps.includes(players[pid].pos)) { 
+            alert("🍌 哎呀！踩到香蕉皮滑倒了！\n請點擊棋子後退 3 格並結束回合。"); 
             
-            // 2. 準備後退的邏輯
-            players[pid].pos = Math.max(0, players[pid].pos - 3);
-
-          updateDisplay();
+            // ✅ 改動：只計算座標，但不自動 updateDisplay
+            players[pid].pos = Math.max(0, players[pid].pos - 3); 
             
-            // 3. 進入「等待點擊」狀態，讓玩家點了才執行移動
-            prepareSpecialClick(pid);
-            return; // 結束 move 函數，不要進入 showModal
+            // ✅ 改動：進入「特殊點擊模式」，點了才移動並換人
+            prepareSpecialClick(pid, true); 
+            return; 
         }
 
+        // 🚀 火箭衝刺事件
         if(boosts.includes(players[pid].pos)) { 
-            // 1. 先跳出提示
-            alert("🚀 太棒了！坐上火箭衝刺！\n點擊棋子前進 5 格。"); 
+            alert("🚀 太棒了！坐上火箭衝刺！\n請點擊棋子前進 5 格並結束回合。"); 
+            players[pid].pos = Math.min(words.length-1, players[pid].pos + 5); 
             
-            // 2. 準備前進的邏輯
-            players[pid].pos = Math.min(words.length-1, players[pid].pos + 5);
-
-            updateDisplay();
-            
-            // 3. 進入「等待點擊」狀態
-            prepareSpecialClick(pid);
-            return; // 結束 move 函數，不要進入 showModal
+            prepareSpecialClick(pid, true); 
+            return; 
         }
-        
-        // --- 🦖 處理恐龍事件 ---
-           // --- 🦖 處理恐龍事件 ---
-        if(dinosaurs.includes(players[pid].pos)) { 
-            alert("🦖 糟了！遇到大恐龍！\n請點擊棋子後退 1 格。"); 
-            
-            // 預設好後退後的位置
-            players[pid].pos = Math.max(0, players[pid].pos - 1); 
 
-            updateDisplay();
+        // 🦖 恐龍事件
+        if(dinosaurs.includes(players[pid].pos)) { 
+            alert("🦖 糟了！遇到大恐龍！\n請點擊棋子後退 1 格並結束回合。"); 
+            players[pid].pos = Math.max(0, players[pid].pos - 1); 
             
-            // 使用你寫好的 prepareSpecialClick 讓棋子開始跳動等待點擊
-            prepareSpecialClick(pid);
+            prepareSpecialClick(pid, true); 
             return; 
         }
         
-        // 如果沒有觸發事件，則正常檢查終點或顯示詞語
+        // 如果沒有觸發任何事件，才進入原本的讀詞語流程
         checkEndOrModal(pid);
     }
 
