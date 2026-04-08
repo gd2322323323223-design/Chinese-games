@@ -414,7 +414,6 @@
     function showModal() {
         document.getElementById('modal-text').innerText = words[players[turn].pos];
         document.getElementById('modal').style.display = 'block';
-        speak();
         let timeLeft = 60;
         clearInterval(timerInterval);
         timerInterval = setInterval(() => {
