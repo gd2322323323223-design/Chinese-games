@@ -26,8 +26,7 @@
         #board { 
             display: grid; 
             grid-template-columns: repeat(10, 1fr); 
-            gap: 120px 15px; 
-            gap: 180px 15px; 
+            gap: 90px 15px; 
             padding: 40px; 
             border-radius: 40px; 
             /* 修正：加入你的背景圖 */
@@ -57,7 +56,6 @@
         .cell::after {
             content: "";
             position: absolute;
-            bottom: -100px;
             bottom: -115px;
             left: -10px; 
             right: -10px;
@@ -247,14 +245,13 @@
     players.forEach((p, i) => {
         // 抓取當前棋子所在的格子元素
         const cell = document.getElementById('c' + p.pos);
-
+        const pEl = document.getElementById('p' + (i + 1));
+        
         // ✨ 保險措施：如果找不到格子，不執行定位，防止掉到左下角
         if (!cell) {
             console.error("找不到格子:", p.pos);
             return; 
         }
-
-        const pEl = document.getElementById('p' + (i + 1));
 
         // 1. 左右位置：置中對齊格子
         // offsetLeft 是格子相對於容器的左側距離
@@ -275,8 +272,8 @@
 
         if (i === 0) {
             // 玩家 1 (貓)：站在馬路偏上方 (靠近格子)
-            pEl.style.top = (roadAreaTop + -20) + 'px';
             pEl.style.top = (roadAreaTop + -5) + 'px';
+            pEl.style.top = (roadAreaTop + -40) + 'px';
         } else {
             // 玩家 2 (狗)：站在馬路偏下方 (靠近路邊石)
             pEl.style.top = (roadAreaTop + 25) + 'px'; // 往下移 35px，拉開距離
