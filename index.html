@@ -1,452 +1,453 @@
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>中文詞語 88 關：究極挑戰版</title>
-    <style>
-        :root { 
-            --p1-color: #3182ce; 
-            --p2-color: #d53f8c; 
-            --cell-size: 90px; /* ✨ 修改：縮小格子高度 (原本是 100px) */
-            --road-height: 90px;
-        }
-        
-        body { 
-            font-family: "Microsoft JhengHei", sans-serif; 
-            margin: 0; 
-            background: #f0f4f8; 
-            overflow-y: scroll; 
-            padding-bottom: 200px; 
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>中文詞語 88 關：究極挑戰版</title>
+<style>
+:root { 
+--p1-color: #3182ce; 
+--p2-color: #d53f8c; 
+--cell-size: 85px; /* ✨ 修改：縮小格子高度 (原本是 100px) */
+--road-height: 90px;
+}
 
-        #game-container { position: relative; width: 95%; max-width: 1400px; margin: 20px auto; }
+body { 
+font-family: "Microsoft JhengHei", sans-serif; 
+margin: 0; 
+background: #f0f4f8; 
+overflow-y: scroll; 
+padding-bottom: 200px; 
+}
 
-        #board { 
-            display: grid; 
-            grid-template-columns: repeat(10, 1fr); 
-            gap: 180px 15px; 
-            padding: 40px; 
-            border-radius: 40px; 
-            /* 修正：加入你的背景圖 */
-            background-image: url('images/board-bg.jpg');
-            background-size: cover;
-            background-position: center;
-            background-color: #ffffff; 
-            box-shadow: 0 25px 50px rgba(0,0,0,0.1); 
-            border: 12px solid white;
-        }
+#game-container { position: relative; width: 95%; max-width: 1400px; margin: 20px auto; }
 
-        .cell { 
-            height: var(--cell-size);
-            border-radius: 20px; 
-            display: flex; 
-            flex-direction: column; 
-            align-items: center; 
-            justify-content: center; 
-            position: relative; 
-            transition: 0.3s; 
-            background-color: rgba(255, 255, 255, 0.9); /* 稍微透明，透出背景圖 */
-            padding: 5px; 
-            box-sizing: border-box; 
-            border: 2px solid #e2e8f0;
-            backdrop-filter: blur(5px);
-        }
-        .cell::after {
-            content: "";
-            position: absolute;
-            bottom: -115px;
-            left: -10px; 
-            right: -10px;
-            height: var(--road-height);
-            background: #4a5568; /* 深灰色馬路 */
-            border-bottom: 6px solid #cbd5e0; /* 路邊石 */
-            z-index: 1;
-            border-radius: 10px;
-        }
+#board { 
+display: grid; 
+grid-template-columns: repeat(10, 1fr); 
+gap: 120px 15px; 
+padding: 40px; 
+border-radius: 40px; 
+/* 修正：加入你的背景圖 */
+background-image: url('images/board-bg.jpg');
+background-size: cover;
+background-position: center;
+background-color: #ffffff; 
+box-shadow: 0 25px 50px rgba(0,0,0,0.1); 
+border: 12px solid white;
+}
 
-        /* 加上馬路白線 */
-        .cell::before {
-            content: "";
-            position: absolute;
-            bottom: calc(-1 * var(--road-height) / 2 - 8px);
-            left: 10%;
-            right: 10%;
-            height: 2px;
-            border-top: 2px dashed rgba(255,255,255,0.3);
-            z-index: 2;
-        }
+.cell { 
+height: var(--cell-size);
+border-radius: 20px; 
+display: flex; 
+flex-direction: column; 
+align-items: center; 
+justify-content: center; 
+position: relative; 
+transition: 0.3s; 
+background-color: rgba(255, 255, 255, 0.9); /* 稍微透明，透出背景圖 */
+padding: 5px; 
+box-sizing: border-box; 
+border: 2px solid #e2e8f0;
+backdrop-filter: blur(5px);
+}
+.cell::after {
+content: "";
+position: absolute;
+bottom: -100px;
+left: -10px; 
+right: -10px;
+height: var(--road-height);
+background: #4a5568; /* 深灰色馬路 */
+border-bottom: 6px solid #cbd5e0; /* 路邊石 */
+z-index: 1;
+border-radius: 10px;
+}
 
+/* 加上馬路白線 */
+.cell::before {
+content: "";
+position: absolute;
+bottom: calc(-1 * var(--road-height) / 2 - 8px);
+left: 10%;
+right: 10%;
+height: 2px;
+border-top: 2px dashed rgba(255,255,255,0.3);
+z-index: 2;
+}
+
+        .cell-text { font-size: 38px; /* 大幅放大文字 (原本是 22px) */
         .cell-text { font-size: 30px; /* 大幅放大文字 (原本是 22px) */
-            font-weight: 900; 
-            color: #1a202c; 
-            z-index: 3; 
-            margin: 0;
-            line-height: 1.2; }
-        .cell-index { position: absolute; top: 8px; left: 10px; font-size: 14px; color: #a0aec0; }
-        
-        /* 修正：換回你的小狗小貓圖片 */
-        .player { 
-            width: 65px; 
-            height: 65px; 
-            position: absolute; 
-            z-index: 100; 
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
-            background-size: contain;
-            background-repeat: no-repeat;
-            background-position: center;
-            filter: drop-shadow(0 4px 8px rgba(0,0,0,0.3));
-        }
-        #p1 { background-image: url('images/p1.png'); }
-        #p2 { background-image: url('images/p2.png'); }
-        /* 當可以移動時，讓棋子跳動並發光 */
-        .can-move { 
-            animation: bounce 0.6s infinite alternate; 
-            cursor: pointer; 
-            filter: drop-shadow(0 0 15px #48bb78) brightness(1.2) !important; }
-        @keyframes bounce { 
-            from { transform: translateY(0); } 
-            to { transform: translateY(-20px); }
-        }
+font-weight: 900; 
+color: #1a202c; 
+z-index: 3; 
+margin: 0;
+line-height: 1.2; }
+.cell-index { position: absolute; top: 8px; left: 10px; font-size: 14px; color: #a0aec0; }
 
-        #controls { 
-            position: fixed; bottom: 0; left: 0; width: 100%; 
-            background: rgba(255, 255, 255, 0.95); 
-            display: flex; justify-content: center; align-items: center; 
-            gap: 30px; padding: 20px; z-index: 100; 
-            box-shadow: 0 -10px 30px rgba(0,0,0,0.05); 
-            backdrop-filter: blur(10px);
-        }
+/* 修正：換回你的小狗小貓圖片 */
+.player { 
+width: 65px; 
+height: 65px; 
+position: absolute; 
+z-index: 100; 
+transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+background-size: contain;
+background-repeat: no-repeat;
+background-position: center;
+filter: drop-shadow(0 4px 8px rgba(0,0,0,0.3));
+}
+#p1 { background-image: url('images/p1.png'); }
+#p2 { background-image: url('images/p2.png'); }
+/* 當可以移動時，讓棋子跳動並發光 */
+.can-move { 
+animation: bounce 0.6s infinite alternate; 
+cursor: pointer; 
+filter: drop-shadow(0 0 15px #48bb78) brightness(1.2) !important; }
+@keyframes bounce { 
+from { transform: translateY(0); } 
+to { transform: translateY(-20px); }
+}
 
-        #dice-box { font-size: 45px; padding: 10px 25px; background: #edf2f7; border-radius: 15px; min-width: 60px; text-align: center; }
-        
-        #btn-roll { 
-            padding: 15px 40px; font-size: 22px; background: #48bb78; 
-            color: white; border: none; border-radius: 50px; 
-            cursor: pointer; font-weight: bold; transition: 0.2s;
-        }
-        #btn-roll:hover { background: #38a169; transform: scale(1.05); }
-        #btn-roll:disabled { background: #cbd5e0; transform: scale(1); }
+#controls { 
+position: fixed; bottom: 0; left: 0; width: 100%; 
+background: rgba(255, 255, 255, 0.95); 
+display: flex; justify-content: center; align-items: center; 
+gap: 30px; padding: 20px; z-index: 100; 
+box-shadow: 0 -10px 30px rgba(0,0,0,0.05); 
+backdrop-filter: blur(10px);
+}
 
-        /* 彈窗樣式 */
-        #modal { 
-            display: none; position: fixed; top: 50%; left: 50%; 
-            transform: translate(-50%, -50%); 
-            background: white; padding: 40px; border-radius: 40px; 
-            z-index: 300; box-shadow: 0 30px 100px rgba(0,0,0,0.4); 
-            text-align: center; width: 90%; max-width: 450px;
-            border: 10px solid #ebf8ff;
-        }
+#dice-box { font-size: 45px; padding: 10px 25px; background: #edf2f7; border-radius: 15px; min-width: 60px; text-align: center; }
 
-        #modal-text { font-size: 70px; font-weight: 900; margin: 25px 0; cursor: pointer; color: #2b6cb0; }
-        .event-icon { font-size: 55px; position: absolute; bottom: auto; right: auto; z-index: 2; }
-        
-    </style>
+#btn-roll { 
+padding: 15px 40px; font-size: 22px; background: #48bb78; 
+color: white; border: none; border-radius: 50px; 
+cursor: pointer; font-weight: bold; transition: 0.2s;
+}
+#btn-roll:hover { background: #38a169; transform: scale(1.05); }
+#btn-roll:disabled { background: #cbd5e0; transform: scale(1); }
+
+/* 彈窗樣式 */
+#modal { 
+display: none; position: fixed; top: 50%; left: 50%; 
+transform: translate(-50%, -50%); 
+background: white; padding: 40px; border-radius: 40px; 
+z-index: 300; box-shadow: 0 30px 100px rgba(0,0,0,0.4); 
+text-align: center; width: 90%; max-width: 450px;
+border: 10px solid #ebf8ff;
+}
+
+#modal-text { font-size: 70px; font-weight: 900; margin: 25px 0; cursor: pointer; color: #2b6cb0; }
+.event-icon { font-size: 55px; position: absolute; bottom: auto; right: auto; z-index: 2; }
+
+</style>
 </head>
 <body>
 
 <div id="game-container">
-    <div id="board"></div>
-    <div id="p1" class="player" onclick="handlePlayerClick(0)"></div>
-    <div id="p2" class="player" onclick="handlePlayerClick(1)"></div>
+<div id="board"></div>
+<div id="p1" class="player" onclick="handlePlayerClick(0)"></div>
+<div id="p2" class="player" onclick="handlePlayerClick(1)"></div>
 </div>
 
 <div id="controls">
-    <div style="font-size: 20px; font-weight: bold; color: #4a5568;">
-        <span style="color:var(--p1-color)">P1: <span id="s1">0</span></span> | 
-        <span style="color:var(--p2-color)">P2: <span id="s2">0</span></span>
-    </div>
-    <div id="status" style="font-size: 20px; font-weight: bold;">輪到：<span id="player-turn-name" style="color:var(--p1-color)">玩家 1</span></div>
-    <div id="dice-box">🎲</div>
-    <button id="btn-roll" onclick="roll()">擲骰子</button>
+<div style="font-size: 20px; font-weight: bold; color: #4a5568;">
+<span style="color:var(--p1-color)">P1: <span id="s1">0</span></span> | 
+<span style="color:var(--p2-color)">P2: <span id="s2">0</span></span>
+</div>
+<div id="status" style="font-size: 20px; font-weight: bold;">輪到：<span id="player-turn-name" style="color:var(--p1-color)">玩家 1</span></div>
+<div id="dice-box">🎲</div>
+<button id="btn-roll" onclick="roll()">擲骰子</button>
 </div>
 
 <div id="modal">
-    <div id="timer" style="font-size: 22px; color: #e67e22; font-weight: bold;">⏳ 剩餘時間: 60s</div>
-    <div id="modal-text" onclick="speak()">詞語</div>
-    <p style="font-size: 16px; color: #a0aec0; margin-bottom: 25px;">💡 點擊詞語可重複聽讀音</p>
-    <div style="display: flex; gap: 15px; flex-direction: column;">
-        <button onclick="startRecognition()" style="padding: 12px; background: #4299e1; color: white; border: none; border-radius: 15px; font-size: 18px; cursor: pointer; font-weight: bold;">🤖 AI 檢查讀音</button>
-        <button onclick="closeModal()" style="padding: 18px; background: #48bb78; color: white; border: none; border-radius: 20px; font-size: 22px; cursor: pointer; font-weight: bold;">我讀好了！</button>
-    </div>
+<div id="timer" style="font-size: 22px; color: #e67e22; font-weight: bold;">⏳ 剩餘時間: 60s</div>
+<div id="modal-text" onclick="speak()">詞語</div>
+<p style="font-size: 16px; color: #a0aec0; margin-bottom: 25px;">💡 點擊詞語可重複聽讀音</p>
+<div style="display: flex; gap: 15px; flex-direction: column;">
+<button onclick="startRecognition()" style="padding: 12px; background: #4299e1; color: white; border: none; border-radius: 15px; font-size: 18px; cursor: pointer; font-weight: bold;">🤖 AI 檢查讀音</button>
+<button onclick="closeModal()" style="padding: 18px; background: #48bb78; color: white; border: none; border-radius: 20px; font-size: 22px; cursor: pointer; font-weight: bold;">我讀好了！</button>
+</div>
 </div>
 
 <script>
-    // --- 基礎變數定義 ---
-    let pendingSteps = 0; 
-    let turn = 0, dice = 0, moving = false, timerInterval;
-    let waitingForClick = false; 
-    let specialEventActive = false; 
+// --- 基礎變數定義 ---
+let pendingSteps = 0; 
+let turn = 0, dice = 0, moving = false, timerInterval;
+let waitingForClick = false; 
+let specialEventActive = false; 
 
-    const players = [{pos: 0, score: 0}, {pos: 0, score: 0}];
-    const traps = [5, 12, 25, 40, 55, 70];
-    const boosts = [8, 20, 35, 50, 65, 80];
-    const dinosaurs = [2]; 
+const players = [{pos: 0, score: 0}, {pos: 0, score: 0}];
+const traps = [5, 12, 25, 40, 55, 70];
+const boosts = [8, 20, 35, 50, 65, 80];
+const dinosaurs = [2]; 
 
-    // --- 詞語重組邏輯 (✨ 關鍵修改：將詞語順延，空出特殊格) ---
-    const rawWords = ["學校", "禮堂", "校務處", "操場", "音樂室", "課室", "洗手間", "電腦室", "樓梯", "圖書館", "走廊", "升降機", "教員室", "草地上", "沙灘", "山頂", "運動場", "籃球場", "足球場", "燒烤場", "公園", "家裏", "客廳", "浴室", "睡房", "廚房", "清真寺", "商場", "超市", "街市", "麵包店", "理髮店", "便利店", "藥房", "餐廳", "醫院", "補習社", "博物館", "銀行", "地鐵站", "巴士站", "行人道", "刷牙", "洗澡", "洗手", "喝水", "吃飯", "睡覺", "穿衣服", "戴口罩", "做家務", "倒垃圾", "洗碗", "抹窗戶", "煮飯", "上課", "做功課", "溫習", "看書", "畫畫", "做早操", "跑步", "游泳", "跳繩", "踢足球", "打籃球", "騎單車", "遠足", "拍照", "表演", "唱歌", "跳舞", "慶祝", "排隊", "玩遊戲", "看手機", "打電話", "打招呼", "買水果", "比賽", "說話", "摺紙", "下棋", "玩拼圖"];
+// --- 詞語重組邏輯 (✨ 關鍵修改：將詞語順延，空出特殊格) ---
+const rawWords = ["學校", "禮堂", "校務處", "操場", "音樂室", "課室", "洗手間", "電腦室", "樓梯", "圖書館", "走廊", "升降機", "教員室", "草地上", "沙灘", "山頂", "運動場", "籃球場", "足球場", "燒烤場", "公園", "家裏", "客廳", "浴室", "睡房", "廚房", "清真寺", "商場", "超市", "街市", "麵包店", "理髮店", "便利店", "藥房", "餐廳", "醫院", "補習社", "博物館", "銀行", "地鐵站", "巴士站", "行人道", "刷牙", "洗澡", "洗手", "喝水", "吃飯", "睡覺", "穿衣服", "戴口罩", "做家務", "倒垃圾", "洗碗", "抹窗戶", "煮飯", "上課", "做功課", "溫習", "看書", "畫畫", "做早操", "跑步", "游泳", "跳繩", "踢足球", "打籃球", "騎單車", "遠足", "拍照", "表演", "唱歌", "跳舞", "慶祝", "排隊", "玩遊戲", "看手機", "打電話", "打招呼", "買水果", "比賽", "說話", "摺紙", "下棋", "玩拼圖"];
 
-    let words = [];
-    let wordIdx = 0;
-    // 循環生成 100 格地圖，遇到特殊格就跳過詞語
-    for (let i = 0; i < 110; i++) {
-        if (i === 0) {
-            words.push("起點");
-        } else if (traps.includes(i) || boosts.includes(i) || dinosaurs.includes(i)) {
-            words.push(""); // 這裡是事件格，不放文字
-        } else if (wordIdx < rawWords.length) {
-            words.push(rawWords[wordIdx]);
-            wordIdx++;
-        } else {
-            words.push("🏆 終點");
-            break; 
-        }
-    }
-
-    // --- 初始化畫板 ---
-    function init() {
-        const board = document.getElementById('board');
-        board.innerHTML = "";
-        words.forEach((w, i) => {
-            const cell = document.createElement('div');
-            cell.className = 'cell';
-            cell.id = 'c' + i;
-            
-            let iconText = "";
-            let isEvent = false;
-
-            if(traps.includes(i)) { iconText = "🍌"; isEvent = true; }
-            else if(boosts.includes(i)) { iconText = "🚀"; isEvent = true; }
-            else if(dinosaurs.includes(i)) { iconText = "🦖"; isEvent = true; }
-
-            // 如果是事件格，背景變淺橘色，方便辨識
-            if (isEvent) {
-                cell.style.backgroundColor = "rgba(255, 235, 200, 0.9)";
-            }
-
-            // ✨ 修正語法：確保模板字串正確閉合
-        cell.innerHTML = `
-            <span class="cell-index">${i}</span>
-            ${w !== "" ? 
-                `<div class="cell-text">${w}</div>
-                 <span class="event-icon" style="position: absolute; bottom: 5px; right: 8px; font-size: 30px;">${iconText}</span>` 
-                : 
-                `<div class="event-icon" style="font-size: 70px;">${iconText}</div>`
-            }
-        `;
-        
-        board.appendChild(cell);
-    });
-        setTimeout(updateDisplay, 50);
-    }
-
-    function updateDisplay() {
-    players.forEach((p, i) => {
-        // 抓取當前棋子所在的格子元素
-        const cell = document.getElementById('c' + p.pos);
-        
-        // ✨ 保險措施：如果找不到格子，不執行定位，防止掉到左下角
-        if (!cell) {
-            console.error("找不到格子:", p.pos);
-            return; 
-        }
-
-        const pEl = document.getElementById('p' + (i + 1));
-        
-        // 1. 左右位置：置中對齊格子
-        // offsetLeft 是格子相對於容器的左側距離
-        const centerX = cell.offsetLeft + (cell.offsetWidth / 2) - 32;
-        pEl.style.left = centerX + 'px';
-        
-        // 2. 上下位置：精確踩在馬路上
-        // 我們用格子的頂部 (offsetTop) + 格子高度 (85px) 
-        // 加上我們在 CSS 中設的偏移量 (100px - 90px = 10px縫隙)
-        // 這樣能得到每一行馬路的頂部位置。
-        
-        const cellTop = cell.offsetTop;       // 格子頂部
-        const cellHeight = cell.offsetHeight; // 格子高度 (85px)
-        const roadOffset = 100;               // ✨ 對應CSS：bottom: -100px
-        
-        // 計算馬路區域的頂部座標 (格子底線向下 10px 的位置)
-        const roadAreaTop = cellTop + cellHeight + (roadOffset - 90);
-
-        if (i === 0) {
-            // 玩家 1 (貓)：站在馬路偏上方 (靠近格子)
-            pEl.style.top = (roadAreaTop + -5) + 'px';
-        } else {
-            // 玩家 2 (狗)：站在馬路偏下方 (靠近路邊石)
-            pEl.style.top = (roadAreaTop + 40) + 'px'; // 往下移 35px，拉開距離
-        }
-    });
+let words = [];
+let wordIdx = 0;
+// 循環生成 100 格地圖，遇到特殊格就跳過詞語
+for (let i = 0; i < 110; i++) {
+if (i === 0) {
+words.push("起點");
+} else if (traps.includes(i) || boosts.includes(i) || dinosaurs.includes(i)) {
+words.push(""); // 這裡是事件格，不放文字
+} else if (wordIdx < rawWords.length) {
+words.push(rawWords[wordIdx]);
+wordIdx++;
+} else {
+words.push("🏆 終點");
+break; 
+}
 }
 
-    async function roll() {
-        if(moving || waitingForClick) return; 
-        document.getElementById('btn-roll').disabled = true;
-        for(let i=0; i<8; i++) {
-            dice = Math.floor(Math.random()*6)+1;
-            document.getElementById('dice-box').innerText = dice;
-            await new Promise(r => setTimeout(r, 60));
-        }
-        waitingForClick = true; 
-        document.getElementById('p' + (turn + 1)).classList.add('can-move'); 
-        document.getElementById('player-turn-name').innerText = "👈 請點擊棋子行走！";
-    }
+// --- 初始化畫板 ---
+function init() {
+const board = document.getElementById('board');
+board.innerHTML = "";
+words.forEach((w, i) => {
+const cell = document.createElement('div');
+cell.className = 'cell';
+cell.id = 'c' + i;
 
-    async function handlePlayerClick(pid) {
-        if (!waitingForClick || pid !== turn || moving) return;
-        waitingForClick = false;
-        document.getElementById('p' + (turn + 1)).classList.remove('can-move');
+let iconText = "";
+let isEvent = false;
 
-        if (specialEventActive) {
-            specialEventActive = false;
-            // ✨ 改動：調用一步一步走的函數
-            await moveSteps(pid, pendingSteps); 
-            finishTurn(); 
-        } else {
-            await move(pid); 
-        }
-    }
-    // 準備特殊移動：設定方向與步數，並讓棋子跳動
-    function prepareSpecialStep(pid, steps) {
-        moving = false; 
-        waitingForClick = true; 
-        specialEventActive = true; 
-        pendingSteps = steps; // 記錄要走幾步（正數前進，負數後退）
-        document.getElementById('p' + (pid + 1)).classList.add('can-move');
-        document.getElementById('player-turn-name').innerText = "👈 請點擊棋子執行事件移動！";
-    }
+if(traps.includes(i)) { iconText = "🍌"; isEvent = true; }
+else if(boosts.includes(i)) { iconText = "🚀"; isEvent = true; }
+else if(dinosaurs.includes(i)) { iconText = "🦖"; isEvent = true; }
 
-    // 執行步進動畫的函數
-    async function moveSteps(pid, steps) {
-        moving = true;
-        const isForward = steps > 0;
-        const absoluteSteps = Math.abs(steps);
+// 如果是事件格，背景變淺橘色，方便辨識
+if (isEvent) {
+cell.style.backgroundColor = "rgba(255, 235, 200, 0.9)";
+}
 
-        for(let i=0; i < absoluteSteps; i++) {
-            if (isForward) {
-                // 前進邏輯
-                if (players[pid].pos < words.length - 1) players[pid].pos++;
-            } else {
-                // 後退邏輯
-                if (players[pid].pos > 0) players[pid].pos--;
-            }
-            updateDisplay();
-            await new Promise(r => setTimeout(r, 300)); // 每步停頓 0.3 秒
-        }
-        moving = false;
-    }
-    
-    async function move(pid) {
-        moving = true;
-        
-        // 1. 正常的骰子一步一步移動過程
-        for(let i=0; i<dice; i++) {
-            if (players[pid].pos < words.length - 1) {
-                players[pid].pos++;
-                updateDisplay();
-                await new Promise(r => setTimeout(r, 300));
-            }
-        }
+// ✨ 修正語法：確保模板字串正確閉合
+cell.innerHTML = `
+           <span class="cell-index">${i}</span>
+           ${w !== "" ? 
+               `<div class="cell-text">${w}</div>
+                <span class="event-icon" style="position: absolute; bottom: 5px; right: 8px; font-size: 30px;">${iconText}</span>` 
+               : 
+               `<div class="event-icon" style="font-size: 70px;">${iconText}</div>`
+           }
+       `;
 
-        // 2. 移動結束後，先檢查是否踩到「特殊事件格」
-        
-        // 🍌 香蕉皮事件 (後退 3 格)
-        if(traps.includes(players[pid].pos)) { 
-            alert("🍌 哎呀！踩到香蕉皮滑倒了！\n請點擊棋子後退 3 格。"); 
-            prepareSpecialStep(pid, -3); // 這裡會呼叫我們之前寫的「一步一步後退」
-            return; // 結束函數，不執行後面的讀詞彈窗
-        }
+board.appendChild(cell);
+});
+setTimeout(updateDisplay, 50);
+}
 
-        // 🚀 火箭衝刺事件 (前進 5 格)
-        if(boosts.includes(players[pid].pos)) { 
-            alert("🚀 太棒了！坐上火箭衝刺！\n請點擊棋子前進 5 格。"); 
-            prepareSpecialStep(pid, 5); // 這裡會呼叫「一步一步前進」
-            return; // 結束函數
-        }
+function updateDisplay() {
+players.forEach((p, i) => {
+// 抓取當前棋子所在的格子元素
+const cell = document.getElementById('c' + p.pos);
 
-        // 🦖 恐龍事件 (後退 1 格)
-        if(dinosaurs.includes(players[pid].pos)) { 
-            alert("🦖 糟了！遇到大恐龍！\n請點擊棋子後退 1 格。"); 
-            prepareSpecialStep(pid, -1); 
-            return; // 結束函數
-        }
+// ✨ 保險措施：如果找不到格子，不執行定位，防止掉到左下角
+if (!cell) {
+console.error("找不到格子:", p.pos);
+return; 
+}
 
-        // 3. 如果沒踩到事件，再檢查是否要讀詞語
-        // 判斷：格子不是空的 ""，也不是 "起點"
-        if (words[players[pid].pos] !== "" && words[players[pid].pos] !== "起點") {
-            // ✅ 執行原本的：檢查是否終點 + 跳出讀詞彈窗
-            checkEndOrModal(pid);
-        } else {
-            // ✅ 如果停在特殊事件格(已處理)或起點，直接換人
-            finishTurn();
-        }
-    } // 這裡結束 move 函數
+const pEl = document.getElementById('p' + (i + 1));
 
-    function prepareSpecialClick(pid) {
-        moving = false; 
-        waitingForClick = true; 
-        specialEventActive = true; 
-        document.getElementById('p' + (pid + 1)).classList.add('can-move');
-        document.getElementById('player-turn-name').innerText = "👈 請點擊棋子執行事件位移！";
-    }
+// 1. 左右位置：置中對齊格子
+// offsetLeft 是格子相對於容器的左側距離
+const centerX = cell.offsetLeft + (cell.offsetWidth / 2) - 32;
+pEl.style.left = centerX + 'px';
 
-    function finishTurn() {
-        turn = (turn === 0) ? 1 : 0;
-        const turnName = document.getElementById('player-turn-name');
-        turnName.innerText = `輪到：玩家 ${turn + 1}`;
-        turnName.style.color = turn === 0 ? 'var(--p1-color)' : 'var(--p2-color)';
-        document.getElementById('btn-roll').disabled = false;
-        moving = false;
-    }
+// 2. 上下位置：精確踩在馬路上
+// 我們用格子的頂部 (offsetTop) + 格子高度 (85px) 
+// 加上我們在 CSS 中設的偏移量 (100px - 90px = 10px縫隙)
+// 這樣能得到每一行馬路的頂部位置。
 
-    function checkEndOrModal(pid) {
-        moving = false;
-        if(players[pid].pos === words.length-1) {
-            alert(`🏆 恭喜玩家 ${pid + 1} 成功挑戰 88 關！`);
-            location.reload();
-        } else {
-            showModal();
-        }
-    }
+const cellTop = cell.offsetTop;       // 格子頂部
+const cellHeight = cell.offsetHeight; // 格子高度 (85px)
+const roadOffset = 100;               // ✨ 對應CSS：bottom: -100px
 
-    function showModal() {
-        document.getElementById('modal-text').innerText = words[players[turn].pos];
-        document.getElementById('modal').style.display = 'block';
-        speak();
-        let timeLeft = 60;
-        clearInterval(timerInterval);
-        timerInterval = setInterval(() => {
-            timeLeft--;
-            document.getElementById('timer').innerText = `⏳ 剩餘時間: ${timeLeft}s`;
-            if(timeLeft <= 0) closeModal(false);
-        }, 1000);
-    }
+// 計算馬路區域的頂部座標 (格子底線向下 10px 的位置)
+const roadAreaTop = cellTop + cellHeight + (roadOffset - 90);
 
-    function closeModal(addScore = true) {
-        clearInterval(timerInterval);
-        if(addScore) {
-            players[turn].score += 10;
-            document.getElementById('s' + (turn + 1)).innerText = players[turn].score;
-        }
-        document.getElementById('modal').style.display = 'none';
-        finishTurn();
-    }
+if (i === 0) {
+// 玩家 1 (貓)：站在馬路偏上方 (靠近格子)
+pEl.style.top = (roadAreaTop + -20) + 'px';
+} else {
+// 玩家 2 (狗)：站在馬路偏下方 (靠近路邊石)
+pEl.style.top = (roadAreaTop + 25) + 'px'; // 往下移 35px，拉開距離
+}
+});
+}
 
-    function speak() {
-        window.speechSynthesis.cancel();
-        const textToSpeak = document.getElementById('modal-text').innerText.trim();
-        const msg = new SpeechSynthesisUtterance(textToSpeak); 
-        msg.lang = 'zh-HK';
-        msg.rate = 0.85;
-        window.speechSynthesis.speak(msg);
-    }
+async function roll() {
+if(moving || waitingForClick) return; 
+document.getElementById('btn-roll').disabled = true;
+for(let i=0; i<8; i++) {
+dice = Math.floor(Math.random()*6)+1;
+document.getElementById('dice-box').innerText = dice;
+await new Promise(r => setTimeout(r, 60));
+}
+waitingForClick = true; 
+document.getElementById('p' + (turn + 1)).classList.add('can-move'); 
+document.getElementById('player-turn-name').innerText = "👈 請點擊棋子行走！";
+}
 
-    function startRecognition() { alert("AI 檢查功能需要權限。"); }
-    window.onload = init;
-    // window.onload = function() { init(); }; // 這也是可以的
-    
-    // 不要直接執行 init();，必須放在 onload 裡面。
+async function handlePlayerClick(pid) {
+if (!waitingForClick || pid !== turn || moving) return;
+waitingForClick = false;
+document.getElementById('p' + (turn + 1)).classList.remove('can-move');
+
+if (specialEventActive) {
+specialEventActive = false;
+// ✨ 改動：調用一步一步走的函數
+await moveSteps(pid, pendingSteps); 
+finishTurn(); 
+} else {
+await move(pid); 
+}
+}
+// 準備特殊移動：設定方向與步數，並讓棋子跳動
+function prepareSpecialStep(pid, steps) {
+moving = false; 
+waitingForClick = true; 
+specialEventActive = true; 
+pendingSteps = steps; // 記錄要走幾步（正數前進，負數後退）
+document.getElementById('p' + (pid + 1)).classList.add('can-move');
+document.getElementById('player-turn-name').innerText = "👈 請點擊棋子執行事件移動！";
+}
+
+// 執行步進動畫的函數
+async function moveSteps(pid, steps) {
+moving = true;
+const isForward = steps > 0;
+const absoluteSteps = Math.abs(steps);
+
+for(let i=0; i < absoluteSteps; i++) {
+if (isForward) {
+// 前進邏輯
+if (players[pid].pos < words.length - 1) players[pid].pos++;
+} else {
+// 後退邏輯
+if (players[pid].pos > 0) players[pid].pos--;
+}
+updateDisplay();
+await new Promise(r => setTimeout(r, 300)); // 每步停頓 0.3 秒
+}
+moving = false;
+}
+
+async function move(pid) {
+moving = true;
+
+// 1. 正常的骰子一步一步移動過程
+for(let i=0; i<dice; i++) {
+if (players[pid].pos < words.length - 1) {
+players[pid].pos++;
+updateDisplay();
+await new Promise(r => setTimeout(r, 300));
+}
+}
+
+// 2. 移動結束後，先檢查是否踩到「特殊事件格」
+
+// 🍌 香蕉皮事件 (後退 3 格)
+if(traps.includes(players[pid].pos)) { 
+alert("🍌 哎呀！踩到香蕉皮滑倒了！\n請點擊棋子後退 3 格。"); 
+prepareSpecialStep(pid, -3); // 這裡會呼叫我們之前寫的「一步一步後退」
+return; // 結束函數，不執行後面的讀詞彈窗
+}
+
+// 🚀 火箭衝刺事件 (前進 5 格)
+if(boosts.includes(players[pid].pos)) { 
+alert("🚀 太棒了！坐上火箭衝刺！\n請點擊棋子前進 5 格。"); 
+prepareSpecialStep(pid, 5); // 這裡會呼叫「一步一步前進」
+return; // 結束函數
+}
+
+// 🦖 恐龍事件 (後退 1 格)
+if(dinosaurs.includes(players[pid].pos)) { 
+alert("🦖 糟了！遇到大恐龍！\n請點擊棋子後退 1 格。"); 
+prepareSpecialStep(pid, -1); 
+return; // 結束函數
+}
+
+// 3. 如果沒踩到事件，再檢查是否要讀詞語
+// 判斷：格子不是空的 ""，也不是 "起點"
+if (words[players[pid].pos] !== "" && words[players[pid].pos] !== "起點") {
+// ✅ 執行原本的：檢查是否終點 + 跳出讀詞彈窗
+checkEndOrModal(pid);
+} else {
+// ✅ 如果停在特殊事件格(已處理)或起點，直接換人
+finishTurn();
+}
+} // 這裡結束 move 函數
+
+function prepareSpecialClick(pid) {
+moving = false; 
+waitingForClick = true; 
+specialEventActive = true; 
+document.getElementById('p' + (pid + 1)).classList.add('can-move');
+document.getElementById('player-turn-name').innerText = "👈 請點擊棋子執行事件位移！";
+}
+
+function finishTurn() {
+turn = (turn === 0) ? 1 : 0;
+const turnName = document.getElementById('player-turn-name');
+turnName.innerText = `輪到：玩家 ${turn + 1}`;
+turnName.style.color = turn === 0 ? 'var(--p1-color)' : 'var(--p2-color)';
+document.getElementById('btn-roll').disabled = false;
+moving = false;
+}
+
+function checkEndOrModal(pid) {
+moving = false;
+if(players[pid].pos === words.length-1) {
+alert(`🏆 恭喜玩家 ${pid + 1} 成功挑戰 88 關！`);
+location.reload();
+} else {
+showModal();
+}
+}
+
+function showModal() {
+document.getElementById('modal-text').innerText = words[players[turn].pos];
+document.getElementById('modal').style.display = 'block';
+speak();
+let timeLeft = 60;
+clearInterval(timerInterval);
+timerInterval = setInterval(() => {
+timeLeft--;
+document.getElementById('timer').innerText = `⏳ 剩餘時間: ${timeLeft}s`;
+if(timeLeft <= 0) closeModal(false);
+}, 1000);
+}
+
+function closeModal(addScore = true) {
+clearInterval(timerInterval);
+if(addScore) {
+players[turn].score += 10;
+document.getElementById('s' + (turn + 1)).innerText = players[turn].score;
+}
+document.getElementById('modal').style.display = 'none';
+finishTurn();
+}
+
+function speak() {
+window.speechSynthesis.cancel();
+const textToSpeak = document.getElementById('modal-text').innerText.trim();
+const msg = new SpeechSynthesisUtterance(textToSpeak); 
+msg.lang = 'zh-HK';
+msg.rate = 0.85;
+window.speechSynthesis.speak(msg);
+}
+
+function startRecognition() { alert("AI 檢查功能需要權限。"); }
+window.onload = init;
+// window.onload = function() { init(); }; // 這也是可以的
+
+// 不要直接執行 init();，必須放在 onload 裡面。
 </script>
 
 </body>
