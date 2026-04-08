@@ -56,7 +56,7 @@
         .cell::after {
             content: "";
             position: absolute;
-            bottom: -100px;
+            bottom: -110px;
             left: -10px; 
             right: -10px;
             height: var(--road-height);
@@ -270,15 +270,13 @@
         // 計算馬路區域的頂部座標 (格子底線向下 10px 的位置)
         const roadAreaTop = cellTop + cellHeight + (roadOffset - 90);
 
-        if (i === 0) {
-            // 玩家 1 (貓)：站在馬路偏上方 (靠近格子)
-            pEl.style.top = (roadAreaTop -15) + 'px';
+      if (i === 0) {
+            // 玩家 1 (貓)：稍微向下離開馬路頂部邊緣
+            pEl.style.top = (roadAreaTop + 5) + 'px'; 
         } else {
-            // 玩家 2 (狗)：站在馬路偏下方 (靠近路邊石)
-            pEl.style.top = (roadAreaTop + 40) + 'px'; // 往下移 35px，拉開距離
+            // 玩家 2 (狗)：與貓保持適當距離，且不超出馬路底部
+            pEl.style.top = (roadAreaTop + 45) + 'px'; 
         }
-    });
-}
 
     async function roll() {
         if(moving || waitingForClick) return; 
