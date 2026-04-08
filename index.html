@@ -77,7 +77,7 @@
             z-index: 2;
         }
 
-        .cell-text { ont-size: 48px; /* 大幅放大文字 (原本是 22px) */
+        .cell-text { font-size: 48px; /* 大幅放大文字 (原本是 22px) */
             font-weight: 900; 
             color: #1a202c; 
             z-index: 3; 
@@ -224,14 +224,19 @@
                 cell.style.backgroundColor = "rgba(255, 235, 200, 0.9)";
             }
 
-            // ✨ 修改這裡：直接顯示 i，不再判斷 w 是否為空
-            cell.innerHTML = `
-                <span class="cell-index">${i}</span>
-                ${w !== "" ? `<div class="cell-text">${w}</div>` : `<div class="event-icon">${iconText}</div>`}
-                <span class='event-icon' style="${w === "" ? 'position: relative; margin-top: 10px;' : 'position: absolute; bottom: 5px; right: 5px; font-size: 35px;'}">${iconText}</span>
-            `;
-            board.appendChild(cell);
-        });
+            // ✨ 修正語法：確保模板字串正確閉合
+        cell.innerHTML = `
+            <span class="cell-index">${i}</span>
+            ${w !== "" ? 
+                `<div class="cell-text">${w}</div>
+                 <span class="event-icon" style="position: absolute; bottom: 5px; right: 8px; font-size: 30px;">${iconText}</span>` 
+                : 
+                `<div class="event-icon" style="font-size: 70px;">${iconText}</div>`
+            }
+        `;
+        
+        board.appendChild(cell);
+    });
         setTimeout(updateDisplay, 50);
     }
 
