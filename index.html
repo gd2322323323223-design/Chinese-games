@@ -255,9 +255,7 @@
             else if(dinosaurs.includes(i)) { iconText = "🦖"; isEvent = true; }
 
             // 如果是事件格，背景變淺橘色，方便辨識
-            if (isEvent) {
-                cell.style.backgroundColor = "rgba(255, 235, 200, 0.9)";
-            }
+            if (isEvent) {cell.style.backgroundColor = "rgba(255, 235, 200, 0.9)";}
 
             // ✨ 修正語法：確保模板字串正確閉合
         cell.innerHTML = `
@@ -271,7 +269,7 @@
         `;
 
         board.appendChild(cell);
-    });
+        });
         setTimeout(updateDisplay, 50);
     }
 
@@ -323,6 +321,7 @@
           // 玩家 2 (狗)：與貓保持適當距離，且不超出馬路底部
             pEl.style.top = (roadAreaTop + 30) + 'px'; 
         }
+            }
         }); // ✨ 這是第一個：用來結束 players.forEach 的循環
 } // ✨ 這是第二個：用來結束 updateDisplay 函數的定義
 
