@@ -25,7 +25,7 @@
         #board { 
             display: grid; 
             grid-template-columns: repeat(10, 1fr); 
-            gap: 140px 15px; 
+            gap: 80px 15px; 
             padding: 40px; 
             border-radius: 40px; 
             /* 修正：加入你的背景圖 */
@@ -248,18 +248,19 @@
             // 直接抓取格子的 offsetTop (頂部位置) + 格子高度 (85px) + 馬路偏移量
             const cellTop = cell.offsetTop;
             const cellHeight = cell.offsetHeight;
+            const roadOffset = 100;      // ✨ 必須對應 CSS 的 bottom: -100px
             
             // ✨ 修改：計算棋子的腳底 Top。
             // 我們把 cellBottomY 加上馬路相對於格子底部的偏移 (例如 +105px, 要對應CSS里的::after bottom)
             // 再加上馬路高度的一半 (45px)，減去棋子高度的一半 (32px)，使兩者並排置中
-            const roadAreaTop = cellTop + CellHeight + 10; // 馬路頂部
+            const roadAreaTop = cellTop + CellHeight + (roadOffset - 90); // 馬路頂部
             
             if (i === 0) {
                 // 玩家 1 (小貓)：站在馬路的上半部
-                pEl.style.top = (roadAreaTop + 5) + 'px';
+                pEl.style.top = (roadAreaTop + 10) + 'px';
             } else {
                 // 玩家 2 (小狗)：站在馬路的下半部 (往下移 40px)
-                pEl.style.top = (roadAreaTop + 40) + 'px';
+                pEl.style.top = (roadAreaTop + 45) + 'px';
             }
         });
     }
