@@ -8,7 +8,7 @@
         :root { 
             --p1-color: #3182ce; 
             --p2-color: #d53f8c; 
-            --cell-size: 85px; /* ✨ 修改：縮小格子高度 (原本是 100px) */
+            --cell-size: 90px; /* ✨ 修改：縮小格子高度 (原本是 100px) */
             --road-height: 90px;
         }
         
@@ -25,7 +25,7 @@
         #board { 
             display: grid; 
             grid-template-columns: repeat(10, 1fr); 
-            gap: 120px 15px; 
+            gap: 180px 15px; 
             padding: 40px; 
             border-radius: 40px; 
             /* 修正：加入你的背景圖 */
@@ -55,7 +55,7 @@
         .cell::after {
             content: "";
             position: absolute;
-            bottom: -100px;
+            bottom: -115px;
             left: -10px; 
             right: -10px;
             height: var(--road-height);
@@ -272,10 +272,10 @@
 
         if (i === 0) {
             // 玩家 1 (貓)：站在馬路偏上方 (靠近格子)
-            pEl.style.top = (roadAreaTop + -20) + 'px';
+            pEl.style.top = (roadAreaTop + -5) + 'px';
         } else {
             // 玩家 2 (狗)：站在馬路偏下方 (靠近路邊石)
-            pEl.style.top = (roadAreaTop + 25) + 'px'; // 往下移 35px，拉開距離
+            pEl.style.top = (roadAreaTop + 40) + 'px'; // 往下移 35px，拉開距離
         }
     });
 }
