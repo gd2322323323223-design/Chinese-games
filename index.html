@@ -8,8 +8,8 @@
         :root { 
             --p1-color: #3182ce; 
             --p2-color: #d53f8c; 
-            --cell-size: 100px; /* 1. 縮小格子高度 (原本是 140px) */
-            --road-height: 90px; /* 新增：路軌的高度 */
+            --cell-size: 85px; /* ✨ 修改：縮小格子高度 (原本是 100px) */
+            --road-height: 90px;
         }
         
         body { 
@@ -39,16 +39,16 @@
 
         .cell { 
             height: var(--cell-size);
-            margin-bottom: var(--road-height); /* 為下方的路留出空間 */
-            border-radius: 25px; 
+            margin-bottom: 10px;
+            border-radius: 20px; 
             display: flex; 
             flex-direction: column; 
             align-items: center; 
             justify-content: center; 
             position: relative; 
             transition: 0.3s; 
-            background-color: rgba(255, 255, 255, 0.85); /* 稍微透明，透出背景圖 */
-            padding: 10px; 
+            background-color: rgba(255, 255, 255, 0.9); /* 稍微透明，透出背景圖 */
+            padding: 5px; 
             box-sizing: border-box; 
             border: 2px solid #e2e8f0;
             backdrop-filter: blur(5px);
@@ -56,13 +56,14 @@
         .cell::after {
             content: "";
             position: absolute;
-            bottom: calc(-1 * var(--road-height) - 10px); /* 貼在格子下方 */
+            bottom: -105px;
             left: -10px; 
             right: -10px;
             height: var(--road-height);
             background: #4a5568; /* 深灰色馬路 */
-            border-bottom: 4px solid #cbd5e0; /* 路邊石 */
+            border-bottom: 6px solid #cbd5e0; /* 路邊石 */
             z-index: 1;
+            border-radius: 10px;
         }
 
         /* 加上馬路白線 */
@@ -77,7 +78,12 @@
             z-index: 2;
         }
 
-        .cell-text { font-size: 22px; font-weight: 900; color: #2d3748; z-index: 3; }
+        .cell-text { ont-size: 28px; /* 大幅放大文字 (原本是 22px) */
+            font-weight: 900; 
+            color: #1a202c; 
+            z-index: 3; 
+            margin: 0;
+            line-height: 1.2; }
         .cell-index { position: absolute; top: 8px; left: 10px; font-size: 14px; color: #a0aec0; }
         
         /* 修正：換回你的小狗小貓圖片 */
@@ -134,7 +140,8 @@
         }
 
         #modal-text { font-size: 70px; font-weight: 900; margin: 25px 0; cursor: pointer; color: #2b6cb0; }
-        .event-icon { font-size: 30px; position: absolute; bottom: 5px; right: 8px; }
+        .event-icon { font-size: 55px; position: absolute; bottom: auto; right: auto; z-index: 2; }
+        
     </style>
 </head>
 <body>
@@ -221,8 +228,8 @@
             // ✨ 修改這裡：直接顯示 i，不再判斷 w 是否為空
             cell.innerHTML = `
                 <span class="cell-index">${i}</span>
-                <div class="cell-text" style="font-size: ${w.length > 3 ? '18px' : '22px'}">${w}</div>
-                <span class='event-icon' style="font-size: 40px; position: absolute; bottom: 10px; right: 10px;">${iconText}</span>
+                <div class="cell-text" style="display: ${w === "" ? 'none' : 'block'}">${w}</div>
+                <span class='event-icon' style="${w === "" ? 'position: relative; margin-top: 10px;' : 'position: absolute; bottom: 5px; right: 5px; font-size: 35px;'}">${iconText}</span>
             `;
             board.appendChild(cell);
         });
@@ -233,14 +240,26 @@
         players.forEach((p, i) => {
             const cell = document.getElementById('c' + p.pos);
             const pEl = document.getElementById('p' + (i + 1));
+            
+            // 1. 左右位置：保持置中
             const centerX = cell.offsetLeft + (cell.offsetWidth / 2) - 32;
             pEl.style.left = centerX + 'px';
-            const baseTop = cell.offsetTop + cell.offsetHeight;
+            
+            // 2. 上下位置：重新計算 (使棋子踩在馬路中央)
+            // cell.offsetTop + cell.offsetHeight 是格子的「最底線」
+            const cellBottomY = cell.offsetTop + cell.offsetHeight;
+            
+            // ✨ 修改：計算棋子的腳底 Top。
+            // 我們把 cellBottomY 加上馬路相對於格子底部的偏移 (例如 +105px, 要對應CSS里的::after bottom)
+            // 再加上馬路高度的一半 (45px)，減去棋子高度的一半 (32px)，使兩者並排置中
+            const roadBaseTop = cellBottomY + 105; // 馬路頂部
             
             if (i === 0) {
-                pEl.style.top = (baseTop - 5) + 'px';
+                // 玩家 1 (小貓)：站在馬路的上半部
+                pEl.style.top = (roadBaseTop + 10) + 'px';
             } else {
-                pEl.style.top = (baseTop + 30) + 'px';
+                // 玩家 2 (小狗)：站在馬路的下半部 (往下移 40px)
+                pEl.style.top = (roadBaseTop + 50) + 'px';
             }
         });
     }
