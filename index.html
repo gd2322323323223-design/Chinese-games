@@ -63,6 +63,12 @@
             border: 6px solid #f56565 !important;
             z-index: 5;
         }
+        /* ✨ 關鍵修改：讓內容由上而下排列 */
+        display: flex;
+        flex-direction: column; 
+        justify-content: center;
+        align-items: center;
+        gap: 10px; /* 獎盃與文字的間距 */
         
         /* 放大終點文字與圖案 */
         .goal-cell .cell-text {
@@ -71,8 +77,9 @@
         }
         
         .goal-cell .event-icon {
-            font-size: 80px !important; 
+            font-size: 120px !important; 
             position: static !important; /* 讓獎盃回到文字下方排列 */
+            order: 1 /* 確保它在上面 */
         }
         
         /* ❌ 取消終點的馬路與虛線 */
@@ -257,14 +264,18 @@
             // 如果是事件格，背景變淺橘色，方便辨識
             if (isEvent) {cell.style.backgroundColor = "rgba(255, 235, 200, 0.9)";}
 
-            // ✨ 修正語法：確保模板字串正確閉合
+            // 在 init 函數的 words.forEach 裡面找到 cell.innerHTML
         cell.innerHTML = `
             <span class="cell-index">${i}</span>
-            ${w !== "" ? 
-                `<div class="cell-text">${w}</div>
-                 <span class="event-icon" style="position: absolute; bottom: 5px; right: 8px; font-size: 30px;">${iconText}</span>` 
+            ${i === words.length - 1 ? 
+                `<div class="event-icon">🏆</div>
+                 <div class="cell-text">終點</div>` 
                 : 
-                `<div class="event-icon" style="font-size: 70px;">${iconText}</div>`
+                (w !== "" ? 
+                    `<div class="cell-text">${w}</div>
+                     <span class="event-icon" style="position: absolute; bottom: 5px; right: 8px; font-size: 30px;">${iconText}</span>` 
+                    : `<div class="event-icon" style="font-size: 70px;">${iconText}</div>`
+                )
             }
         `;
 
