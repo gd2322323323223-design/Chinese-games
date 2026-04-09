@@ -432,14 +432,16 @@
         document.getElementById('p' + (turn + 1)).classList.remove('can-move');
 
         if (specialEventActive) {
-            specialEventActive = false;
-            // ✨ 改動：調用一步一步走的函數
-            await moveSteps(pid, pendingSteps); 
-            finishTurn(); 
-        } else {
-            await move(pid); 
-        }
+    specialEventActive = false;
+    await moveSteps(pid, pendingSteps); // 執行後退或衝刺
+    
+    // ✨ 關鍵：位移結束後，檢查新位置是否需要讀詞
+    if (words[players[pid].pos] !== "" && words[players[pid].pos] !== "起點") {
+        checkEndOrModal(pid); // 👈 這樣就會跳出讀詞視窗了
+    } else {
+        finishTurn(); 
     }
+}
     // 準備特殊移動：設定方向與步數，並讓棋子跳動
     function prepareSpecialStep(pid, steps) {
         moving = false; 
