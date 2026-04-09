@@ -479,7 +479,70 @@ function speak() {
     msg.lang = 'zh-HK';
     window.speechSynthesis.speak(msg);
 }
+    
+// --- 🤖 AI 語音辨識檢查功能 ---
+function startRecognition() {
+    // 檢查瀏覽器是否支持語音辨識
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SpeechRecognition) {
+        alert("抱歉，您的瀏覽器不支持語音辨識功能。建議使用 Chrome 瀏覽器。");
+        return;
+    }
 
+    const recognition = new SpeechRecognition();
+    recognition.lang = 'zh-HK'; // 設定辨識語言為粵語 (如果是國語可改 zh-CN)
+    recognition.interimResults = false; // 只取最終結果
+    recognition.maxAlternatives = 1;
+
+    const modalText = document.getElementById('modal-text');
+    const originalWord = modalText.innerText; // 記住原本的詞語
+
+    // 當辨識開始時
+    modalText.innerHTML = `<span style="color:#4299e1">🎤 正在聽...請讀出「${originalWord}」</span>`;
+    
+    recognition.start();
+
+    // 辨識成功回傳結果
+    recognition.onresult = (event) => {
+        const result = event.results[0][0].transcript;
+        console.log("辨識結果:", result);
+
+        // 簡單的比對邏輯 (檢查結果是否包含目標詞語)
+        if (result.includes(originalWord)) {
+            modalText.innerHTML = `
+                <div style="color:#48bb78">✅ 太棒了！讀音正確</div>
+                <div style="font-size:24px; color:#a0aec0">(你說的是: ${result})</div>
+            `;
+            // 答對給予額外獎勵分
+            players[turn].score += 5;
+            document.getElementById('s' + (turn + 1)).innerText = players[turn].score;
+        } else {
+            modalText.innerHTML = `
+                <div style="color:#f56565">❌ 好像不太對喔</div>
+                <div style="font-size:24px; color:#a0aec0">(我聽成: ${result})</div>
+            `;
+        }
+
+        // 3秒後恢復顯示原始詞語，方便玩家重讀
+        setTimeout(() => {
+            modalText.innerText = originalWord;
+        }, 3000);
+    };
+
+    // 辨識錯誤 (例如沒說話或沒權限)
+    recognition.onerror = (event) => {
+        console.error("語音辨識錯誤:", event.error);
+        modalText.innerHTML = `<span style="color:#e53e3e">⚠️ 無法辨識，請再試一次</span>`;
+        setTimeout(() => {
+            modalText.innerText = originalWord;
+        }, 2000);
+    };
+
+    // 辨識結束
+    recognition.onspeechend = () => {
+        recognition.stop();
+    };
+}
 function fancyAlert(msg, type = 'event') {
     return new Promise(resolve => {
         const notice = document.createElement('div');
