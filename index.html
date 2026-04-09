@@ -344,36 +344,28 @@ async function roll() {
     document.getElementById('player-turn-name').innerText = "👈 請點擊棋子行走！";
 }
 
+// ✨ 修復核心：處理玩家點擊（包含正常移動與特殊事件後續移動）
 async function handlePlayerClick(pid) {
     if (!waitingForClick || pid !== turn || moving) return;
     
-    waitingForClick = false;
+    waitingForClick = false; // 立即關閉點擊許可，防止連點
     document.getElementById('p' + (turn + 1)).classList.remove('can-move');
 
     if (specialEventActive) {
+        // 如果是特殊事件（如踩到香蕉）引發的點擊
         let steps = pendingSteps;
         specialEventActive = false;
         pendingSteps = 0;
         await moveSteps(pid, steps);
+        checkEndOrModal(pid); // 移動完後再檢查
     } else {
+        // 正常的擲骰子移動
         await move(pid);
-    }
-    checkEndOrModal(pid);
-}
-
-async function checkEndOrModal(pid) {
-    const pos = players[pid].pos;
-    const isGoal = (pos === words.length - 1);
-    const isSpecial = traps.includes(pos) || boosts.includes(pos) || dinosaurs.includes(pos);
-    const isStart = (pos === 0);
-
-    if (isGoal) {
-        await fancyAlert(`🏆 玩家 ${pid + 1} 奪冠！`, "goal");
-        location.reload();
-    } else if (isSpecial || isStart) {
-        finishTurn();
-    } else {
-        showModal();
+        // 注意：move 內部會處理是否觸發特殊事件彈窗
+        // 如果 move 沒觸發特殊事件彈窗，會在這裡檢查彈窗
+        if (!specialEventActive) {
+            checkEndOrModal(pid);
+        }
     }
 }
 
@@ -411,7 +403,6 @@ function prepareSpecialStep(pid, steps) {
 }
 
 async function moveSteps(pid, steps) {
-    if (steps === 0) return;
     moving = true;
     const isForward = steps > 0;
     const totalSteps = Math.abs(steps);
@@ -427,8 +418,28 @@ async function moveSteps(pid, steps) {
     moving = false;
 }
 
+async function checkEndOrModal(pid) {
+    const pos = players[pid].pos;
+    const isGoal = (pos === words.length - 1);
+    const isSpecial = traps.includes(pos) || boosts.includes(pos) || dinosaurs.includes(pos);
+
+    if (isGoal) {
+        await fancyAlert(`🏆 玩家 ${pid + 1} 奪冠！`, "goal");
+        location.reload();
+    } else if (isSpecial) {
+        // 如果移動後落點是特殊格，不顯示詞語彈窗（已由 move 或 moveSteps 處理完畢後調用此函數）
+        finishTurn();
+    } else if (pos === 0) {
+        finishTurn();
+    } else {
+        showModal();
+    }
+}
+
 function showModal() {
     const currentWord = words[players[turn].pos];
+    if (!currentWord || currentWord === "") { finishTurn(); return; }
+    
     document.getElementById('modal-text').innerText = currentWord;
     const sentenceText = document.getElementById('ai-sentence-text');
     const rTime = sentenceElements.times[Math.floor(Math.random() * sentenceElements.times.length)];
@@ -467,29 +478,25 @@ function speak() {
 function startRecognition() {
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!SpeechRecognition) {
-        alert("抱歉，您的瀏覽器不支持語音辨識功能。建議使用 Chrome 瀏覽器。");
+        alert("請使用 Chrome 瀏覽器以支援語音辨識。");
         return;
     }
     const recognition = new SpeechRecognition();
     recognition.lang = 'zh-HK';
     const modalText = document.getElementById('modal-text');
     const originalWord = modalText.innerText;
-    modalText.innerHTML = `<span style="color:#4299e1">🎤 正在聽...請讀出「${originalWord}」</span>`;
+    modalText.innerHTML = `<span style="color:#4299e1">🎤 正在聽...讀出「${originalWord}」</span>`;
     recognition.start();
 
     recognition.onresult = (event) => {
         const result = event.results[0][0].transcript;
         if (result.includes(originalWord)) {
-            modalText.innerHTML = `<div style="color:#48bb78">✅ 太棒了！</div><div style="font-size:24px; color:#a0aec0">(你說: ${result})</div>`;
+            modalText.innerHTML = `<div style="color:#48bb78">✅ 太棒了！</div>`;
             players[turn].score += 5;
             document.getElementById('s' + (turn + 1)).innerText = players[turn].score;
         } else {
-            modalText.innerHTML = `<div style="color:#f56565">❌ 不太對喔</div><div style="font-size:24px; color:#a0aec0">(聽成: ${result})</div>`;
+            modalText.innerHTML = `<div style="color:#f56565">❌ 聽成: ${result}</div>`;
         }
-        setTimeout(() => { modalText.innerText = originalWord; }, 3000);
-    };
-    recognition.onerror = () => {
-        modalText.innerHTML = `<span style="color:#e53e3e">⚠️ 無法辨識</span>`;
         setTimeout(() => { modalText.innerText = originalWord; }, 2000);
     };
 }
@@ -498,7 +505,7 @@ function fancyAlert(msg, type = 'event') {
     return new Promise(resolve => {
         const notice = document.createElement('div');
         notice.className = `special-notice notice-${type}`;
-        notice.innerHTML = `${msg}<br><span style="font-size:16px; opacity:0.8;">( 點擊關閉 )</span>`;
+        notice.innerHTML = `${msg}<br><span style="font-size:16px; opacity:0.8;">( 點擊關閉並移動 )</span>`;
         document.body.appendChild(notice);
         setTimeout(() => notice.classList.add('show'), 10);
         notice.onclick = () => {
@@ -521,15 +528,12 @@ function closeModal(addScore = true) {
 function finishTurn() {
     turn = (turn === 0) ? 1 : 0;
     const nameEl = document.getElementById('player-turn-name');
-    if (nameEl) {
-        nameEl.innerText = `輪到：玩家 ${turn + 1}`;
-        nameEl.style.color = (turn === 0) ? 'var(--p1-color)' : 'var(--p2-color)';
-    }
+    nameEl.innerText = `輪到：玩家 ${turn + 1}`;
+    nameEl.style.color = (turn === 0) ? 'var(--p1-color)' : 'var(--p2-color)';
     document.getElementById('btn-roll').disabled = false;
     moving = false;
     waitingForClick = false;
-    specialEventActive = false; 
-    pendingSteps = 0;
+    specialEventActive = false;
 }
 
 window.onload = init;
