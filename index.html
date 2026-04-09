@@ -194,8 +194,14 @@
             white-space: nowrap;
             box-shadow: 0 0 50px rgba(0,0,0,0.3);
             opacity: 0;
-            pointer-events: none;
+            pointer-events: auto;
+            cursor: pointer;          /* 鼠標變成手指狀 */
             transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        /* 加上懸停效果，讓玩家知道可以點 */
+        .special-notice:hover {
+            transform: translate(-50%, -50%) scale(1.05);
+            filter: brightness(1.1);
         }
         
         .special-notice.show {
@@ -284,28 +290,29 @@
         }
     }
     function fancyAlert(msg, type = 'event') {
-    // 移除舊的（如果有的話）
-    const oldNotice = document.querySelector('.special-notice');
-    if (oldNotice) oldNotice.remove();
-
-    // 建立新元素
-    const notice = document.createElement('div');
-    notice.className = `special-notice notice-${type}`;
-    notice.innerHTML = msg;
-    document.body.appendChild(notice);
-
-    // 動畫啟動
-    setTimeout(() => notice.classList.add('show'), 10);
-
-    // 3秒後消失
     return new Promise(resolve => {
-        setTimeout(() => {
+        // 移除舊的（如果有的話）
+        const oldNotice = document.querySelector('.special-notice');
+        if (oldNotice) oldNotice.remove();
+
+        // 建立新元素
+        const notice = document.createElement('div');
+        notice.className = `special-notice notice-${type}`;
+        // 加入提示文字，讓玩家知道要點擊
+        notice.innerHTML = `${msg}<br><span style="font-size:16px; opacity:0.8; display:block; margin-top:10px;">( 點擊關閉 )</span>`;
+        document.body.appendChild(notice);
+
+        // 動畫啟動
+        setTimeout(() => notice.classList.add('show'), 10);
+
+        // ✨ 核心修改：點擊後消失
+        notice.onclick = () => {
             notice.classList.remove('show');
             setTimeout(() => {
                 notice.remove();
-                resolve();
-            }, 400);
-        }, 2500);
+                resolve(); // 消失後才繼續後續的移動邏輯
+            }, 400); // 這裡的 400 毫秒是等待 CSS 收縮動畫完成
+        };
     });
 }
 
