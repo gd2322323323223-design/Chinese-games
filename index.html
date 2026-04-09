@@ -260,325 +260,221 @@
 </div>
 
 <script>
-    // --- 基礎變數定義 ---
-    let pendingSteps = 0; 
-    let turn = 0, dice = 0, moving = false, timerInterval;
-    let waitingForClick = false; 
-    let specialEventActive = false; 
+   // --- 基礎變數定義 ---
+let pendingSteps = 0; 
+let turn = 0, dice = 0, moving = false, timerInterval;
+let waitingForClick = false; 
+let specialEventActive = false; 
 
-    const players = [{pos: 0, score: 0}, {pos: 0, score: 0}];
-    const traps = [1, 16, 39, 48, 61, 76,96];
-    const boosts = [8, 20, 32, 51, 68, 80,90];
-    const dinosaurs = [5,12,27,43,55,70,86,103]; 
+const players = [{pos: 0, score: 0}, {pos: 0, score: 0}];
+const traps = [1, 16, 39, 48, 61, 76, 96];
+const boosts = [8, 20, 32, 51, 68, 80, 90];
+const dinosaurs = [5, 12, 27, 43, 55, 70, 86, 103]; 
 
-    // --- 詞語重組邏輯 (✨ 關鍵修改：將詞語順延，空出特殊格) ---
-    const rawWords = ["學校", "禮堂", "校務處", "操場", "音樂室", "課室", "洗手間", "電腦室", "樓梯", "圖書館", "走廊", "升降機", "教員室", "草地上", "沙灘", "山頂", "運動場", "籃球場", "足球場", "燒烤場", "公園", "家裏", "客廳", "浴室", "睡房", "廚房", "清真寺", "商場", "超市", "街市", "麵包店", "理髮店", "便利店", "藥房", "餐廳", "醫院", "補習社", "博物館", "銀行", "地鐵站", "巴士站", "行人道", "刷牙", "洗澡", "洗手", "喝水", "吃飯", "睡覺", "穿衣服", "戴口罩", "做家務", "倒垃圾", "洗碗", "抹窗戶", "煮飯", "上課", "做功課", "溫習", "看書", "畫畫", "做早操", "跑步", "游泳", "跳繩", "踢足球", "打籃球", "騎單車", "遠足", "拍照", "表演", "唱歌", "跳舞", "慶祝", "排隊", "玩遊戲", "看手機", "打電話", "打招呼", "買水果", "比賽", "說話", "摺紙", "下棋", "玩拼圖"];
+const rawWords = ["學校", "禮堂", "校務處", "操場", "音樂室", "課室", "洗手間", "電腦室", "樓梯", "圖書館", "走廊", "升降機", "教員室", "草地上", "沙灘", "山頂", "運動場", "籃球場", "足球場", "燒烤場", "公園", "家裏", "客廳", "浴室", "睡房", "廚房", "清真寺", "商場", "超市", "街市", "麵包店", "理髮店", "便利店", "藥房", "餐廳", "醫院", "補習社", "博物館", "銀行", "地鐵站", "巴士站", "行人道", "刷牙", "洗澡", "洗手", "喝水", "吃飯", "睡覺", "穿衣服", "戴口罩", "做家務", "倒垃圾", "洗碗", "抹窗戶", "煮飯", "上課", "做功課", "溫習", "看書", "畫畫", "做早操", "跑步", "游泳", "跳繩", "踢足球", "打籃球", "騎單車", "遠足", "拍照", "表演", "唱歌", "跳舞", "慶祝", "排隊", "玩遊戲", "看手機", "打電話", "打招呼", "買水果", "比賽", "說話", "摺紙", "下棋", "玩拼圖"];
 
-    let words = [];
-    let wordIdx = 0;
-    // 循環生成 100 格地圖，遇到特殊格就跳過詞語
-    for (let i = 0; i < 110; i++) {
-        if (i === 0) {
-            words.push("起點");
-        } else if (traps.includes(i) || boosts.includes(i) || dinosaurs.includes(i)) {
-            words.push(""); // 這裡是事件格，不放文字
-        } else if (wordIdx < rawWords.length) {
-            words.push(rawWords[wordIdx]);
-            wordIdx++;
-        } else {
-            words.push("終點 🏆");
-            break; 
-        }
-    }
-    function fancyAlert(msg, type = 'event') {
-    return new Promise(resolve => {
-        // 移除舊的（如果有的話）
-        const oldNotice = document.querySelector('.special-notice');
-        if (oldNotice) oldNotice.remove();
-
-        // 建立新元素
-        const notice = document.createElement('div');
-        notice.className = `special-notice notice-${type}`;
-        // 加入提示文字，讓玩家知道要點擊
-        notice.innerHTML = `${msg}<br><span style="font-size:16px; opacity:0.8; display:block; margin-top:10px;">( 點擊關閉 )</span>`;
-        document.body.appendChild(notice);
-
-        // 動畫啟動
-        setTimeout(() => notice.classList.add('show'), 10);
-
-        // ✨ 核心修改：點擊後消失
-        notice.onclick = () => {
-            notice.classList.remove('show');
-            setTimeout(() => {
-                notice.remove();
-                resolve(); // 消失後才繼續後續的移動邏輯
-            }, 400); // 這裡的 400 毫秒是等待 CSS 收縮動畫完成
-        };
-    });
+let words = [];
+let wordIdx = 0;
+for (let i = 0; i < 110; i++) {
+    if (i === 0) words.push("起點");
+    else if (traps.includes(i) || boosts.includes(i) || dinosaurs.includes(i)) words.push(""); 
+    else if (wordIdx < rawWords.length) { words.push(rawWords[wordIdx]); wordIdx++; }
+    else { words.push("終點 🏆"); break; }
 }
 
-    // --- 初始化畫板 ---
-    function init() {
-        const board = document.getElementById('board');
-        board.innerHTML = "";
-        words.forEach((w, i) => {
-            const cell = document.createElement('div');
-            cell.className = 'cell';
-            cell.id = 'c' + i;
-            
-            // ✨ 插入點 1：判斷是否為最後一個格子（終點）
-            if (i === words.length - 1) {
-                cell.classList.add('goal-cell');
-            }
-            
-            let iconText = "";
-            let isEvent = false;
+function init() {
+    const board = document.getElementById('board');
+    board.innerHTML = "";
+    words.forEach((w, i) => {
+        const cell = document.createElement('div');
+        cell.className = 'cell';
+        cell.id = 'c' + i;
+        if (i === words.length - 1) cell.classList.add('goal-cell');
+        
+        let iconText = "";
+        if(traps.includes(i)) iconText = "🍌";
+        else if(boosts.includes(i)) iconText = "🚀";
+        else if(dinosaurs.includes(i)) iconText = "🦖";
 
-            if(traps.includes(i)) { iconText = "🍌"; isEvent = true; }
-            else if(boosts.includes(i)) { iconText = "🚀"; isEvent = true; }
-            else if(dinosaurs.includes(i)) { iconText = "🦖"; isEvent = true; }
-
-            // 如果是事件格，背景變淺橘色，方便辨識
-            if (isEvent) {cell.style.backgroundColor = "rgba(255, 235, 200, 0.9)";}
-
-            // 在 init 函數的 words.forEach 裡面找到 cell.innerHTML
         cell.innerHTML = `
             <span class="cell-index">${i}</span>
             ${i === words.length - 1 ? 
-                `<div class="event-icon" style="font-size: 120px; position: static; display: block;">🏆</div>
-                 <div class="cell-text" style="font-size: 30px; position: static;">終點</div>`
-                : 
+                `<div class="event-icon" style="font-size: 120px; position: static; order: 1;">🏆</div>
+                 <div class="cell-text" style="font-size: 30px; order: 2;">終點</div>` :
                 (w !== "" ? 
                     `<div class="cell-text">${w}</div>
-                     <span class="event-icon" style="position: absolute; bottom: 5px; right: 8px; font-size: 30px;">${iconText}</span>` 
-                    : 
+                     <span class="event-icon" style="position: absolute; bottom: 5px; right: 8px; font-size: 30px;">${iconText}</span>` :
                     `<div class="event-icon" style="font-size: 70px;">${iconText}</div>`
                 )
             }
         `;
-
         board.appendChild(cell);
-        });
-        setTimeout(updateDisplay, 50);
-    }
+    });
+    setTimeout(updateDisplay, 50);
+}
 
-    function updateDisplay() {
+function updateDisplay() {
     players.forEach((p, i) => {
         const cell = document.getElementById('c' + p.pos);
         const pEl = document.getElementById('p' + (i + 1));
-        
-        if (!cell || !pEl) return; // 保險：找不到元素就跳過
+        if (!cell || !pEl) return;
 
-        const isGoal = cell.classList.contains('goal-cell');
-        
-        // 1. 計算水平置中 (共用邏輯)
         const centerX = cell.offsetLeft + (cell.offsetWidth / 2) - 32;
         pEl.style.left = centerX + 'px';
 
-        if (isGoal) {
-            // 2. 終點的垂直定位 (大格子中央)
+        if (cell.classList.contains('goal-cell')) {
             const centerY = cell.offsetTop + (cell.offsetHeight / 2) + (i === 0 ? -40 : 20);
             pEl.style.top = centerY + 'px';
         } else {
-            // 3. 一般格子的垂直定位 (踩在馬路上)
-            const cellTop = cell.offsetTop;
-            const cellHeight = cell.offsetHeight;
-            const roadOffset = 110; // 對應 CSS 的偏移量
-            
-            // 計算馬路區域的基準線
-            const roadAreaTop = cellTop + cellHeight + (roadOffset - 90);
-
-            if (i === 0) {
-                // 玩家 1 (貓)
-                pEl.style.top = (roadAreaTop - 16) + 'px'; 
-            } else {
-                // 玩家 2 (狗)
-                pEl.style.top = (roadAreaTop + 30) + 'px'; 
-            }
+            const roadAreaTop = cell.offsetTop + cell.offsetHeight + 20; 
+            pEl.style.top = (i === 0 ? roadAreaTop - 16 : roadAreaTop + 30) + 'px';
         }
-    }); 
+    });
 }
 
-    async function roll() {
-        if(moving || waitingForClick) return; 
-        document.getElementById('btn-roll').disabled = true;
-        for(let i=0; i<8; i++) {
-            dice = Math.floor(Math.random()*6)+1;
-            document.getElementById('dice-box').innerText = dice;
-            await new Promise(r => setTimeout(r, 60));
-        }
-        waitingForClick = true; 
-        document.getElementById('p' + (turn + 1)).classList.add('can-move'); 
-        document.getElementById('player-turn-name').innerText = "👈 請點擊棋子行走！";
+async function roll() {
+    if(moving || waitingForClick) return;
+    document.getElementById('btn-roll').disabled = true;
+    for(let i=0; i<8; i++) {
+        dice = Math.floor(Math.random()*6)+1;
+        document.getElementById('dice-box').innerText = dice;
+        await new Promise(r => setTimeout(r, 60));
     }
+    waitingForClick = true;
+    document.getElementById('p' + (turn + 1)).classList.add('can-move');
+    document.getElementById('player-turn-name').innerText = "👈 請點擊棋子行走！";
+}
 
-    async function handlePlayerClick(pid) {
-    // 1. 檢查是否輪到該玩家且目前處於等待點擊狀態
+async function handlePlayerClick(pid) {
     if (!waitingForClick || pid !== turn || moving) return;
-
+    
     waitingForClick = false;
-    // 移除跳動動畫
     document.getElementById('p' + (turn + 1)).classList.remove('can-move');
 
-    // 2. 判斷是「特殊事件位移」還是「普通骰子移動」
     if (specialEventActive) {
-        specialEventActive = false; // 重置狀態
-        await moveSteps(pid, pendingSteps); // 執行前進/後退動畫
+        specialEventActive = false;
+        await moveSteps(pid, pendingSteps);
     } else {
-        await move(pid); // 執行擲骰子的正常移動
+        await move(pid);
     }
 
-    // --- ✨ 關鍵修正：以下代碼必須放在函數括號內 ---
-
-    // 3. 移動完全結束後，檢查當前位置
-    const currentPos = players[pid].pos;
-    const currentWord = words[currentPos];
-
-    if (currentWord !== "" && currentWord !== "起點") {
-        // 如果格內有詞語，跳出讀詞視窗
-        checkEndOrModal(pid); 
-    } else {
-        // 如果是空位（例如再次踩到另一個事件格），則直接換下一位
-        finishTurn(); 
+    // 移動結束後，統一在此檢查
+    const pos = players[pid].pos;
+    if (words[pos] !== "" && words[pos] !== "起點") {
+        checkEndOrModal(pid);
+    } else if (!specialEventActive) {
+        finishTurn();
     }
-} // 這裡只有一個結尾括號，對應函數開始
-    
-    // 準備特殊移動：設定方向與步數，並讓棋子跳動
-    function prepareSpecialStep(pid, steps) {
-        moving = false; 
-        waitingForClick = true; 
-        specialEventActive = true; 
-        pendingSteps = steps; // 記錄要走幾步（正數前進，負數後退）
-        document.getElementById('p' + (pid + 1)).classList.add('can-move');
-        document.getElementById('player-turn-name').innerText = "👈 請點擊棋子執行事件移動！";
-    }
+}
 
-    // 執行步進動畫的函數
-    async function moveSteps(pid, steps) {
-        moving = true;
-        const isForward = steps > 0;
-        const absoluteSteps = Math.abs(steps);
-
-        for(let i=0; i < absoluteSteps; i++) {
-            if (isForward) {
-                // 前進邏輯
-                if (players[pid].pos < words.length - 1) players[pid].pos++;
-            } else {
-                // 後退邏輯
-                if (players[pid].pos > 0) players[pid].pos--;
-            }
+async function move(pid) {
+    moving = true;
+    for(let i=0; i<dice; i++) {
+        if (players[pid].pos < words.length - 1) {
+            players[pid].pos++;
             updateDisplay();
-            await new Promise(r => setTimeout(r, 300)); // 每步停頓 0.3 秒
+            await new Promise(r => setTimeout(r, 300));
         }
-        moving = false;
     }
+    
+    moving = false; // 這裡很重要！釋放狀態才能觸發點擊
 
-    async function move(pid) {
-        moving = true;
-
-        // 1. 正常的骰子一步一步移動過程
-        for(let i=0; i<dice; i++) {
-            if (players[pid].pos < words.length - 1) {
-                players[pid].pos++;
-                updateDisplay();
-                await new Promise(r => setTimeout(r, 300));
-            }
-        }
-
-        // 2. 移動結束後，先檢查是否踩到「特殊事件格」
-
-        // 將原本的 alert 換成 fancyAlert
-        if(traps.includes(players[pid].pos)) { 
-            await fancyAlert("🍌 哎呀！踩到香蕉滑倒了！<br><small>點擊棋子後退 1 格</small>", "event"); 
-            prepareSpecialStep(pid, -1); 
-            return;
-        }
-        
-        if(boosts.includes(players[pid].pos)) { 
-            await fancyAlert("🚀 太棒了！坐上火箭衝刺中！<br><small>點擊棋子前進 5 格</small>", "event"); 
-            prepareSpecialStep(pid, 5); 
-            return;
-        }
-        
-        if(dinosaurs.includes(players[pid].pos)) { 
-            await fancyAlert("🦖 哇！是恐龍，快躲起來！...<br><small>點擊棋子後退 3 格</small>", "event"); 
-            prepareSpecialStep(pid, -3); 
-            return;
-        }
-
-        // 3. 如果沒踩到事件，再檢查是否要讀詞語
-        // 判斷：格子不是空的 ""，也不是 "起點"
-        if (words[players[pid].pos] !== "" && words[players[pid].pos] !== "起點") {
-            // ✅ 執行原本的：檢查是否終點 + 跳出讀詞彈窗
-            checkEndOrModal(pid);
-        } else {
-            // ✅ 如果停在特殊事件格(已處理)或起點，直接換人
-            finishTurn();
-        }
-    } // 這裡結束 move 函數
-
-    function prepareSpecialClick(pid) {
-        moving = false; 
-        waitingForClick = true; 
-        specialEventActive = true; 
-        document.getElementById('p' + (pid + 1)).classList.add('can-move');
-        document.getElementById('player-turn-name').innerText = "👈 請點擊棋子執行事件位移！";
+    const pos = players[pid].pos;
+    if(traps.includes(pos)) {
+        await fancyAlert("🍌 踩到香蕉滑倒了！<br><small>點擊棋子後退 1 格</small>");
+        prepareSpecialStep(pid, -1);
+    } else if(boosts.includes(pos)) {
+        await fancyAlert("🚀 坐上火箭衝刺！<br><small>點擊棋子前進 5 格</small>");
+        prepareSpecialStep(pid, 5);
+    } else if(dinosaurs.includes(pos)) {
+        await fancyAlert("🦖 有恐龍！快逃！<br><small>點擊棋子後退 3 格</small>");
+        prepareSpecialStep(pid, -3);
     }
+}
 
-    function finishTurn() {
-        turn = (turn === 0) ? 1 : 0;
-        const turnName = document.getElementById('player-turn-name');
-        turnName.innerText = `輪到：玩家 ${turn + 1}`;
-        turnName.style.color = turn === 0 ? 'var(--p1-color)' : 'var(--p2-color)';
-        document.getElementById('btn-roll').disabled = false;
-        moving = false;
+function prepareSpecialStep(pid, steps) {
+    waitingForClick = true;
+    specialEventActive = true;
+    pendingSteps = steps;
+    document.getElementById('p' + (pid + 1)).classList.add('can-move');
+    document.getElementById('player-turn-name').innerText = "👈 點擊執行特殊移動！";
+}
+
+async function moveSteps(pid, steps) {
+    moving = true;
+    const isForward = steps > 0;
+    for(let i=0; i < Math.abs(steps); i++) {
+        if (isForward && players[pid].pos < words.length - 1) players[pid].pos++;
+        else if (!isForward && players[pid].pos > 0) players[pid].pos--;
+        updateDisplay();
+        await new Promise(r => setTimeout(r, 300));
     }
-
-    async function checkEndOrModal(pid) {
     moving = false;
+}
+
+function finishTurn() {
+    turn = (turn === 0) ? 1 : 0;
+    const nameEl = document.getElementById('player-turn-name');
+    nameEl.innerText = `輪到：玩家 ${turn + 1}`;
+    nameEl.style.color = turn === 0 ? 'var(--p1-color)' : 'var(--p2-color)';
+    document.getElementById('btn-roll').disabled = false;
+    moving = false;
+    waitingForClick = false;
+}
+
+async function checkEndOrModal(pid) {
     if(players[pid].pos === words.length-1) {
-        // 華麗的終點彈幕
-        await fancyAlert(`🏆 恭喜玩家 ${pid + 1}<br>成功奪冠！`, "goal");
+        await fancyAlert(`🏆 玩家 ${pid + 1} 奪冠！`, "goal");
         location.reload();
     } else {
         showModal();
     }
 }
 
-    function showModal() {
-        document.getElementById('modal-text').innerText = words[players[turn].pos];
-        document.getElementById('modal').style.display = 'block';
-        let timeLeft = 60;
-        clearInterval(timerInterval);
-        timerInterval = setInterval(() => {
-            timeLeft--;
-            document.getElementById('timer').innerText = `⏳ 剩餘時間: ${timeLeft}s`;
-            if(timeLeft <= 0) closeModal(false);
-        }, 1000);
-    }
+function showModal() {
+    document.getElementById('modal-text').innerText = words[players[turn].pos];
+    document.getElementById('modal').style.display = 'block';
+    let timeLeft = 60;
+    clearInterval(timerInterval);
+    timerInterval = setInterval(() => {
+        timeLeft--;
+        document.getElementById('timer').innerText = `⏳ 剩餘時間: ${timeLeft}s`;
+        if(timeLeft <= 0) closeModal(false);
+    }, 1000);
+}
 
-    function closeModal(addScore = true) {
-        clearInterval(timerInterval);
-        if(addScore) {
-            players[turn].score += 10;
-            document.getElementById('s' + (turn + 1)).innerText = players[turn].score;
-        }
-        document.getElementById('modal').style.display = 'none';
-        finishTurn();
+function closeModal(addScore = true) {
+    clearInterval(timerInterval);
+    if(addScore) {
+        players[turn].score += 10;
+        document.getElementById('s' + (turn + 1)).innerText = players[turn].score;
     }
+    document.getElementById('modal').style.display = 'none';
+    finishTurn();
+}
 
-    function speak() {
-        window.speechSynthesis.cancel();
-        const textToSpeak = document.getElementById('modal-text').innerText.trim();
-        const msg = new SpeechSynthesisUtterance(textToSpeak); 
-        msg.lang = 'zh-HK';
-        msg.rate = 0.85;
-        window.speechSynthesis.speak(msg);
-    }
+function speak() {
+    window.speechSynthesis.cancel();
+    const msg = new SpeechSynthesisUtterance(document.getElementById('modal-text').innerText);
+    msg.lang = 'zh-HK';
+    window.speechSynthesis.speak(msg);
+}
 
-    function startRecognition() { alert("AI 檢查功能需要權限。"); }
-    window.onload = init;
-    // window.onload = function() { init(); }; // 這也是可以的
+function fancyAlert(msg, type = 'event') {
+    return new Promise(resolve => {
+        const notice = document.createElement('div');
+        notice.className = `special-notice notice-${type}`;
+        notice.innerHTML = `${msg}<br><span style="font-size:16px; opacity:0.8;">( 點擊關閉 )</span>`;
+        document.body.appendChild(notice);
+        setTimeout(() => notice.classList.add('show'), 10);
+        notice.onclick = () => {
+            notice.classList.remove('show');
+            setTimeout(() => { notice.remove(); resolve(); }, 400);
+        };
+    });
+}
+
+window.onload = init;
 
     // 不要直接執行 init();，必須放在 onload 裡面。
 </script>
