@@ -401,7 +401,7 @@ async function move(pid) {
 
     const pos = players[pid].pos;
     if(traps.includes(pos)) {
-        await fancyAlert("🍌 哎呀！踩到香蕉滑倒。！<br><small>點擊棋子後退 1 格</small>");
+        await fancyAlert("🍌 哎呀！踩到香蕉滑倒了。<br><small>點擊棋子後退 1 格</small>");
         prepareSpecialStep(pid, -1);
     } else if(boosts.includes(pos)) {
         await fancyAlert("🚀 哈哈！坐上火箭衝刺！<br><small>點擊棋子前進 5 格</small>");
