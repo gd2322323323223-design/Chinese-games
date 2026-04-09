@@ -62,13 +62,14 @@
             background: linear-gradient(135deg, #fff5f5 0%, #fff 100%) !important;
             border: 6px solid #f56565 !important;
             z-index: 5;
-        }
+        
         /* ✨ 關鍵修改：讓內容由上而下排列 */
         display: flex;
         flex-direction: column; 
         justify-content: center;
         align-items: center;
         gap: 10px; /* 獎盃與文字的間距 */
+        }
         
         /* 放大終點文字與圖案 */
         .goal-cell .cell-text {
@@ -432,8 +433,13 @@
         document.getElementById('p' + (turn + 1)).classList.remove('can-move');
 
         if (specialEventActive) {
-    specialEventActive = false;
-    await moveSteps(pid, pendingSteps); // 執行後退或衝刺
+            specialEventActive = false;
+            await moveSteps(pid, pendingSteps); // 執行後退或衝刺
+    } else {
+        /* ✨ 加入這行，點擊後才會開始走骰子的步數 */
+        await move(pid); 
+    }
+}
     
     // ✨ 關鍵：位移結束後，檢查新位置是否需要讀詞
     if (words[players[pid].pos] !== "" && words[players[pid].pos] !== "起點") {
