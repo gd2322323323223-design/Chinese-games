@@ -382,18 +382,26 @@ async function roll() {
 }
 
 async function handlePlayerClick(pid) {
+    // 只有輪到該玩家，且處於等待點擊狀態，且棋子沒在動時才執行
     if (!waitingForClick || pid !== turn || moving) return;
     
-    waitingForClick = false;
+    waitingForClick = false; // 立即關閉開關，防止重複點擊
     document.getElementById('p' + (turn + 1)).classList.remove('can-move');
 
-    // 1. 執行移動邏輯（判斷是普通骰子移動還是火箭/香蕉皮移動）
     if (specialEventActive) {
-        specialEventActive = false;
-        await moveSteps(pid, pendingSteps);
+        // 如果現在是「特殊事件」觸發的移動（如香蕉皮、火箭）
+        let steps = pendingSteps; // 取得預存的步數
+        specialEventActive = false; // 重置事件開關
+        pendingSteps = 0; // 清空步數
+        await moveSteps(pid, steps); // 執行特殊移動
     } else {
+        // 如果是普通的骰子移動
         await move(pid);
     }
+
+    // 移動徹底結束後，進行分流判斷
+    checkEndOrModal(pid);
+}
 
     // 2. ✨ 核心修正：移動徹底結束後，呼叫分流器
     // 這裡會自動判斷：要去終點、要彈窗造句、還是直接換人
@@ -445,23 +453,35 @@ async function move(pid) {
 }
 
 function prepareSpecialStep(pid, steps) {
-    waitingForClick = true;
-    specialEventActive = true;
-    pendingSteps = steps;
+    moving = false;          // 確保移動狀態已解鎖
+    waitingForClick = true;  // 開啟等待點擊
+    specialEventActive = true; 
+    pendingSteps = steps;    // 把要走幾步存起來（例如 -1 或 5）
+    
+    // 讓棋子跳動，提醒玩家點擊
     document.getElementById('p' + (pid + 1)).classList.add('can-move');
-    document.getElementById('player-turn-name').innerText = "👈 點擊執行特殊移動！";
+    document.getElementById('player-turn-name').innerText = "👈 請點擊棋子執行特殊事件！";
+    console.log("已準備好特殊移動，步數：", steps);
 }
 
 async function moveSteps(pid, steps) {
-    moving = true;
+    if (steps === 0) return;
+    moving = true; // 鎖定狀態，防止移動中亂點
+    
     const isForward = steps > 0;
-    for(let i=0; i < Math.abs(steps); i++) {
-        if (isForward && players[pid].pos < words.length - 1) players[pid].pos++;
-        else if (!isForward && players[pid].pos > 0) players[pid].pos--;
+    const totalSteps = Math.abs(steps);
+
+    for (let i = 0; i < totalSteps; i++) {
+        if (isForward) {
+            if (players[pid].pos < words.length - 1) players[pid].pos++;
+        } else {
+            if (players[pid].pos > 0) players[pid].pos--;
+        }
         updateDisplay();
-        await new Promise(r => setTimeout(r, 300));
+        await new Promise(r => setTimeout(r, 300)); // 每步停 0.3 秒
     }
-    moving = false;
+    
+    moving = false; // 移動完畢，解鎖
 }
 
 function showModal() {
