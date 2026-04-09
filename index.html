@@ -53,23 +53,23 @@
             border: 2px solid #e2e8f0;
             backdrop-filter: blur(5px);
         }
-        /* --- 插入在 <style> 內 --- */
+
         .cell.goal-cell {
             grid-column: span 2;    /* 橫跨 2 欄 */
             grid-row: span 2;       /* 橫跨 2 列 */
             height: auto;           
-            min-height: calc(var(--cell-size) * 2 + 130px); /* 130px 是你的 gap 數值 */
+            min-height: calc(var(--cell-size) * 2 + 130px); 
             background: linear-gradient(135deg, #fff5f5 0%, #fff 100%) !important;
             border: 6px solid #f56565 !important;
             z-index: 5;
-        
-        /* ✨ 關鍵修改：讓內容由上而下排列 */
-        display: flex;
-        flex-direction: column; 
-        justify-content: center;
-        align-items: center;
-        gap: 10px; /* 獎盃與文字的間距 */
-        }
+    
+            /* ✨ 這些屬性必須待在大括號裡面 */
+            display: flex !important;
+            flex-direction: column !important;
+            justify-content: center !important;
+            align-items: center !important;
+            gap: 10px; 
+        } /* 只有這裡需要一個結束的大括號 */
         
         /* 放大終點文字與圖案 */
         .goal-cell .cell-text {
@@ -364,55 +364,40 @@
 
     function updateDisplay() {
     players.forEach((p, i) => {
-        // 抓取當前棋子所在的格子元素
         const cell = document.getElementById('c' + p.pos);
         const pEl = document.getElementById('p' + (i + 1));
         
-        // ✨ 保險措施：如果找不到格子，不執行定位，防止掉到左下角
-        if (!cell) {
-            console.error("找不到格子:", p.pos);
-            return; 
-        }
-        
-        // 1. 判斷是否為巨大終點
-        const isGoal = cell.classList.contains('goal-cell');
-        if (isGoal) {
-            // ✨ 終點定位：讓棋子站在大格子的中央
-            const centerX = cell.offsetLeft + (cell.offsetWidth / 2) - 32;
-            // 貓狗在終點垂直稍微錯開，看起來比較有層次
-            const centerY = cell.offsetTop + (cell.offsetHeight / 2) - (i === 0 ? 40 : -10);
+        if (!cell || !pEl) return; // 保險：找不到元素就跳過
 
-            pEl.style.left = centerX + 'px';
-            pEl.style.top = centerY + 'px';
-        } else {
+        const isGoal = cell.classList.contains('goal-cell');
         
-        // 2. 左右位置：置中對齊格子
-        // offsetLeft 是格子相對於容器的左側距離
+        // 1. 計算水平置中 (共用邏輯)
         const centerX = cell.offsetLeft + (cell.offsetWidth / 2) - 32;
         pEl.style.left = centerX + 'px';
 
-        // 3. 上下位置：精確踩在馬路上
-        // 我們用格子的頂部 (offsetTop) + 格子高度 (85px) 
-        // 加上我們在 CSS 中設的偏移量 (100px - 90px = 10px縫隙)
-        // 這樣能得到每一行馬路的頂部位置。
+        if (isGoal) {
+            // 2. 終點的垂直定位 (大格子中央)
+            const centerY = cell.offsetTop + (cell.offsetHeight / 2) + (i === 0 ? -40 : 20);
+            pEl.style.top = centerY + 'px';
+        } else {
+            // 3. 一般格子的垂直定位 (踩在馬路上)
+            const cellTop = cell.offsetTop;
+            const cellHeight = cell.offsetHeight;
+            const roadOffset = 110; // 對應 CSS 的偏移量
+            
+            // 計算馬路區域的基準線
+            const roadAreaTop = cellTop + cellHeight + (roadOffset - 90);
 
-        const cellTop = cell.offsetTop;       // 格子頂部
-        const cellHeight = cell.offsetHeight; // 格子高度 (85px)
-        const roadOffset = 110;               // ✨ 對應CSS：bottom: -110px
-
-        // 計算馬路區域的頂部座標 (格子底線向下 10px 的位置)
-        const roadAreaTop = cellTop + cellHeight + (roadOffset - 90);
-
-      if (i === 0) {
-            // 玩家 1 (貓)：稍微向下離開馬路頂部邊緣
-            pEl.style.top = (roadAreaTop - 16) + 'px'; 
-        } else  {
-          // 玩家 2 (狗)：與貓保持適當距離，且不超出馬路底部
-            pEl.style.top = (roadAreaTop + 30) + 'px'; 
-        }
+            if (i === 0) {
+                // 玩家 1 (貓)
+                pEl.style.top = (roadAreaTop - 16) + 'px'; 
+            } else {
+                // 玩家 2 (狗)
+                pEl.style.top = (roadAreaTop + 30) + 'px'; 
             }
-        }); // ✨ 這是第一個：用來結束 players.forEach 的循環
-} // ✨ 這是第二個：用來結束 updateDisplay 函數的定義
+        }
+    }); 
+}
 
     async function roll() {
         if(moving || waitingForClick) return; 
@@ -439,7 +424,6 @@
         /* ✨ 加入這行，點擊後才會開始走骰子的步數 */
         await move(pid); 
     }
-}
     
     // ✨ 關鍵：位移結束後，檢查新位置是否需要讀詞
     if (words[players[pid].pos] !== "" && words[players[pid].pos] !== "起點") {
