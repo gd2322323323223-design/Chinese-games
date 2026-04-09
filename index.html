@@ -413,25 +413,35 @@
     }
 
     async function handlePlayerClick(pid) {
-        if (!waitingForClick || pid !== turn || moving) return;
-        waitingForClick = false;
-        document.getElementById('p' + (turn + 1)).classList.remove('can-move');
+    // 1. 檢查是否輪到該玩家且目前處於等待點擊狀態
+    if (!waitingForClick || pid !== turn || moving) return;
 
-        if (specialEventActive) {
-            specialEventActive = false;
-            await moveSteps(pid, pendingSteps); // 執行後退或衝刺
+    waitingForClick = false;
+    // 移除跳動動畫
+    document.getElementById('p' + (turn + 1)).classList.remove('can-move');
+
+    // 2. 判斷是「特殊事件位移」還是「普通骰子移動」
+    if (specialEventActive) {
+        specialEventActive = false; // 重置狀態
+        await moveSteps(pid, pendingSteps); // 執行前進/後退動畫
     } else {
-        /* ✨ 加入這行，點擊後才會開始走骰子的步數 */
-        await move(pid); 
+        await move(pid); // 執行擲骰子的正常移動
     }
-    
-    // ✨ 關鍵：位移結束後，檢查新位置是否需要讀詞
-    if (words[players[pid].pos] !== "" && words[players[pid].pos] !== "起點") {
-        checkEndOrModal(pid); // 👈 這樣就會跳出讀詞視窗了
+
+    // --- ✨ 關鍵修正：以下代碼必須放在函數括號內 ---
+
+    // 3. 移動完全結束後，檢查當前位置
+    const currentPos = players[pid].pos;
+    const currentWord = words[currentPos];
+
+    if (currentWord !== "" && currentWord !== "起點") {
+        // 如果格內有詞語，跳出讀詞視窗
+        checkEndOrModal(pid); 
     } else {
+        // 如果是空位（例如再次踩到另一個事件格），則直接換下一位
         finishTurn(); 
     }
-        }
+} // 這裡只有一個結尾括號，對應函數開始
     
     // 準備特殊移動：設定方向與步數，並讓棋子跳動
     function prepareSpecialStep(pid, steps) {
