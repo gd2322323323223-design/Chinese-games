@@ -290,6 +290,10 @@ function init() {
         cell.className = 'cell';
         cell.id = 'c' + i;
         if (i === words.length - 1) cell.classList.add('goal-cell');
+        // 加入這段，找回變色功能
+        if (traps.includes(i) || boosts.includes(i) || dinosaurs.includes(i)) {
+            cell.style.backgroundColor = "rgba(255, 235, 200, 0.9)"; // 淡淡的橘色
+        }
         
         let iconText = "";
         if(traps.includes(i)) iconText = "🍌";
