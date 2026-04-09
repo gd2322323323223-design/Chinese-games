@@ -486,19 +486,19 @@
 
         // 將原本的 alert 換成 fancyAlert
         if(traps.includes(players[pid].pos)) { 
-            await fancyAlert("🍌 哎呀！滑倒了！<br><small>點擊棋子後退 1 格</small>", "event"); 
+            await fancyAlert("🍌 哎呀！踩到香蕉滑倒了！<br><small>點擊棋子後退 1 格</small>", "event"); 
             prepareSpecialStep(pid, -1); 
             return;
         }
         
         if(boosts.includes(players[pid].pos)) { 
-            await fancyAlert("🚀 太棒了！衝刺中！<br><small>點擊棋子前進 5 格</small>", "event"); 
+            await fancyAlert("🚀 太棒了！坐上火箭衝刺中！<br><small>點擊棋子前進 5 格</small>", "event"); 
             prepareSpecialStep(pid, 5); 
             return;
         }
         
         if(dinosaurs.includes(players[pid].pos)) { 
-            await fancyAlert("🦖 遇到恐龍！躲避中...<br><small>點擊棋子後退 3 格</small>", "event"); 
+            await fancyAlert("🦖 哇！是恐龍，快躲起來！...<br><small>點擊棋子後退 3 格</small>", "event"); 
             prepareSpecialStep(pid, -3); 
             return;
         }
