@@ -208,7 +208,10 @@
     </style>
 </head>
 <body>
-
+<div id="music-ctrl" onclick="toggleBGM()" style="position:fixed; top:20px; right:20px; z-index:1000; cursor:pointer; font-size:30px; background:white; border-radius:50%; width:50px; height:50px; display:flex; align-items:center; justify-content:center; box-shadow:0 4px 10px rgba(0,0,0,0.2);">
+    🎵
+</div>
+    
 <div id="game-container">
     <div id="board"></div>
     <div id="p1" class="player" onclick="handlePlayerClick(0)"></div>
@@ -245,6 +248,75 @@ let pendingSteps = 0;
 let turn = 0, dice = 0, moving = false, timerInterval;
 let waitingForClick = false; 
 let specialEventActive = false;
+
+// --- 音效初始化 ---
+const audio = {
+    bgm: new Audio('sounds/bgm.mp3'),
+    dice: new Audio('sounds/dice.mp3'),
+    win: new Audio('sounds/win.mp3')
+};
+
+// 背景音樂設定：循環播放、音量適中
+audio.bgm.loop = true;
+audio.bgm.volume = 0.3;
+
+// 控制背景音樂開關
+function toggleBGM() {
+    if (audio.bgm.paused) {
+        audio.bgm.play().catch(e => console.log("音樂播放被瀏覽器阻擋:", e));
+        document.getElementById('music-ctrl').innerText = "🎶";
+    } else {
+        audio.bgm.pause();
+        document.getElementById('music-ctrl').innerText = "🔇";
+    }
+}
+
+// 播放音效輔助函式
+function playSound(name) {
+    if (audio[name]) {
+        audio[name].currentTime = 0; // 每次播放重置時間，確保連點有效
+        audio[name].play().catch(e => {});
+    }
+}
+
+// --- 修改現有的函式來觸發音效 ---
+
+// 1. 修改擲骰子函式
+async function roll() {
+    if(moving || waitingForClick) return;
+    
+    // 🎲 播放擲骰子音效
+    playSound('dice');
+    
+    document.getElementById('btn-roll').disabled = true;
+    for(let i=0; i<8; i++) {
+        dice = Math.floor(Math.random()*6)+1;
+        document.getElementById('dice-box').innerText = dice;
+        await new Promise(r => setTimeout(r, 60));
+    }
+    waitingForClick = true;
+    document.getElementById('p' + (turn + 1)).classList.add('can-move');
+    document.getElementById('player-turn-name').innerText = "👈 請點擊棋子行走！";
+}
+
+// 2. 修改檢查終點與彈窗的函式
+async function checkEndOrModal(pid) {
+    const pos = players[pid].pos;
+    const isGoal = (pos === words.length - 1);
+    const isSpecial = traps.includes(pos) || boosts.includes(pos) || dinosaurs.includes(pos);
+
+    if (isGoal) {
+        // 🏆 播放獲勝音效
+        playSound('win');
+        
+        await fancyAlert(`🏆 玩家 ${pid + 1} 奪冠！`, "goal");
+        location.reload();
+    } else if (isSpecial || pos === 0) {
+        finishTurn();
+    } else {
+        showModal();
+    }
+}
 
 const players = [{pos: 0, score: 0}, {pos: 0, score: 0}];
 const traps = [1, 16, 39, 48, 61, 76, 96];
