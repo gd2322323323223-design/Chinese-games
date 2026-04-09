@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>中文詞語 88 關：究極挑戰版</title>
+    <title>貓狗詞語大作戰</title>
     <style>
         :root { 
             --p1-color: #3182ce; 
@@ -178,6 +178,50 @@
         #modal-text { font-size: 70px; font-weight: 900; margin: 25px 0; cursor: pointer; color: #2b6cb0; }
         .event-icon { font-size: 55px; position: absolute; bottom: auto; right: auto; z-index: 2; }
 
+        /* 華麗彈幕容器 */
+        .special-notice {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0.5);
+            z-index: 1000;
+            padding: 40px 80px;
+            border-radius: 100px;
+            color: white;
+            font-size: 48px;
+            font-weight: 900;
+            text-align: center;
+            white-space: nowrap;
+            box-shadow: 0 0 50px rgba(0,0,0,0.3);
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        
+        .special-notice.show {
+            opacity: 1;
+            transform: translate(-50%, -50%) scale(1);
+        }
+        
+        /* 衝刺/事件背景 */
+        .notice-event {
+            background: linear-gradient(45deg, #4299e1, #667eea);
+            border: 8px solid #ebf8ff;
+        }
+        
+        /* 終點背景 */
+        .notice-goal {
+            background: linear-gradient(45deg, #ecc94b, #ed8936);
+            border: 8px solid #fffaf0;
+            font-size: 60px;
+            animation: gold-glow 1s infinite alternate;
+        }
+        
+        @keyframes gold-glow {
+            from { box-shadow: 0 0 20px #ecc94b; }
+            to { box-shadow: 0 0 60px #f6ad55, 0 0 100px rgba(236, 201, 75, 0.5); }
+        }
+
     </style>
 </head>
 <body>
@@ -239,6 +283,31 @@
             break; 
         }
     }
+    function fancyAlert(msg, type = 'event') {
+    // 移除舊的（如果有的話）
+    const oldNotice = document.querySelector('.special-notice');
+    if (oldNotice) oldNotice.remove();
+
+    // 建立新元素
+    const notice = document.createElement('div');
+    notice.className = `special-notice notice-${type}`;
+    notice.innerHTML = msg;
+    document.body.appendChild(notice);
+
+    // 動畫啟動
+    setTimeout(() => notice.classList.add('show'), 10);
+
+    // 3秒後消失
+    return new Promise(resolve => {
+        setTimeout(() => {
+            notice.classList.remove('show');
+            setTimeout(() => {
+                notice.remove();
+                resolve();
+            }, 400);
+        }, 2500);
+    });
+}
 
     // --- 初始化畫板 ---
     function init() {
@@ -408,25 +477,23 @@
 
         // 2. 移動結束後，先檢查是否踩到「特殊事件格」
 
-        // 🍌 香蕉皮事件 (後退 1 格)
+        // 將原本的 alert 換成 fancyAlert
         if(traps.includes(players[pid].pos)) { 
-            alert("🍌 哎呀！踩到香蕉皮滑倒了！\n請點擊棋子後退 1 格。"); 
-            prepareSpecialStep(pid, -1); // 這裡會呼叫我們之前寫的「一步一步後退」
-            return; // 結束函數，不執行後面的讀詞彈窗
+            await fancyAlert("🍌 哎呀！滑倒了！<br><small>點擊棋子後退 1 格</small>", "event"); 
+            prepareSpecialStep(pid, -1); 
+            return;
         }
-
-        // 🚀 火箭衝刺事件 (前進 5 格)
+        
         if(boosts.includes(players[pid].pos)) { 
-            alert("🚀 太棒了！坐上火箭衝刺！\n請點擊棋子前進 5 格。"); 
-            prepareSpecialStep(pid, 5); // 這裡會呼叫「一步一步前進」
-            return; // 結束函數
+            await fancyAlert("🚀 太棒了！衝刺中！<br><small>點擊棋子前進 5 格</small>", "event"); 
+            prepareSpecialStep(pid, 5); 
+            return;
         }
-
-        // 🦖 恐龍事件 (後退 3 格)
+        
         if(dinosaurs.includes(players[pid].pos)) { 
-            alert("🦖 糟了！遇到大恐龍！\n請點擊棋子後退 3 格。"); 
+            await fancyAlert("🦖 遇到恐龍！躲避中...<br><small>點擊棋子後退 3 格</small>", "event"); 
             prepareSpecialStep(pid, -3); 
-            return; // 結束函數
+            return;
         }
 
         // 3. 如果沒踩到事件，再檢查是否要讀詞語
@@ -457,15 +524,16 @@
         moving = false;
     }
 
-    function checkEndOrModal(pid) {
-        moving = false;
-        if(players[pid].pos === words.length-1) {
-            alert(`🏆 恭喜玩家 ${pid + 1} 成功挑戰 88 關！`);
-            location.reload();
-        } else {
-            showModal();
-        }
+    async function checkEndOrModal(pid) {
+    moving = false;
+    if(players[pid].pos === words.length-1) {
+        // 華麗的終點彈幕
+        await fancyAlert(`🏆 恭喜玩家 ${pid + 1}<br>成功奪冠！`, "goal");
+        location.reload();
+    } else {
+        showModal();
     }
+}
 
     function showModal() {
         document.getElementById('modal-text').innerText = words[players[turn].pos];
