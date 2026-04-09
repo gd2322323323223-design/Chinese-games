@@ -261,7 +261,7 @@
     <p style="font-size: 14px; color: #a0aec0; margin-bottom: 20px;">💡 點擊詞語可重複聽讀音</p>
     <div style="display: flex; gap: 15px; flex-direction: column;">
         <button onclick="startRecognition()" style="padding: 12px; background: #4299e1; color: white; border: none; border-radius: 15px; font-size: 18px; cursor: pointer; font-weight: bold;">🤖 AI 檢查讀音</button>
-        <button onclick="closeModal()" style="padding: 18px; background: #48bb78; color: white; border: none; border-radius: 20px; font-size: 22px; cursor: pointer; font-weight: bold;">我讀好了！</button>
+        <button onclick="closeModal(true)" style="padding: 12px; background: #48bb78; color: white; border: none; border-radius: 15px; font-size: 18px; cursor: pointer; font-weight: bold;">✅ 我讀好了！</button>
     </div>
 </div>
 
@@ -270,7 +270,8 @@
 let pendingSteps = 0; 
 let turn = 0, dice = 0, moving = false, timerInterval;
 let waitingForClick = false; 
-let specialEventActive = false; 
+let specialEventActive = false;
+let timerInterval; // 必須定義在全域，closeModal 才能讀到它
 
 const players = [{pos: 0, score: 0}, {pos: 0, score: 0}];
 const traps = [1, 16, 39, 48, 61, 76, 96];
@@ -448,16 +449,6 @@ async function moveSteps(pid, steps) {
     moving = false;
 }
 
-function finishTurn() {
-    turn = (turn === 0) ? 1 : 0;
-    const nameEl = document.getElementById('player-turn-name');
-    nameEl.innerText = `輪到：玩家 ${turn + 1}`;
-    nameEl.style.color = turn === 0 ? 'var(--p1-color)' : 'var(--p2-color)';
-    document.getElementById('btn-roll').disabled = false;
-    moving = false;
-    waitingForClick = false;
-}
-
 async function checkEndOrModal(pid) {
     if(players[pid].pos === words.length-1) {
         await fancyAlert(`🏆 玩家 ${pid + 1} 奪冠！`, "goal");
@@ -597,6 +588,63 @@ function fancyAlert(msg, type = 'event') {
 window.onload = init;
 
     // 不要直接執行 init();，必須放在 onload 裡面。
+    // --- 🚪 關閉彈窗並處理結果 ---
+function closeModal(addScore = true) {
+    console.log("正在執行 closeModal, 是否加分:", addScore);
+
+    // 1. 停止倒計時器
+    if (timerInterval) {
+        clearInterval(timerInterval);
+    }
+
+    // 2. 如果成功朗讀，則給當前玩家加分
+    if (addScore) {
+        players[turn].score += 10;
+        const scoreEl = document.getElementById('s' + (turn + 1));
+        if (scoreEl) {
+            scoreEl.innerText = players[turn].score;
+        }
+    }
+
+    // 3. 隱藏彈窗介面
+    const modal = document.getElementById('modal');
+    if (modal) {
+        modal.style.display = 'none';
+    }
+
+    // 4. ✨ 呼叫換人函數
+    finishTurn();
+}
+
+// --- 🔄 切換玩家與狀態重置 ---
+function finishTurn() {
+    console.log("正在執行 finishTurn, 切換前玩家是:", turn);
+
+    // 1. 切換玩家索引 (0 變 1, 1 變 0)
+    turn = (turn === 0) ? 1 : 0;
+
+    // 2. 更新頂部的回合提示文字與顏色
+    const nameEl = document.getElementById('player-turn-name');
+    if (nameEl) {
+        nameEl.innerText = `輪到：玩家 ${turn + 1}`;
+        nameEl.style.color = (turn === 0) ? 'var(--p1-color)' : 'var(--p2-color)';
+    }
+
+    // 3. 恢復擲骰子按鈕
+    const rollBtn = document.getElementById('btn-roll');
+    if (rollBtn) {
+        rollBtn.disabled = false;
+    }
+
+    // 4. 🛠️ 核心修正：重置所有邏輯開關，防止下一回合無法點擊
+    moving = false;
+    waitingForClick = false;
+    specialEventActive = false; 
+    pendingSteps = 0;
+
+    console.log("換人完成，現在輪到玩家:", turn);
+}
+    
 </script>
 
 </body>
