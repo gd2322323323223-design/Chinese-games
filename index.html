@@ -265,8 +265,7 @@
     </div>
 </div>
 
-<script>
-   // --- 基礎變數定義 ---
+// --- 基礎變數定義 ---
 let pendingSteps = 0; 
 let turn = 0, dice = 0, moving = false, timerInterval;
 let waitingForClick = false; 
@@ -279,13 +278,11 @@ const dinosaurs = [5, 12, 27, 43, 55, 70, 86, 103];
 
 const rawWords = ["學校", "禮堂", "校務處", "操場", "音樂室", "課室", "洗手間", "電腦室", "樓梯", "圖書館", "走廊", "升降機", "教員室", "草地上", "沙灘", "山頂", "運動場", "籃球場", "足球場", "燒烤場", "公園", "家裏", "客廳", "浴室", "睡房", "廚房", "清真寺", "商場", "超市", "街市", "麵包店", "理髮店", "便利店", "藥房", "餐廳", "醫院", "補習社", "博物館", "銀行", "地鐵站", "巴士站", "行人道", "刷牙", "洗澡", "洗手", "喝水", "吃飯", "睡覺", "穿衣服", "戴口罩", "做家務", "倒垃圾", "洗碗", "抹窗戶", "煮飯", "上課", "做功課", "溫習", "看書", "畫畫", "做早操", "跑步", "游泳", "跳繩", "踢足球", "打籃球", "騎單車", "遠足", "拍照", "表演", "唱歌", "跳舞", "慶祝", "排隊", "玩遊戲", "看手機", "打電話", "打招呼", "買水果", "比賽", "說話", "摺紙", "下棋", "玩拼圖"];
 
-   /// 1. 🎭 AI 四素句素材庫
 const sentenceElements = {
     times: ["早上", "中午", "放學後", "星期六", "今天", "晚上", "星期日", "早上八時", "昨天", "明天"],
     people: ["媽媽", "爸爸", "老師", "小明", "我", "姐姐", "妹妹", "叔叔", "同學", "哥哥", "弟弟", "爺爺", "姨姨", "我們"]
 };
 
-// 2. 📍 從原始詞庫切分 (移出對象外)
 const allPlaces = rawWords.slice(0, 42); 
 const allActions = rawWords.slice(42);
     
@@ -298,38 +295,31 @@ for (let i = 0; i < 110; i++) {
     else { words.push("終點 🏆"); break; }
 }
 
-    function init() {
+function init() {
     const board = document.getElementById('board');
     board.innerHTML = "";
-    
-    let displayIndex = 1; // ✨ 用來記錄「詞語格」的數字，從 1 開始
+    let displayIndex = 1; 
 
     words.forEach((w, i) => {
         const cell = document.createElement('div');
         cell.className = 'cell';
         cell.id = 'c' + i;
-
         const isGoal = (i === words.length - 1);
         const isStart = (i === 0);
         const isSpecial = traps.includes(i) || boosts.includes(i) || dinosaurs.includes(i);
 
         if (isGoal) cell.classList.add('goal-cell');
-        
-        // ✨ 特殊事件格背景變色（橘色）
-        if (isSpecial) {
-            cell.style.backgroundColor = "rgba(255, 235, 200, 0.9)";
-        }
+        if (isSpecial) cell.style.backgroundColor = "rgba(255, 235, 200, 0.9)";
 
         let iconText = "";
         if(traps.includes(i)) iconText = "🍌";
         else if(boosts.includes(i)) iconText = "🚀";
         else if(dinosaurs.includes(i)) iconText = "🦖";
 
-        // ✨ 數字顯示邏輯：只有既不是起點、不是終點、也不是特殊格時，才顯示數字並累加
         let numberHtml = "";
         if (!isStart && !isGoal && !isSpecial) {
             numberHtml = `<span class="cell-index">${displayIndex}</span>`;
-            displayIndex++; // 只有詞語格會讓數字增加
+            displayIndex++;
         }
 
         cell.innerHTML = `
@@ -347,17 +337,15 @@ for (let i = 0; i < 110; i++) {
         board.appendChild(cell);
     });
     setTimeout(updateDisplay, 50);
-    }
+}
 
 function updateDisplay() {
     players.forEach((p, i) => {
         const cell = document.getElementById('c' + p.pos);
         const pEl = document.getElementById('p' + (i + 1));
         if (!cell || !pEl) return;
-
         const centerX = cell.offsetLeft + (cell.offsetWidth / 2) - 32;
         pEl.style.left = centerX + 'px';
-
         if (cell.classList.contains('goal-cell')) {
             const centerY = cell.offsetTop + (cell.offsetHeight / 2) + (i === 0 ? -40 : 20);
             pEl.style.top = centerY + 'px';
@@ -381,34 +369,26 @@ async function roll() {
     document.getElementById('player-turn-name').innerText = "👈 請點擊棋子行走！";
 }
 
+// ✨ 修正重點：整合 handlePlayerClick
 async function handlePlayerClick(pid) {
-    // 只有輪到該玩家，且處於等待點擊狀態，且棋子沒在動時才執行
     if (!waitingForClick || pid !== turn || moving) return;
     
-    waitingForClick = false; // 立即關閉開關，防止重複點擊
+    waitingForClick = false;
     document.getElementById('p' + (turn + 1)).classList.remove('can-move');
 
     if (specialEventActive) {
-        // 如果現在是「特殊事件」觸發的移動（如香蕉皮、火箭）
-        let steps = pendingSteps; // 取得預存的步數
-        specialEventActive = false; // 重置事件開關
-        pendingSteps = 0; // 清空步數
-        await moveSteps(pid, steps); // 執行特殊移動
+        let steps = pendingSteps;
+        specialEventActive = false;
+        pendingSteps = 0;
+        await moveSteps(pid, steps);
     } else {
-        // 如果是普通的骰子移動
         await move(pid);
     }
 
-    // 移動徹底結束後，進行分流判斷
     checkEndOrModal(pid);
 }
 
-    // 2. ✨ 核心修正：移動徹底結束後，呼叫分流器
-    // 這裡會自動判斷：要去終點、要彈窗造句、還是直接換人
-    checkEndOrModal(pid);
-}
-
-// 這裡是分流器，請確保你的腳本裡也有這段 (或是覆蓋掉舊的)
+// ✨ 修正重點：獨立分流判斷
 async function checkEndOrModal(pid) {
     const pos = players[pid].pos;
     const isGoal = (pos === words.length - 1);
@@ -419,10 +399,8 @@ async function checkEndOrModal(pid) {
         await fancyAlert(`🏆 玩家 ${pid + 1} 奪冠！`, "goal");
         location.reload();
     } else if (isSpecial || isStart) {
-        // 如果是特殊格或起點，不彈窗，直接換下一個人
         finishTurn();
     } else {
-        // 如果是普通詞語格，顯示 AI 四素句彈窗
         showModal();
     }
 }
@@ -436,8 +414,7 @@ async function move(pid) {
             await new Promise(r => setTimeout(r, 300));
         }
     }
-    
-    moving = false; // 這裡很重要！釋放狀態才能觸發點擊
+    moving = false;
 
     const pos = players[pid].pos;
     if(traps.includes(pos)) {
@@ -453,24 +430,19 @@ async function move(pid) {
 }
 
 function prepareSpecialStep(pid, steps) {
-    moving = false;          // 確保移動狀態已解鎖
-    waitingForClick = true;  // 開啟等待點擊
+    moving = false;
+    waitingForClick = true;
     specialEventActive = true; 
-    pendingSteps = steps;    // 把要走幾步存起來（例如 -1 或 5）
-    
-    // 讓棋子跳動，提醒玩家點擊
+    pendingSteps = steps;
     document.getElementById('p' + (pid + 1)).classList.add('can-move');
     document.getElementById('player-turn-name').innerText = "👈 請點擊棋子執行特殊事件！";
-    console.log("已準備好特殊移動，步數：", steps);
 }
 
 async function moveSteps(pid, steps) {
     if (steps === 0) return;
-    moving = true; // 鎖定狀態，防止移動中亂點
-    
+    moving = true;
     const isForward = steps > 0;
     const totalSteps = Math.abs(steps);
-
     for (let i = 0; i < totalSteps; i++) {
         if (isForward) {
             if (players[pid].pos < words.length - 1) players[pid].pos++;
@@ -478,39 +450,28 @@ async function moveSteps(pid, steps) {
             if (players[pid].pos > 0) players[pid].pos--;
         }
         updateDisplay();
-        await new Promise(r => setTimeout(r, 300)); // 每步停 0.3 秒
+        await new Promise(r => setTimeout(r, 300));
     }
-    
-    moving = false; // 移動完畢，解鎖
+    moving = false;
 }
 
 function showModal() {
-    const currentWord = words[players[turn].pos]; // 獲取當前格子的詞語
+    const currentWord = words[players[turn].pos];
     document.getElementById('modal-text').innerText = currentWord;
-    
     const sentenceText = document.getElementById('ai-sentence-text');
-
-    // 🎲 隨機抽取「時間」和「人物」
     const rTime = sentenceElements.times[Math.floor(Math.random() * sentenceElements.times.length)];
     const rPerson = sentenceElements.people[Math.floor(Math.random() * sentenceElements.people.length)];
-
     let finalSentence = "";
 
-    // 📍 判斷當前詞語是地點還是事情，並進行四素句組裝
     if (allPlaces.includes(currentWord)) {
-        // 【情況 A：當前是地點】-> 從 allActions 隨機抓一個「事情」來配對
         const randomAction = allActions[Math.floor(Math.random() * allActions.length)];
         finalSentence = `${rTime}，${rPerson}在${currentWord}${randomAction}。`;
     } else {
-        // 【情況 B：當前是事情】-> 從 allPlaces 隨機抓一個「地點」來配對
         const randomPlace = allPlaces[Math.floor(Math.random() * allPlaces.length)];
         finalSentence = `${rTime}，${rPerson}在${randomPlace}${currentWord}。`;
     }
 
-    // 將生成的 AI 四素句顯示在網頁上
     sentenceText.innerText = finalSentence;
-
-    // --- 以下為原本的彈窗顯示與計時邏輯 ---
     document.getElementById('modal').style.display = 'block';
     let timeLeft = 60;
     clearInterval(timerInterval);
@@ -522,81 +483,45 @@ function showModal() {
 }
 
 function speak() {
-    window.speechSynthesis.cancel(); // 先停止之前的聲音
-    
+    window.speechSynthesis.cancel();
     const word = document.getElementById('modal-text').innerText;
     const sentence = document.getElementById('ai-sentence-text').innerText;
-    
-    // AI 會先讀詞語，停一秒，再讀出完整的四素句
     const msg = new SpeechSynthesisUtterance(`${word}。……句子練習：${sentence}`);
     msg.lang = 'zh-HK';
-    msg.rate = 0.8; // 稍微放慢一點速度，聽得更清楚
+    msg.rate = 0.8;
     window.speechSynthesis.speak(msg);
 }
-    
-// --- 🤖 AI 語音辨識檢查功能 ---
+
 function startRecognition() {
-    // 檢查瀏覽器是否支持語音辨識
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!SpeechRecognition) {
         alert("抱歉，您的瀏覽器不支持語音辨識功能。建議使用 Chrome 瀏覽器。");
         return;
     }
-
     const recognition = new SpeechRecognition();
-    recognition.lang = 'zh-HK'; // 設定辨識語言為粵語 (如果是國語可改 zh-CN)
-    recognition.interimResults = false; // 只取最終結果
-    recognition.maxAlternatives = 1;
-
+    recognition.lang = 'zh-HK';
     const modalText = document.getElementById('modal-text');
-    const originalWord = modalText.innerText; // 記住原本的詞語
-
-    // 當辨識開始時
+    const originalWord = modalText.innerText;
     modalText.innerHTML = `<span style="color:#4299e1">🎤 正在聽...請讀出「${originalWord}」</span>`;
-    
     recognition.start();
 
-    // 辨識成功回傳結果
     recognition.onresult = (event) => {
         const result = event.results[0][0].transcript;
-        console.log("辨識結果:", result);
-
-        // 簡單的比對邏輯 (檢查結果是否包含目標詞語)
         if (result.includes(originalWord)) {
-            modalText.innerHTML = `
-                <div style="color:#48bb78">✅ 太棒了！讀音正確</div>
-                <div style="font-size:24px; color:#a0aec0">(你說的是: ${result})</div>
-            `;
-            // 答對給予額外獎勵分
+            modalText.innerHTML = `<div style="color:#48bb78">✅ 太棒了！</div><div style="font-size:24px; color:#a0aec0">(你說: ${result})</div>`;
             players[turn].score += 5;
             document.getElementById('s' + (turn + 1)).innerText = players[turn].score;
         } else {
-            modalText.innerHTML = `
-                <div style="color:#f56565">❌ 好像不太對喔</div>
-                <div style="font-size:24px; color:#a0aec0">(我聽成: ${result})</div>
-            `;
+            modalText.innerHTML = `<div style="color:#f56565">❌ 不太對喔</div><div style="font-size:24px; color:#a0aec0">(聽成: ${result})</div>`;
         }
-
-        // 3秒後恢復顯示原始詞語，方便玩家重讀
-        setTimeout(() => {
-            modalText.innerText = originalWord;
-        }, 3000);
+        setTimeout(() => { modalText.innerText = originalWord; }, 3000);
     };
-
-    // 辨識錯誤 (例如沒說話或沒權限)
-    recognition.onerror = (event) => {
-        console.error("語音辨識錯誤:", event.error);
-        modalText.innerHTML = `<span style="color:#e53e3e">⚠️ 無法辨識，請再試一次</span>`;
-        setTimeout(() => {
-            modalText.innerText = originalWord;
-        }, 2000);
-    };
-
-    // 辨識結束
-    recognition.onspeechend = () => {
-        recognition.stop();
+    recognition.onerror = () => {
+        modalText.innerHTML = `<span style="color:#e53e3e">⚠️ 無法辨識</span>`;
+        setTimeout(() => { modalText.innerText = originalWord; }, 2000);
     };
 }
+
 function fancyAlert(msg, type = 'event') {
     return new Promise(resolve => {
         const notice = document.createElement('div');
@@ -611,67 +536,29 @@ function fancyAlert(msg, type = 'event') {
     });
 }
 
-window.onload = init;
-
-    // 不要直接執行 init();，必須放在 onload 裡面。
-    // --- 🚪 關閉彈窗並處理結果 ---
 function closeModal(addScore = true) {
-    console.log("正在執行 closeModal, 是否加分:", addScore);
-
-    // 1. 停止倒計時器
-    if (timerInterval) {
-        clearInterval(timerInterval);
-    }
-
-    // 2. 如果成功朗讀，則給當前玩家加分
+    if (timerInterval) clearInterval(timerInterval);
     if (addScore) {
         players[turn].score += 10;
-        const scoreEl = document.getElementById('s' + (turn + 1));
-        if (scoreEl) {
-            scoreEl.innerText = players[turn].score;
-        }
+        document.getElementById('s' + (turn + 1)).innerText = players[turn].score;
     }
-
-    // 3. 隱藏彈窗介面
-    const modal = document.getElementById('modal');
-    if (modal) {
-        modal.style.display = 'none';
-    }
-
-    // 4. ✨ 呼叫換人函數
+    document.getElementById('modal').style.display = 'none';
     finishTurn();
 }
 
-// --- 🔄 切換玩家與狀態重置 ---
 function finishTurn() {
-    console.log("正在執行 finishTurn, 切換前玩家是:", turn);
-
-    // 1. 切換玩家索引 (0 變 1, 1 變 0)
     turn = (turn === 0) ? 1 : 0;
-
-    // 2. 更新頂部的回合提示文字與顏色
     const nameEl = document.getElementById('player-turn-name');
-    if (nameEl) {
-        nameEl.innerText = `輪到：玩家 ${turn + 1}`;
-        nameEl.style.color = (turn === 0) ? 'var(--p1-color)' : 'var(--p2-color)';
-    }
-
-    // 3. 恢復擲骰子按鈕
-    const rollBtn = document.getElementById('btn-roll');
-    if (rollBtn) {
-        rollBtn.disabled = false;
-    }
-
-    // 4. 🛠️ 核心修正：重置所有邏輯開關，防止下一回合無法點擊
+    nameEl.innerText = `輪到：玩家 ${turn + 1}`;
+    nameEl.style.color = (turn === 0) ? 'var(--p1-color)' : 'var(--p2-color)';
+    document.getElementById('btn-roll').disabled = false;
     moving = false;
     waitingForClick = false;
     specialEventActive = false; 
     pendingSteps = 0;
-
-    console.log("換人完成，現在輪到玩家:", turn);
 }
-    
-</script>
+
+window.onload = init;
 
 </body>
 </html>
