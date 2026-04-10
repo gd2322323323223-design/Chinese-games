@@ -11,14 +11,35 @@
             --cell-size: 90px; 
             --road-height: 90px;
         }
+        
+body::before {
+    content: "";
+    position: fixed; 
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(255, 255, 255, 0.35);  
+    backdrop-filter: blur(10px);  
+    -webkit-backdrop-filter: blur(10px); 
+    z-index: -1; 
+    pointer-events: none; 
+}
 
-        body { 
-            font-family: "Microsoft JhengHei", sans-serif; 
-            margin: 0; 
-            background: #f0f4f8; 
-            overflow-y: scroll; 
-            padding-bottom: 200px; 
-        }
+body {
+    font-family: "Microsoft JhengHei", sans-serif;
+    margin: 0;
+    /* 1. 確保大背景圖正確顯示 */
+    background-image: url('images/forest-bg.jpg'); 
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed; /* 讓背景固定，增加空間感 */
+    
+    overflow-y: scroll;
+    padding-bottom: 200px;
+    position: relative; /* 為了讓下方的霧氣層定位正確 */
+    min-height: 100vh;
+}
 
         #game-container { position: relative; width: 95%; max-width: 1400px; margin: 20px auto; }
 
