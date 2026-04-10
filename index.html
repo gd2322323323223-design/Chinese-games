@@ -14,30 +14,38 @@
         
 body::before {
     content: "";
-    position: fixed; 
+    position: fixed;
     top: 0;
     left: 0;
     right: 0;
     bottom: 0;
-    background: rgba(255, 255, 255, 0.35);  
-    backdrop-filter: blur(10px);  
-    -webkit-backdrop-filter: blur(10px); 
+    /* ✨ 稍微加深顏色 (0.35 -> 0.5)，測試看看有沒有變白一點 */
+    background: rgba(255, 255, 255, 0.5);  
+    
+    /* ✨ 增加模糊度測試 (10px -> 15px) */
+    backdrop-filter: blur(15px);  
+    -webkit-backdrop-filter: blur(15px); 
+    
+    /* 將 z-index 設為 -1，並確保 body 是 relative */
     z-index: -1; 
-    pointer-events: none; 
+    pointer-events: none;
 }
 
 body {
     font-family: "Microsoft JhengHei", sans-serif;
     margin: 0;
-    /* 1. 確保大背景圖正確顯示 */
+    /* 確保這行路徑是對的，或是先用顏色測試：background-color: #e8f5e9; */
     background-image: url('images/forest-bg.jpg'); 
     background-size: cover;
     background-position: center;
-    background-attachment: fixed; /* 讓背景固定，增加空間感 */
+    background-attachment: fixed;
+    
+    /* ✨ 新增這兩行：確保 body 本身不遮擋偽元素 */
+    position: relative;
+    background-color: transparent; 
     
     overflow-y: scroll;
     padding-bottom: 200px;
-    position: relative; /* 為了讓下方的霧氣層定位正確 */
     min-height: 100vh;
 }
 
