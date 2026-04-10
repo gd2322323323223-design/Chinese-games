@@ -53,14 +53,16 @@ body {
             grid-template-columns: repeat(10, 1fr); 
             gap: 140px 15px; 
             padding: 40px 40px 150px 40px; 
-            border-radius: 40px; 
+            border-radius: 30px; 
             background-image: url('images/board-bg.jpg');
             background-size: cover;
             background-position: center;
             background-color: #ffffff;  
             border: 12px solid #8d6e63;   /* 加入深棕色實體邊框 */
             outline: 6px solid #5d4037;   /* 加入外層輪廓線，製造木頭厚度 */
-            box-shadow: 0 25px 50px rgba(0,0,0,0.3); /* 加強陰影讓它立體 */
+           box-shadow: 
+               0 15px 0 #5d4037,           /* 木板的側面厚度 */
+               0 25px 50px rgba(0,0,0,0.3); /* 投射在霧氣上的影子 */
         }
 
         .cell { 
@@ -117,10 +119,11 @@ body {
             left: -10px; 
             right: -10px;
             height: var(--road-height);
-            background: #4a5568; 
-            border-bottom: 6px solid #cbd5e0; 
-            z-index: 1;
+            background: #a1887f !important; /* 暖棕色泥土 */
+            border-bottom: 5px solid #795548; /* 泥土的側邊厚度 */
             border-radius: 10px;
+            height: 90px; /* 確保高度夠寬，讓貓狗能站進去 */
+            z-index: 1;
         }
 
         .cell::before {
@@ -513,8 +516,11 @@ function updateDisplay() {
             const centerY = cell.offsetTop + (cell.offsetHeight / 2) + (i === 0 ? -40 : 20);
             pEl.style.top = centerY + 'px';
         } else {
-            const roadAreaTop = cell.offsetTop + cell.offsetHeight + 20; 
-            pEl.style.top = (i === 0 ? roadAreaTop - 16 : roadAreaTop + 30) + 'px';
+            // 1. 先定義道路的基準線（格子底部再往下移一點，進入泥土路區域）
+            const roadAreaTop = cell.offsetTop + cell.offsetHeight + 45; 
+            // 2. 根據是玩家 1 還是玩家 2，給予不同的垂直位移，讓牠們上下並排
+            // i === 0 是小狗，稍微靠上；i === 1 是小貓，稍微靠下
+            pEl.style.top = (i === 0 ? roadAreaTop : roadAreaTop + 35) + 'px';
         }
     });
 }
