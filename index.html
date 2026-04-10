@@ -465,14 +465,20 @@ function updateDisplay() {
         const cell = document.getElementById('c' + p.pos);
         const pEl = document.getElementById('p' + (i + 1));
         if (!cell || !pEl) return;
+        
         const centerX = cell.offsetLeft + (cell.offsetWidth / 2) - 32;
         pEl.style.left = centerX + 'px';
+
         if (cell.classList.contains('goal-cell')) {
             const centerY = cell.offsetTop + (cell.offsetHeight / 2) + (i === 0 ? -40 : 20);
             pEl.style.top = centerY + 'px';
         } else {
-            const roadAreaTop = cell.offsetTop + cell.offsetHeight + 20; 
-            pEl.style.top = (i === 0 ? roadAreaTop - 16 : roadAreaTop + 30) + 'px';
+            // ✨ 這裡要對應 CSS 的道路位置
+            // cell.offsetTop + cell.offsetHeight 是格子的底部
+            // 我們把路設在底部下方，所以這裡加的數值要讓棋子落在 90px 的路面上
+            const roadBase = cell.offsetTop + cell.offsetHeight + 15; 
+            pEl.style.top = (i === 0 ? roadBase : roadBase + 45) + 'px'; 
+            // i=0 是第一隻，i=1 是第二隻，相差 45px 剛好在路面上並排
         }
     });
 }
