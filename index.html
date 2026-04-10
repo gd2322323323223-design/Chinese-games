@@ -35,12 +35,13 @@
         
         /* 🎨 修改：木質感大邊框 */
         border-radius: 40px;
-        border: 12px solid #8d6e63; 
+        border: 12px solid #8d6e63;
+        outline: 6px solid #5d4037;   /* 加入外層輪廓線，製造木頭厚度 */
         background-color: #ffffff;
         background-image: url('images/board-bg.jpg'); /* 保留你的背景圖 */
         background-size: cover;
         background-position: center;
-        box-shadow: 0 25px 50px rgba(0,0,0,0.15), 0 10px 0 #5d4037; 
+        box-shadow: 0 25px 50px rgba(0,0,0,0.3); /* 加強陰影讓它立體 */
     }
 
 /* --- 格子設計 --- */
@@ -137,6 +138,22 @@
     cursor: pointer;
     /* 🎨 修改：綠色光暈 */
     filter: drop-shadow(0 0 15px #81c784) brightness(1.1) !important;
+}
+/* 讓輪到的棋子跳動起來 */
+.can-move { 
+    animation: bounce 0.6s infinite alternate !important; 
+    cursor: pointer; 
+    /* 額外加一個發光效果，讓玩家更容易看出來 */
+    filter: drop-shadow(0 0 15px #48bb78) brightness(1.2) !important; 
+}
+
+@keyframes bounce { 
+    from { 
+        transform: translateY(0); 
+    } 
+    to { 
+        transform: translateY(-30px); /* 向上跳 30 像素，很有動感 */
+    } 
 }
 
 /* --- 控制面板與按鈕 --- */
@@ -466,14 +483,15 @@ function updateDisplay() {
         const cell = document.getElementById('c' + p.pos);
         const pEl = document.getElementById('p' + (i + 1));
         if (!cell || !pEl) return;
+        
         const centerX = cell.offsetLeft + (cell.offsetWidth / 2) - 32;
         pEl.style.left = centerX + 'px';
         if (cell.classList.contains('goal-cell')) {
             const centerY = cell.offsetTop + (cell.offsetHeight / 2) + (i === 0 ? -40 : 20);
             pEl.style.top = centerY + 'px';
         } else {
-            const roadAreaTop = cell.offsetTop + cell.offsetHeight + 20; 
-            pEl.style.top = (i === 0 ? roadAreaTop - 16 : roadAreaTop + 30) + 'px';
+            const roadBase = cell.offsetTop + cell.offsetHeight + 15; 
+            pEl.style.top = (i === 0 ? roadBase : roadBase + 45) + 'px';
         }
     });
 }
@@ -496,7 +514,6 @@ async function handlePlayerClick(pid) {
     if (!waitingForClick || pid !== turn || moving) return;
     
     waitingForClick = false; // 立即關閉點擊許可，防止連點
-    document.getElementById('p' + (turn + 1)).classList.remove('can-move');
 
     if (specialEventActive) {
         // 如果是特殊事件（如踩到香蕉）引發的點擊
