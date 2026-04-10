@@ -51,22 +51,29 @@ body {
         #game-container { position: relative; width: 95%; max-width: 1400px; margin: 20px auto; }
 
         #board { 
-            display: grid; 
-            grid-template-columns: repeat(10, 1fr); 
-            gap: 140px 15px; 
-            padding: 40px 40px 150px 40px; 
-            border-radius: 40px; 
-            background-image: url('images/board-bg.png') !important;
-            background-size: cover;
-            background-position: center;
-            background-color: #fcfaf2;
-            background-blend-mode: overlay;
-            border: 12px solid #8d6e63;   /* 加入深棕色實體邊框 */
-            outline: 6px solid #5d4037;   /* 加入外層輪廓線，製造木頭厚度 */
-            box-shadow: 
-                0 15px 0 #5d4037,           /* 這是木板的側面厚度 */
-                0 30px 60px rgba(0,0,0,0.4); /* 這是投射到背景上的深陰影 */
-        }
+    display: grid; 
+    grid-template-columns: repeat(10, 1fr); 
+    gap: 140px 15px; 
+    padding: 40px 40px 150px 40px; 
+    border-radius: 40px; 
+
+    /* --- 背景圖修復開始 --- */
+    /* 1. 確保圖片路徑在引號內，並先移除混合模式測試 */
+    background-image: url("images/board-bg.png") !important; 
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    
+    /* 2. 暫時將顏色設為透明，確保能一眼看到圖片 */
+    background-color: transparent; 
+    /* --- 背景圖修復結束 --- */
+
+    border: 12px solid #8d6e63;
+    outline: 6px solid #5d4037;
+    box-shadow: 
+        0 15px 0 #5d4037,           
+        0 30px 60px rgba(0,0,0,0.4); 
+}
 
         .cell { 
             height: var(--cell-size);
