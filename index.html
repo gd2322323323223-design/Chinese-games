@@ -5,209 +5,206 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>貓狗詞語大作戰</title>
     <style>
-    :root {
-        --cell-size: 100px; /* 你可以根據需要調整格子大小 */
-        --road-height: 40px;
-}
+        :root { 
+            --p1-color: #3182ce; 
+            --p2-color: #d53f8c; 
+            --cell-size: 90px; 
+            --road-height: 90px;
+        }
 
-    body {
-        font-family: "PingFang HK", "Microsoft JhengHei", sans-serif;
-        margin: 0;
+        body { 
+            font-family: "Microsoft JhengHei", sans-serif; 
+            margin: 0; 
+            background: #f0f4f8; 
+            overflow-y: scroll; 
+            padding-bottom: 200px; 
+        }
+
+        #game-container { position: relative; width: 95%; max-width: 1400px; margin: 20px auto; }
+
+        #board { 
+            display: grid; 
+            grid-template-columns: repeat(10, 1fr); 
+            gap: 140px 15px; 
+            padding: 40px 40px 150px 40px; 
+            border-radius: 40px; 
+            background-image: url('images/board-bg.jpg');
+            background-size: cover;
+            background-position: center;
+            background-color: #ffffff; 
+            box-shadow: 0 25px 50px rgba(0,0,0,0.1); 
+            border: 12px solid white;
+        }
+
+        .cell { 
+            height: var(--cell-size);
+            border-radius: 20px; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: center; 
+            position: relative; 
+            transition: 0.3s; 
+            background-color: rgba(255, 255, 255, 0.9); 
+            padding: 5px; 
+            box-sizing: border-box; 
+            border: 2px solid #e2e8f0;
+            backdrop-filter: blur(5px);
+        }
+
+        .cell.goal-cell {
+            grid-column: span 2;
+            grid-row: span 2;
+            height: auto;
+            min-height: calc(var(--cell-size) * 2 + 130px); 
+            background: linear-gradient(135deg, #fff5f5 0%, #fff 100%) !important;
+            border: 6px solid #f56565 !important;
+            z-index: 5;
+            display: flex !important;
+            flex-direction: column !important;
+            justify-content: center !important;
+            align-items: center !important;
+            gap: 10px; 
+        }
         
-        /* 🎨 修改：森林淺綠漸層底 */
-        background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
-        overflow-y: scroll;
-        padding-bottom: 200px;
-    }
-
-    #game-container { 
-        position: relative; 
-        width: 95%; 
-        max-width: 1400px; 
-        margin: 20px auto; 
-    }
-
-    #board {
-        display: grid;
-        grid-template-columns: repeat(10, 1fr);
-        gap: 140px 15px;
-        padding: 40px 40px 150px 40px;
+        .goal-cell .cell-text {
+            font-size: 60px !important; 
+            font-weight: 900;
+        }
         
-        /* 🎨 修改：木質感大邊框 */
-        border-radius: 40px;
-        border: 12px solid #8d6e63;
-        outline: 6px solid #5d4037;   /* 加入外層輪廓線，製造木頭厚度 */
-        background-color: #ffffff;
-        background-image: url('images/board-bg.jpg'); /* 保留你的背景圖 */
-        background-size: cover;
-        background-position: center;
-        box-shadow: 0 25px 50px rgba(0,0,0,0.3); /* 加強陰影讓它立體 */
-    }
+        .goal-cell .event-icon {
+            font-size: 120px !important; 
+            position: static !important; 
+            order: 1 
+        }
+        
+        .goal-cell::after, 
+        .goal-cell::before {
+            display: none !important;
+        }
+        
+        .cell::after {
+            content: "";
+            position: absolute;
+            bottom: -110px;
+            left: -10px; 
+            right: -10px;
+            height: var(--road-height);
+            background: #4a5568; 
+            border-bottom: 6px solid #cbd5e0; 
+            z-index: 1;
+            border-radius: 10px;
+        }
 
-/* --- 格子設計 --- */
-.cell {
-    height: var(--cell-size);
-    border-radius: 20px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    position: relative;
-    transition: 0.3s;
-    /* 🎨 修改：更柔和的白綠色 */
-    background-color: rgba(255, 255, 255, 0.95);
-    padding: 5px;
-    box-sizing: border-box;
-    border: none;
-    box-shadow: 0 4px 0 #cfd8dc;
-    backdrop-filter: blur(5px);
-}
+        .cell::before {
+            content: "";
+            position: absolute;
+            bottom: calc(-110px + (var(--road-height) / 2));
+            left: 10%;
+            right: 10%;
+            height: 2px;
+            border-top: 2px dashed rgba(255,255,255,0.3);
+            z-index: 2;
+        }
 
-.cell:hover {
-    transform: translateY(-5px) scale(1.02);
-}
+        .cell-text { font-size: 30px; font-weight: 900; color: #1a202c; z-index: 3; margin: 0; line-height: 1.2; }
+        .cell-index { position: absolute; top: 8px; left: 10px; font-size: 14px; color: #a0aec0; }
 
-/* 終點格 */
-.cell.goal-cell {
-    grid-column: span 2;
-    grid-row: span 2;
-    height: auto;
-    min-height: calc(var(--cell-size) * 2 + 130px);
-    /* 🎨 修改：黃金果實感漸層 */
-    background: linear-gradient(135deg, #fff9c4 0%, #ffecb3 100%) !important;
-    border: 6px solid #ffa000 !important;
-    z-index: 5;
-    display: flex !important;
-    flex-direction: column !important;
-    justify-content: center !important;
-    align-items: center !important;
-    gap: 10px;
-}
+        .player { 
+            width: 65px; 
+            height: 65px; 
+            position: absolute; 
+            z-index: 100; 
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            filter: drop-shadow(0 4px 8px rgba(0,0,0,0.3));
+        }
+        #p1 { background-image: url('images/p1.png'); }
+        #p2 { background-image: url('images/p2.png'); }
 
-/* --- 道路設計 (保留你的邏輯，顏色改為泥土棕) --- */
-.cell::after {
-    content: "";
-    position: absolute;
-    bottom: -110px;
-    left: -10px;
-    right: -10px;
-    height: var(--road-height);
-    background: #a1887f; /* 泥土色 */
-    border-bottom: 6px solid #8d6e63;
-    z-index: 1;
-    border-radius: 10px;
-}
+        .can-move { 
+            animation: bounce 0.6s infinite alternate; 
+            cursor: pointer; 
+            filter: drop-shadow(0 0 15px #48bb78) brightness(1.2) !important; 
+        }
+        @keyframes bounce { 
+            from { transform: translateY(0); } 
+            to { transform: translateY(-20px); }
+        }
 
-.cell::before {
-    content: "";
-    position: absolute;
-    bottom: calc(-110px + (var(--road-height) / 2));
-    left: 10%;
-    right: 10%;
-    height: 2px;
-    border-top: 2px dashed rgba(255,255,255,0.4);
-    z-index: 2;
-}
+        #controls { 
+            position: fixed; bottom: 0; left: 0; width: 100%; 
+            background: rgba(255, 255, 255, 0.95); 
+            display: flex; justify-content: center; align-items: center; 
+            gap: 30px; padding: 20px; z-index: 100; 
+            box-shadow: 0 -10px 30px rgba(0,0,0,0.05); 
+            backdrop-filter: blur(10px);
+        }
 
-.cell-text { 
-    font-size: 28px; 
-    font-weight: 900; 
-    color: #2e7d32; /* 森林深綠色 */
-    z-index: 3; 
-    margin: 0; 
-    line-height: 1.2; 
-}
+        #dice-box { font-size: 45px; padding: 10px 25px; background: #edf2f7; border-radius: 15px; min-width: 60px; text-align: center; }
 
-/* --- 棋子設計 (保留你的圖片路徑) --- */
-.player {
-    width: 65px;
-    height: 65px;
-    position: absolute;
-    z-index: 100;
-    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    background-size: contain;
-    background-repeat: no-repeat;
-    background-position: center;
-    filter: drop-shadow(0 4px 8px rgba(0,0,0,0.3));
-}
-#p1 { background-image: url('images/p1.png'); }
-#p2 { background-image: url('images/p2.png'); }
+        #btn-roll { 
+            padding: 15px 40px; font-size: 22px; background: #48bb78; 
+            color: white; border: none; border-radius: 50px; 
+            cursor: pointer; font-weight: bold; transition: 0.2s;
+        }
+        #btn-roll:hover { background: #38a169; transform: scale(1.05); }
+        #btn-roll:disabled { background: #cbd5e0; transform: scale(1); }
 
-.can-move {
-    animation: bounce 0.6s infinite alternate;
-    cursor: pointer;
-    /* 🎨 修改：綠色光暈 */
-    filter: drop-shadow(0 0 15px #81c784) brightness(1.1) !important;
-}
-/* 讓輪到的棋子跳動起來 */
-.can-move { 
-    animation: bounce 0.6s infinite alternate !important; 
-    cursor: pointer; 
-    /* 額外加一個發光效果，讓玩家更容易看出來 */
-    filter: drop-shadow(0 0 15px #48bb78) brightness(1.2) !important; 
-}
+        #modal { 
+            display: none; position: fixed; top: 50%; left: 50%; 
+            transform: translate(-50%, -50%); 
+            background: white; padding: 40px; border-radius: 40px; 
+            z-index: 300; box-shadow: 0 30px 100px rgba(0,0,0,0.4); 
+            text-align: center; width: 90%; max-width: 450px;
+            border: 10px solid #ebf8ff;
+        }
 
-@keyframes bounce { 
-    from { 
-        transform: translateY(0); 
-    } 
-    to { 
-        transform: translateY(-30px); /* 向上跳 30 像素，很有動感 */
-    } 
-}
-
-/* --- 控制面板與按鈕 --- */
-#controls {
-    position: fixed; bottom: 0; left: 0; width: 100%;
-    background: rgba(255, 252, 242, 0.95); /* 奶油色底 */
-    display: flex; justify-content: center; align-items: center;
-    gap: 30px; padding: 20px; z-index: 100;
-    box-shadow: 0 -10px 30px rgba(0,0,0,0.05);
-    backdrop-filter: blur(10px);
-    border-top: 5px solid #8d6e63;
-}
-
-#btn-roll {
-    padding: 15px 45px; 
-    font-size: 22px; 
-    background: #66bb6a; /* 森林綠 */
-    color: white; 
-    border: none; 
-    border-radius: 50px;
-    cursor: pointer; 
-    font-weight: bold; 
-    box-shadow: 0 5px 0 #388e3c;
-    transition: 0.1s;
-}
-#btn-roll:active { transform: translateY(3px); box-shadow: 0 2px 0 #388e3c; }
-
-/* --- 彈窗 (羊皮紙風格) --- */
-#modal {
-    display: none; position: fixed; top: 50%; left: 50%;
-    transform: translate(-50%, -50%);
-    background: #fffaf0; 
-    padding: 40px; 
-    border-radius: 40px;
-    z-index: 300; 
-    box-shadow: 0 30px 100px rgba(0,0,0,0.4);
-    text-align: center; 
-    width: 90%; 
-    max-width: 500px;
-    border: 8px solid #a1887f;
-}
-
-#modal-text { 
-    font-size: 60px; 
-    font-weight: 900; 
-    color: #2e7d32; 
-    text-shadow: 2px 2px 0px #c8e6c9;
-}
-
-/* --- 特殊事件通知 --- */
-.notice-event {
-    background: linear-gradient(45deg, #66bb6a, #81c784);
-    border: 6px solid #f1f8e9;
-}
+        #modal-text { font-size: 70px; font-weight: 900; margin: 25px 0; cursor: pointer; color: #2b6cb0; }
+        
+        .special-notice {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0.5);
+            z-index: 1000;
+            padding: 40px 80px;
+            border-radius: 100px;
+            color: white;
+            font-size: 48px;
+            font-weight: 900;
+            text-align: center;
+            white-space: nowrap;
+            box-shadow: 0 0 50px rgba(0,0,0,0.3);
+            opacity: 0;
+            pointer-events: auto;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .special-notice:hover {
+            transform: translate(-50%, -50%) scale(1.05);
+            filter: brightness(1.1);
+        }
+        .special-notice.show {
+            opacity: 1;
+            transform: translate(-50%, -50%) scale(1);
+        }
+        .notice-event {
+            background: linear-gradient(45deg, #4299e1, #667eea);
+            border: 8px solid #ebf8ff;
+        }
+        .notice-goal {
+            background: linear-gradient(45deg, #ecc94b, #ed8936);
+            border: 8px solid #fffaf0;
+            font-size: 60px;
+            animation: gold-glow 1s infinite alternate;
+        }
+        @keyframes gold-glow {
+            from { box-shadow: 0 0 20px #ecc94b; }
+            to { box-shadow: 0 0 60px #f6ad55, 0 0 100px rgba(236, 201, 75, 0.5); }
+        }
     </style>
 </head>
 <body>
@@ -483,15 +480,14 @@ function updateDisplay() {
         const cell = document.getElementById('c' + p.pos);
         const pEl = document.getElementById('p' + (i + 1));
         if (!cell || !pEl) return;
-        
         const centerX = cell.offsetLeft + (cell.offsetWidth / 2) - 32;
         pEl.style.left = centerX + 'px';
         if (cell.classList.contains('goal-cell')) {
             const centerY = cell.offsetTop + (cell.offsetHeight / 2) + (i === 0 ? -40 : 20);
             pEl.style.top = centerY + 'px';
         } else {
-            const roadBase = cell.offsetTop + cell.offsetHeight + 15; 
-            pEl.style.top = (i === 0 ? roadBase : roadBase + 45) + 'px';
+            const roadAreaTop = cell.offsetTop + cell.offsetHeight + 20; 
+            pEl.style.top = (i === 0 ? roadAreaTop - 16 : roadAreaTop + 30) + 'px';
         }
     });
 }
@@ -514,6 +510,7 @@ async function handlePlayerClick(pid) {
     if (!waitingForClick || pid !== turn || moving) return;
     
     waitingForClick = false; // 立即關閉點擊許可，防止連點
+    document.getElementById('p' + (turn + 1)).classList.remove('can-move');
 
     if (specialEventActive) {
         // 如果是特殊事件（如踩到香蕉）引發的點擊
