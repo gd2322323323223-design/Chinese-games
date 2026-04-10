@@ -5,198 +5,213 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>貓狗詞語大作戰</title>
     <style>
-    :root {
-        --cell-size: 100px; /* 你可以根據需要調整格子大小 */
-        --road-height: 40px;
-}
+        :root { 
+            --p1-color: #3182ce; 
+            --p2-color: #d53f8c; 
+            --cell-size: 90px; 
+            --road-height: 90px;
+        }
 
-    body {
-        font-family: "PingFang HK", "Microsoft JhengHei", sans-serif;
-        margin: 0;
-        
-        /* 🎨 修改：森林淺綠漸層底 */
-        background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
-        overflow-y: scroll;
-        padding-bottom: 200px;
-    }
+        body { 
+            font-family: "Microsoft JhengHei", sans-serif; 
+            margin: 0; 
+            background: #f0f4f8; 
+            overflow-y: scroll; 
+            padding-bottom: 200px; 
+        }
 
-    #game-container { 
-        position: relative; 
-        width: 95%; 
-        max-width: 1400px; 
-        margin: 20px auto; 
-    }
+        #game-container { position: relative; width: 95%; max-width: 1400px; margin: 20px auto; }
 
-    #board {
-    display: grid;
-    grid-template-columns: repeat(10, 1fr);
-    gap: 140px 15px; /* 這裡的 140px 是上下格子的間距，確保道路有空間 */
-    padding: 60px 40px 180px 40px; 
-    border-radius: 40px;
-    /* ✨ 強化木質邊框：使用雙層深棕色 */
-    border: 15px solid #8d6e63; 
-    outline: 5px solid #5d4037; /* 增加外輪廓線，讓木頭更厚實 */
-    background-color: #ffffff;
-    background-image: url('images/board-bg.jpg');
-    background-size: cover;
-    background-position: center;
-    box-shadow: 0 30px 60px rgba(0,0,0,0.3);
-}
+        #board { 
+            display: grid; 
+            grid-template-columns: repeat(10, 1fr); 
+            gap: 140px 15px; 
+            padding: 40px 40px 150px 40px; 
+            border-radius: 40px; 
+            background-image: url('images/board-bg.jpg');
+            background-size: cover;
+            background-position: center;
+            background-color: #ffffff; 
+            box-shadow: 0 25px 50px rgba(0,0,0,0.1); 
+            border: 12px solid white;
+        }
 
-/* --- 格子設計 --- */
-.cell {
-    height: var(--cell-size);
-    background-color: rgba(255, 255, 255, 0.95);
-    border: 3px solid #c8e6c9; /* 格子本身加一點淡綠色邊 */
-    border-radius: 20px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    position: relative;
-    box-shadow: 0 4px 0 #81c784; /* 格子底部的綠色陰影 */
-    z-index: 3;
-}
+        .cell { 
+            height: var(--cell-size);
+            border-radius: 20px; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: center; 
+            position: relative; 
+            transition: 0.3s; 
+            background-color: rgba(255, 255, 255, 0.9); 
+            padding: 5px; 
+            box-sizing: border-box; 
+            border: 2px solid #e2e8f0;
+            backdrop-filter: blur(5px);
+        }
 
-.cell:hover {
-    transform: translateY(-5px) scale(1.02);
-}
+        .cell.goal-cell {
+            grid-column: span 2;
+            grid-row: span 2;
+            height: auto;
+            min-height: calc(var(--cell-size) * 2 + 130px); 
+            background: linear-gradient(135deg, #fff5f5 0%, #fff 100%) !important;
+            border: 6px solid #f56565 !important;
+            z-index: 5;
+            display: flex !important;
+            flex-direction: column !important;
+            justify-content: center !important;
+            align-items: center !important;
+            gap: 10px; 
+        }
 
-/* 終點格 */
-.cell.goal-cell {
-    grid-column: span 2;
-    grid-row: span 2;
-    height: auto;
-    min-height: calc(var(--cell-size) * 2 + 130px);
-    /* 🎨 修改：黃金果實感漸層 */
-    background: linear-gradient(135deg, #fff9c4 0%, #ffecb3 100%) !important;
-    border: 6px solid #ffa000 !important;
-    z-index: 5;
-    display: flex !important;
-    flex-direction: column !important;
-    justify-content: center !important;
-    align-items: center !important;
-    gap: 10px;
-}
+        .goal-cell .cell-text {
+            font-size: 60px !important; 
+            font-weight: 900;
+        }
 
-/* --- 道路設計 (保留你的邏輯，顏色改為泥土棕) --- */
-.cell::after {
-    content: "";
-    position: absolute;
-    /* ✨ 修正：讓道路比格子寬一點，確保兩隻棋子並排時不會出界 */
-    bottom: -115px; /* 調整高度位置 */
-    left: -20px; 
-    right: -20px;
-    height: 90px; /* ✨ 拓寬路面：由原本的 40px 增加到 90px */
-    background: #a1887f; /* 泥土色 */
-    border-radius: 15px;
-    border-bottom: 8px solid #795548; /* 路面側邊陰影 */
-    z-index: 1;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-}
+        .goal-cell .event-icon {
+            font-size: 120px !important; 
+            position: static !important; 
+            order: 1 
+        }
 
-/* 修正中間的虛線位置 */
-.cell::before {
-    content: "";
-    position: absolute;
-    bottom: -70px; /* 讓虛線正好在 90px 路面的中間 */
-    left: 0;
-    right: 0;
-    height: 2px;
-    border-top: 2px dashed rgba(255,255,255,0.5);
-    z-index: 2;
-}
+        .goal-cell::after, 
+        .goal-cell::before {
+            display: none !important;
+        }
 
-.cell-text { 
-    font-size: 28px; 
-    font-weight: 900; 
-    color: #2e7d32; /* 森林深綠色 */
-    z-index: 3; 
-    margin: 0; 
-    line-height: 1.2; 
-}
+        .cell::after {
+            content: "";
+            position: absolute;
+            bottom: -110px;
+            left: -10px; 
+            right: -10px;
+            height: var(--road-height);
+            background: #4a5568; 
+            border-bottom: 6px solid #cbd5e0; 
+            z-index: 1;
+            border-radius: 10px;
+        }
 
-/* --- 棋子設計 (保留你的圖片路徑) --- */
-.player {
-    width: 65px;
-    height: 65px;
-    position: absolute;
-    z-index: 100;
-    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    background-size: contain;
-    background-repeat: no-repeat;
-    background-position: center;
-    filter: drop-shadow(0 4px 8px rgba(0,0,0,0.3));
-}
-#p1 { background-image: url('images/p1.png'); }
-#p2 { background-image: url('images/p2.png'); }
+        .cell::before {
+            content: "";
+            position: absolute;
+            bottom: calc(-110px + (var(--road-height) / 2));
+            left: 10%;
+            right: 10%;
+            height: 2px;
+            border-top: 2px dashed rgba(255,255,255,0.3);
+            z-index: 2;
+        }
 
-.can-move {
-    animation: bounce 0.6s infinite alternate;
-    cursor: pointer;
-    /* 🎨 修改：綠色光暈 */
-    filter: drop-shadow(0 0 15px #81c784) brightness(1.1) !important;
-}
+        .cell-text { font-size: 30px; font-weight: 900; color: #1a202c; z-index: 3; margin: 0; line-height: 1.2; }
+        .cell-index { position: absolute; top: 8px; left: 10px; font-size: 14px; color: #a0aec0; }
 
-/* --- 控制面板與按鈕 --- */
-#controls {
-    position: fixed; bottom: 0; left: 0; width: 100%;
-    background: rgba(255, 252, 242, 0.95); /* 奶油色底 */
-    display: flex; justify-content: center; align-items: center;
-    gap: 30px; padding: 20px; z-index: 100;
-    box-shadow: 0 -10px 30px rgba(0,0,0,0.05);
-    backdrop-filter: blur(10px);
-    border-top: 5px solid #8d6e63;
-}
+        .player { 
+            width: 65px; 
+            height: 65px; 
+            position: absolute; 
+            z-index: 100; 
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            filter: drop-shadow(0 4px 8px rgba(0,0,0,0.3));
+        }
+        #p1 { background-image: url('images/p1.png'); }
+        #p2 { background-image: url('images/p2.png'); }
 
-#btn-roll {
-    padding: 15px 45px; 
-    font-size: 22px; 
-    background: #66bb6a; /* 森林綠 */
-    color: white; 
-    border: none; 
-    border-radius: 50px;
-    cursor: pointer; 
-    font-weight: bold; 
-    box-shadow: 0 5px 0 #388e3c;
-    transition: 0.1s;
-}
-#btn-roll:active { transform: translateY(3px); box-shadow: 0 2px 0 #388e3c; }
+        .can-move { 
+            animation: bounce 0.6s infinite alternate; 
+            cursor: pointer; 
+            filter: drop-shadow(0 0 15px #48bb78) brightness(1.2) !important; 
+        }
+        @keyframes bounce { 
+            from { transform: translateY(0); } 
+            to { transform: translateY(-20px); }
+        }
 
-/* --- 彈窗 (羊皮紙風格) --- */
-#modal {
-    display: none; position: fixed; top: 50%; left: 50%;
-    transform: translate(-50%, -50%);
-    background: #fffaf0; 
-    padding: 40px; 
-    border-radius: 40px;
-    z-index: 300; 
-    box-shadow: 0 30px 100px rgba(0,0,0,0.4);
-    text-align: center; 
-    width: 90%; 
-    max-width: 500px;
-    border: 8px solid #a1887f;
-}
+        #controls { 
+            position: fixed; bottom: 0; left: 0; width: 100%; 
+            background: rgba(255, 255, 255, 0.95); 
+            display: flex; justify-content: center; align-items: center; 
+            gap: 30px; padding: 20px; z-index: 100; 
+            box-shadow: 0 -10px 30px rgba(0,0,0,0.05); 
+            backdrop-filter: blur(10px);
+        }
 
-#modal-text { 
-    font-size: 60px; 
-    font-weight: 900; 
-    color: #2e7d32; 
-    text-shadow: 2px 2px 0px #c8e6c9;
-}
+        #dice-box { font-size: 45px; padding: 10px 25px; background: #edf2f7; border-radius: 15px; min-width: 60px; text-align: center; }
 
-/* --- 特殊事件通知 --- */
-.notice-event {
-    background: linear-gradient(45deg, #66bb6a, #81c784);
-    border: 6px solid #f1f8e9;
-}
+        #btn-roll { 
+            padding: 15px 40px; font-size: 22px; background: #48bb78; 
+            color: white; border: none; border-radius: 50px; 
+            cursor: pointer; font-weight: bold; transition: 0.2s;
+        }
+        #btn-roll:hover { background: #38a169; transform: scale(1.05); }
+        #btn-roll:disabled { background: #cbd5e0; transform: scale(1); }
+
+        #modal { 
+            display: none; position: fixed; top: 50%; left: 50%; 
+            transform: translate(-50%, -50%); 
+            background: white; padding: 40px; border-radius: 40px; 
+            z-index: 300; box-shadow: 0 30px 100px rgba(0,0,0,0.4); 
+            text-align: center; width: 90%; max-width: 450px;
+            border: 10px solid #ebf8ff;
+        }
+
+        #modal-text { font-size: 70px; font-weight: 900; margin: 25px 0; cursor: pointer; color: #2b6cb0; }
+
+        .special-notice {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0.5);
+            z-index: 1000;
+            padding: 40px 80px;
+            border-radius: 100px;
+            color: white;
+            font-size: 48px;
+            font-weight: 900;
+            text-align: center;
+            white-space: nowrap;
+            box-shadow: 0 0 50px rgba(0,0,0,0.3);
+            opacity: 0;
+            pointer-events: auto;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .special-notice:hover {
+            transform: translate(-50%, -50%) scale(1.05);
+            filter: brightness(1.1);
+        }
+        .special-notice.show {
+            opacity: 1;
+            transform: translate(-50%, -50%) scale(1);
+        }
+        .notice-event {
+            background: linear-gradient(45deg, #4299e1, #667eea);
+            border: 8px solid #ebf8ff;
+        }
+        .notice-goal {
+            background: linear-gradient(45deg, #ecc94b, #ed8936);
+            border: 8px solid #fffaf0;
+            font-size: 60px;
+            animation: gold-glow 1s infinite alternate;
+        }
+        @keyframes gold-glow {
+            from { box-shadow: 0 0 20px #ecc94b; }
+            to { box-shadow: 0 0 60px #f6ad55, 0 0 100px rgba(236, 201, 75, 0.5); }
+        }
     </style>
 </head>
 <body>
 <div id="music-ctrl" onclick="toggleBGM()" style="position:fixed; top:20px; right:20px; z-index:1000; cursor:pointer; font-size:30px; background:white; border-radius:50%; width:50px; height:50px; display:flex; align-items:center; justify-content:center; box-shadow:0 4px 10px rgba(0,0,0,0.2);">
     🎵
 </div>
-    
+
 <div id="game-container">
     <div id="board"></div>
     <div id="p1" class="player" onclick="handlePlayerClick(0)"></div>
@@ -269,10 +284,10 @@ function playSound(name) {
 // 1. 修改擲骰子函式
 async function roll() {
     if(moving || waitingForClick) return;
-    
+
     // 🎲 播放擲骰子音效
     playSound('dice');
-    
+
     document.getElementById('btn-roll').disabled = true;
     for(let i=0; i<8; i++) {
         dice = Math.floor(Math.random()*6)+1;
@@ -293,7 +308,7 @@ async function checkEndOrModal(pid) {
     if (isGoal) {
         // 🏆 播放獲勝音效
         playSound('win');
-        
+
         await fancyAlert(`🏆 玩家 ${pid + 1} 奪冠！`, "goal");
         location.reload();
     } else if (isSpecial || pos === 0) {
@@ -308,6 +323,11 @@ const traps = [1, 16, 39, 48, 61, 76, 96];
 const boosts = [8, 20, 32, 51, 68, 80, 90];
 const dinosaurs = [5, 12, 27, 43, 55, 70, 86, 103]; 
 
+const rawWords = ["學校", "禮堂", "校務處", "操場", "音樂室", "課室", "洗手間", "電腦室", "樓梯", "圖書館", "走廊", "升降機", "教員室", "草地上", "沙灘", "山頂", "運動場", "籃球場", "足球場", "燒烤場", "公園", "家裏", "客廳", "浴室", "睡房", "廚房", "清真寺", "商場", "超市", "街市", "麵包店", "理髮店", "便利店", "藥房", "餐廳", "醫院", "補習社", "博物館", "銀行", "地鐵站", "巴士站", "行人道", "刷牙", "洗澡", "洗手", "喝水", "吃飯", "睡覺", "穿衣服", "戴口罩", "做家務", "倒垃圾", "洗碗", "抹窗戶", "煮飯", "上課", "做功課", "溫習", "看書", "畫畫", "做早操", "跑步", "游泳", "跳繩", "踢足球", "打籃球", "騎單車", "遠足", "拍照", "表演", "唱歌", "跳舞", "慶祝", "排隊", "玩遊戲", "看手機", "打電話", "打招呼", "買水果", "比賽", "說話", "摺紙", "下棋", "玩拼圖"];
+
+const sentenceElements = {
+    times: ["早上", "中午", "放學後", "星期六", "今天", "晚上", "星期日", "早上八時", "昨天", "明天"],
+    people: ["媽媽", "爸爸", "老師", "小明", "我", "姐姐", "妹妹", "叔叔", "同學", "哥哥", "弟弟", "爺爺", "姨姨", "我們"]
 // --- 1. 建立自定義詞語與特定句子對應表 ---
 // 你可以在這裡輸入你想要的句子，確保邏輯百分之百正確
 const customDictionary = {
@@ -397,12 +417,19 @@ const customDictionary = {
     "玩拼圖": "玩拼圖需要耐心和觀察力。"
 };
 
+const allPlaces = rawWords.slice(0, 42); 
+const allActions = rawWords.slice(42);
+    
 // --- 2. 處理資料與棋盤生成 (取代舊的 rawWords 和 words 循環) ---
 const rawWords = Object.keys(customDictionary);
 let words = [];
 let wordIdx = 0;
 
 for (let i = 0; i < 110; i++) {
+    if (i === 0) words.push("起點");
+    else if (traps.includes(i) || boosts.includes(i) || dinosaurs.includes(i)) words.push(""); 
+    else if (wordIdx < rawWords.length) { words.push(rawWords[wordIdx]); wordIdx++; }
+    else { words.push("終點 🏆"); break; }
     if (i === 0) {
         words.push("起點");
     } else if (traps.includes(i) || boosts.includes(i) || dinosaurs.includes(i)) {
@@ -465,20 +492,14 @@ function updateDisplay() {
         const cell = document.getElementById('c' + p.pos);
         const pEl = document.getElementById('p' + (i + 1));
         if (!cell || !pEl) return;
-        
         const centerX = cell.offsetLeft + (cell.offsetWidth / 2) - 32;
         pEl.style.left = centerX + 'px';
-
         if (cell.classList.contains('goal-cell')) {
             const centerY = cell.offsetTop + (cell.offsetHeight / 2) + (i === 0 ? -40 : 20);
             pEl.style.top = centerY + 'px';
         } else {
-            // ✨ 這裡要對應 CSS 的道路位置
-            // cell.offsetTop + cell.offsetHeight 是格子的底部
-            // 我們把路設在底部下方，所以這裡加的數值要讓棋子落在 90px 的路面上
-            const roadBase = cell.offsetTop + cell.offsetHeight + 15; 
-            pEl.style.top = (i === 0 ? roadBase : roadBase + 45) + 'px'; 
-            // i=0 是第一隻，i=1 是第二隻，相差 45px 剛好在路面上並排
+            const roadAreaTop = cell.offsetTop + cell.offsetHeight + 20; 
+            pEl.style.top = (i === 0 ? roadAreaTop - 16 : roadAreaTop + 30) + 'px';
         }
     });
 }
@@ -499,7 +520,7 @@ async function roll() {
 // ✨ 修復核心：處理玩家點擊（包含正常移動與特殊事件後續移動）
 async function handlePlayerClick(pid) {
     if (!waitingForClick || pid !== turn || moving) return;
-    
+
     waitingForClick = false; // 立即關閉點擊許可，防止連點
     document.getElementById('p' + (turn + 1)).classList.remove('can-move');
 
@@ -590,17 +611,31 @@ async function checkEndOrModal(pid) {
 
 function showModal() {
     const currentWord = words[players[turn].pos];
+    if (!currentWord || currentWord === "") { finishTurn(); return; }
     if (!currentWord || currentWord === "" || currentWord === "起點" || currentWord === "終點 🏆") { 
         finishTurn(); 
         return; 
     }
-    
+
     // 取得預設好的句子
     const specificSentence = customDictionary[currentWord] || "請用這個詞語造一個句子。";
 
     document.getElementById('modal-text').innerText = currentWord;
+    const sentenceText = document.getElementById('ai-sentence-text');
+    const rTime = sentenceElements.times[Math.floor(Math.random() * sentenceElements.times.length)];
+    const rPerson = sentenceElements.people[Math.floor(Math.random() * sentenceElements.people.length)];
+    let finalSentence = "";
+
+    if (allPlaces.includes(currentWord)) {
+        const randomAction = allActions[Math.floor(Math.random() * allActions.length)];
+        finalSentence = `${rTime}，${rPerson}在${currentWord}${randomAction}。`;
+    } else {
+        const randomPlace = allPlaces[Math.floor(Math.random() * allPlaces.length)];
+        finalSentence = `${rTime}，${rPerson}在${randomPlace}${currentWord}。`;
+    }
     document.getElementById('ai-sentence-text').innerText = specificSentence; // 直接顯示特定句子
 
+    sentenceText.innerText = finalSentence;
     document.getElementById('modal').style.display = 'block';
     
     let timeLeft = 60;
@@ -616,6 +651,7 @@ function speak() {
     window.speechSynthesis.cancel();
     const word = document.getElementById('modal-text').innerText;
     const sentence = document.getElementById('ai-sentence-text').innerText;
+    const msg = new SpeechSynthesisUtterance(`${word}。……句子練習：${sentence}`);
     
     // 朗讀詞語 + 句子
     const msg = new SpeechSynthesisUtterance(`${word}。句子練習：${sentence}`);
