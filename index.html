@@ -57,10 +57,13 @@ body {
             background-image: url('images/board-bg.jpg');
             background-size: cover;
             background-position: center;
-            background-color: #ffffff;  
+            background-color: #fcfaf2;
+            background-blend-mode: overlay;
             border: 12px solid #8d6e63;   /* 加入深棕色實體邊框 */
             outline: 6px solid #5d4037;   /* 加入外層輪廓線，製造木頭厚度 */
-            box-shadow: 0 25px 50px rgba(0,0,0,0.3); /* 加強陰影讓它立體 */
+            box-shadow: 
+                0 15px 0 #5d4037,           /* 這是木板的側面厚度 */
+                0 30px 60px rgba(0,0,0,0.4); /* 這是投射到背景上的深陰影 */
         }
 
         .cell { 
