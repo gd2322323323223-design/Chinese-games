@@ -11,16 +11,7 @@
             --cell-size: 90px; 
             --road-height: 90px;
         }
-    .char-opt {
-        width: 85px; 
-        height: 85px; 
-        object-fit: contain; 
-        cursor: pointer; 
-        border: 4px solid transparent; 
-        border-radius: 15px; 
-        background: white;
-        transition: transform 0.2s, border 0.2s; /* 建議加上轉場效果，看起來更順手 */
-        } 
+    
 /* --- 第一部分：專門控制背景圖和模糊效果 --- */
 body::before {
     content: "";
@@ -38,7 +29,6 @@ body::before {
     /* 這裡控制模糊，只會影響這張圖，不會影響你的棋盤文字 */
     filter: blur(8px); 
     -webkit-filter: blur(8px);
-    
     z-index: -1;       /* 確保它在最底層 */
 }
 
@@ -46,81 +36,36 @@ body::before {
 body {
     font-family: "Microsoft JhengHei", sans-serif;
     margin: 0;
-    
-    /* 重要：這裡不要寫 background-image 了，因為我們移到上面 ::before 了 */
-    /* 這裡維持透明，底下的 ::before 才看得到 */
-    background-color: transparent; 
-    
+    background-color: transparent;   
     position: relative;
     overflow-y: scroll;
     padding-bottom: 200px;
     min-height: 100vh;
 }
-        <div id="start-screen" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.98); z-index: 5000; display: flex; flex-direction: column; align-items: center; justify-content: center; backdrop-filter: blur(15px);">
-    
-    <h1 style="font-size: 42px; color: #5d4037; margin-bottom: 10px;">請選擇你的棋子角色</h1>
-    
-    <p id="selection-hint" style="font-size: 22px; color: var(--p1-color); font-weight: bold; margin-bottom: 30px;">
-        請 玩家 1 點擊一個角色
-    </p>
+.char-opt {
+    width: 85px; 
+    height: 85px; 
+    object-fit: contain; 
+    cursor: pointer; 
+    border: 4px solid transparent; 
+    border-radius: 15px; 
+    background: white;
+    transition: transform 0.2s, border 0.2s; /* 建議加上轉場效果，看起來更順手 */
+        } 
+        
 
-    <div id="character-pool" style="display: flex; gap: 15px; flex-wrap: wrap; justify-content: center; max-width: 850px; background: #f7fafc; padding: 30px; border-radius: 30px; box-shadow: inset 0 2px 10px rgba(0,0,0,0.05);">
-        <img src="images/dragon.png" class="char-opt" onclick="selectAny(this, 'images/dragon.png')">
-        <img src="images/fish.png" class="char-opt" onclick="selectAny(this, 'images/fish.png')">
-        <img src="images/jelly%20fish.png" class="char-opt" onclick="selectAny(this, 'images/jelly%20fish.png')">
-        <img src="images/octopus.png" class="char-opt" onclick="selectAny(this, 'images/octopus.png')">
-        <img src="images/p1.png" class="char-opt" onclick="selectAny(this, 'images/p1.png')">
-        <img src="images/p2.png" class="char-opt" onclick="selectAny(this, 'images/p2.png')">
-        <img src="images/star.png" class="char-opt" onclick="selectAny(this, 'images/star.png')">
-    </div>
+#game-container { position: relative; width: 95%; max-width: 1400px; margin: 20px auto; }
 
-    <div style="margin-top: 30px; display: flex; gap: 60px; font-size: 20px;">
-        <div style="text-align: center;">
-            <span style="color: var(--p1-color); font-weight: bold;">P1 已選：</span><br>
-            <span id="p1-choice-name">未選擇</span>
-        </div>
-        <div style="text-align: center;">
-            <span style="color: var(--p2-color); font-weight: bold;">P2 已選：</span><br>
-            <span id="p2-choice-name">未選擇</span>
-        </div>
-    </div>
-
-    <button id="start-game-btn" onclick="startGame()" style="margin-top: 45px; padding: 15px 60px; font-size: 26px; background: #48bb78; color: white; border: none; border-radius: 50px; cursor: pointer; font-weight: bold; box-shadow: 0 10px 20px rgba(72,187,120,0.3); transition: 0.2s;">
-        開始森林大作戰！
-    </button>
-</div>
-
-<div style="text-align: center; margin-top: 10px;">
-    <p>玩家 1 選擇：<span id="p1-choice-name">未選擇</span></p>
-    <p>玩家 2 選擇：<span id="p2-choice-name">未選擇</span></p>
-    <button onclick="startGame()" style="padding: 10px 20px; font-size: 18px; cursor: pointer;">開始遊戲</button>
-</div>
-        </div>
-    </div>
-
-    <button id="start-game-btn" onclick="startGame()" style="margin-top: 60px; padding: 20px 60px; font-size: 28px; background: #48bb78; color: white; border: none; border-radius: 50px; cursor: pointer; font-weight: bold; box-shadow: 0 10px 20px rgba(0,0,0,0.1);">開始森林大作戰！</button>
-</div>
-
-        #game-container { position: relative; width: 95%; max-width: 1400px; margin: 20px auto; }
-
-        #board { 
+#board { 
     display: grid; 
     grid-template-columns: repeat(10, 1fr); 
     gap: 140px 15px; 
     padding: 40px 40px 150px 40px; 
     border-radius: 40px; 
-
-    /* --- 背景圖修復開始 --- */
-    /* 1. 確保圖片路徑在引號內，並先移除混合模式測試 */
     background-image: url("images/board-bg.png") !important; 
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
-    
-    /* 2. 暫時將顏色設為透明，確保能一眼看到圖片 */
-    background-color: transparent; 
-    /* --- 背景圖修復結束 --- */
-
     border: 12px solid #8d6e63;
     outline: 6px solid #5d4037;
     box-shadow: 
@@ -128,51 +73,51 @@ body {
         0 30px 60px rgba(0,0,0,0.4); 
 }
 
-        .cell { 
-            height: var(--cell-size);
-            border-radius: 20px; 
-            display: flex; 
-            flex-direction: column; 
-            align-items: center; 
-            justify-content: center; 
-            position: relative; 
-            transition: 0.3s; 
-            background-color: rgba(255, 255, 255, 0.9); 
-            padding: 5px; 
-            box-sizing: border-box; 
-            border: 2px solid #e2e8f0;
-            backdrop-filter: blur(5px);
+.cell { 
+    height: var(--cell-size);
+    border-radius: 20px; 
+    display: flex; 
+    flex-direction: column; 
+    align-items: center; 
+    justify-content: center; 
+    position: relative; 
+    transition: 0.3s; 
+    background-color: rgba(255, 255, 255, 0.9); 
+    padding: 5px; 
+    box-sizing: border-box; 
+    border: 2px solid #e2e8f0;
+    backdrop-filter: blur(5px);
         }
 
-        .cell.goal-cell {
-            grid-column: span 2;
-            grid-row: span 2;
-            height: auto;
-            min-height: calc(var(--cell-size) * 2 + 130px); 
-            background: linear-gradient(135deg, #fff5f5 0%, #fff 100%) !important;
-            border: 6px solid #f56565 !important;
-            z-index: 5;
-            display: flex !important;
-            flex-direction: column !important;
-            justify-content: center !important;
-            align-items: center !important;
-            gap: 10px; 
+.cell.goal-cell {
+    grid-column: span 2;
+    grid-row: span 2;
+    height: auto;
+    min-height: calc(var(--cell-size) * 2 + 130px); 
+    background: linear-gradient(135deg, #fff5f5 0%, #fff 100%) !important;
+    border: 6px solid #f56565 !important;
+    z-index: 5;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: center !important;
+    align-items: center !important;
+    gap: 10px; 
         }
         
-        .goal-cell .cell-text {
-            font-size: 60px !important; 
-            font-weight: 900;
+    .goal-cell .cell-text {
+        font-size: 60px !important; 
+        font-weight: 900;
         }
         
-        .goal-cell .event-icon {
-            font-size: 120px !important; 
-            position: static !important; 
-            order: 1 
+    .goal-cell .event-icon {
+        font-size: 120px !important; 
+        position: static !important; 
+        order: 1 
         }
         
-        .goal-cell::after, 
-        .goal-cell::before {
-            display: none !important;
+    .goal-cell::after, 
+    .goal-cell::before {
+    display: none !important;
         }
         
         /* 修改道路外觀 */
@@ -202,27 +147,27 @@ body {
     z-index: 2;
 }
 
-        .cell-text { font-size: 30px; font-weight: 900; color: #1a202c; z-index: 3; margin: 0; line-height: 1.2; }
-        .cell-index { position: absolute; top: 8px; left: 10px; font-size: 14px; color: #a0aec0; }
+.cell-text { font-size: 30px; font-weight: 900; color: #1a202c; z-index: 3; margin: 0; line-height: 1.2; }
+.cell-index { position: absolute; top: 8px; left: 10px; font-size: 14px; color: #a0aec0; }
 
-        .player { 
-            width: 65px; 
-            height: 65px; 
-            position: absolute; 
-            z-index: 100; 
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
-            background-size: contain;
-            background-repeat: no-repeat;
-            background-position: center;
-            filter: drop-shadow(0 4px 8px rgba(0,0,0,0.3));
-        }
-        #p1 { background-image: url('images/p1.png'); }
-        #p2 { background-image: url('images/p2.png'); }
+.player { 
+    width: 65px; 
+    height: 65px; 
+    position: absolute; 
+    z-index: 100; 
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    filter: drop-shadow(0 4px 8px rgba(0,0,0,0.3));
+}
+#p1 { background-image: url('images/p1.png'); }
+#p2 { background-image: url('images/p2.png'); }
 
-        .can-move { 
-            animation: bounce 0.6s infinite alternate; 
-            cursor: pointer; 
-            filter: drop-shadow(0 0 15px #48bb78) brightness(1.2) !important; 
+.can-move { 
+    animation: bounce 0.6s infinite alternate; 
+    cursor: pointer; 
+    filter: drop-shadow(0 0 15px #48bb78) brightness(1.2) !important; 
         }
         @keyframes bounce { 
             from { transform: translateY(0); } 
@@ -300,43 +245,93 @@ body {
             from { box-shadow: 0 0 20px #ecc94b; }
             to { box-shadow: 0 0 60px #f6ad55, 0 0 100px rgba(236, 201, 75, 0.5); }
         }
+        /* 棋子被點擊時的縮放效果 */
+.player:active {
+    transform: scale(0.9) translateY(0);
+    transition: 0.1s;
+}
+
+/* 讓語音辨識的按鈕看起來更像按鈕 */
+#ai-sentence-text {
+    background: #f7fafc;
+    padding: 15px;
+    border-radius: 15px;
+    margin-top: 10px;
+    border-left: 5px solid #4299e1;
+    font-size: 18px;
+    color: #4a5568;
+}
     </style>
+    
 </head>
 <body>
-<div id="music-ctrl" onclick="toggleBGM()" style="position:fixed; top:20px; right:20px; z-index:1000; cursor:pointer; font-size:30px; background:white; border-radius:50%; width:50px; height:50px; display:flex; align-items:center; justify-content:center; box-shadow:0 4px 10px rgba(0,0,0,0.2);">
-    🎵
-</div>
+    <div id="start-screen" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.98); z-index: 5000; display: flex; flex-direction: column; align-items: center; justify-content: center; backdrop-filter: blur(15px);">
+        <h1 style="font-size: 42px; color: #5d4037; margin-bottom: 10px;">請選擇你的棋子角色</h1>
+        
+        <p id="selection-hint" style="font-size: 22px; color: var(--p1-color); font-weight: bold; margin-bottom: 30px;">
+            請 玩家 1 點擊一個角色
+        </p>
+
+        <div id="character-pool" style="display: flex; gap: 15px; flex-wrap: wrap; justify-content: center; max-width: 850px; background: #f7fafc; padding: 30px; border-radius: 30px; box-shadow: inset 0 2px 10px rgba(0,0,0,0.05);">
+            <img src="images/dragon.png" class="char-opt" onclick="selectChar(this, 'images/dragon.png')">
+            <img src="images/fish.png" class="char-opt" onclick="selectChar(this, 'images/fish.png')">
+            <img src="images/jelly fish.png" class="char-opt" onclick="selectChar(this, 'images/jelly fish.png')">
+            <img src="images/octopus.png" class="char-opt" onclick="selectChar(this, 'images/octopus.png')">
+            <img src="images/p1.png" class="char-opt" onclick="selectChar(this, 'images/p1.png')">
+            <img src="images/p2.png" class="char-opt" onclick="selectChar(this, 'images/p2.png')">
+            <img src="images/star.png" class="char-opt" onclick="selectChar(this, 'images/star.png')">
+        </div>
+
+        <div style="margin-top: 30px; display: flex; gap: 60px; font-size: 20px;">
+            <div style="text-align: center;">
+                <span style="color: var(--p1-color); font-weight: bold;">P1 已選：</span><br>
+                <span id="p1-choice-name">未選擇</span>
+            </div>
+            <div style="text-align: center;">
+                <span style="color: var(--p2-color); font-weight: bold;">P2 已選：</span><br>
+                <span id="p2-choice-name">未選擇</span>
+            </div>
+        </div>
+
+        <button id="start-game-btn" onclick="startGame()" style="margin-top: 45px; padding: 15px 60px; font-size: 26px; background: #48bb78; color: white; border: none; border-radius: 50px; cursor: pointer; font-weight: bold; box-shadow: 0 10px 20px rgba(72,187,120,0.3); transition: 0.2s;">
+            開始森林大作戰！
+        </button>
+    </div>
+
+    <div id="music-ctrl" onclick="toggleBGM()" style="position:fixed; top:20px; right:20px; z-index:1000; cursor:pointer; font-size:30px; background:white; border-radius:50%; width:50px; height:50px; display:flex; align-items:center; justify-content:center; box-shadow:0 4px 10px rgba(0,0,0,0.2);">
+        🎵
+    </div>
     
-<div id="game-container">
-    <div id="board"></div>
-    <div id="p1" class="player" onclick="handlePlayerClick(0)"></div>
-    <div id="p2" class="player" onclick="handlePlayerClick(1)"></div>
-</div>
-
-<div id="controls">
-    <div style="font-size: 20px; font-weight: bold; color: #4a5568;">
-        <span style="color:var(--p1-color)">P1: <span id="s1">0</span></span> | 
-        <span style="color:var(--p2-color)">P2: <span id="s2">0</span></span>
+    <div id="game-container">
+        <div id="board"></div>
+        <div id="p1" class="player" onclick="handlePlayerClick(0)"></div>
+        <div id="p2" class="player" onclick="handlePlayerClick(1)"></div>
     </div>
-    <div id="status" style="font-size: 20px; font-weight: bold;">輪到：<span id="player-turn-name" style="color:var(--p1-color)">玩家 1</span></div>
-    <div id="dice-box">🎲</div>
-    <button id="btn-roll" onclick="roll()">擲骰子</button>
-</div>
-
-<div id="modal">
-    <div id="timer" style="font-size: 18px; color: #e67e22; font-weight: bold;">⏳ 剩餘時間: 120s</div>
-    <div id="modal-text" onclick="speak()">詞語</div>
-    <div id="ai-sentence-box" style="margin: 15px 0; padding: 15px; background: #f7fafc; border-left: 5px solid #4299e1; border-radius: 10px; text-align: left;">
-        <div style="font-size: 14px; color: #4299e1; font-weight: bold; margin-bottom: 5px;">🤖 AI 老師造句：</div>
-        <div id="ai-sentence-text" style="font-size: 20px; color: #4a5568; line-height: 1.4;">這是一個例句。</div>
+    
+    <div id="controls">
+        <div style="font-size: 20px; font-weight: bold; color: #4a5568;">
+            <span style="color:var(--p1-color)">P1: <span id="s1">0</span></span> | 
+            <span style="color:var(--p2-color)">P2: <span id="s2">0</span></span>
+        </div>
+        <div id="status" style="font-size: 20px; font-weight: bold;">輪到：<span id="player-turn-name" style="color:var(--p1-color)">玩家 1</span></div>
+        <div id="dice-box">🎲</div>
+        <button id="btn-roll" onclick="roll()">擲骰子</button>
     </div>
-    <p style="font-size: 14px; color: #a0aec0; margin-bottom: 20px;">💡 點擊詞語可重複聽讀音</p>
-    <div style="display: flex; gap: 15px; flex-direction: column;">
-        <button onclick="startRecognition()" style="padding: 12px; background: #5d4037; color: white; border: none; border-radius: 15px; font-size: 18px; cursor: pointer; font-weight: bold;">🎤 AI 老師聽讀音</button>
-        <button onclick="closeModal(true)" style="padding: 12px; background: #48bb78; color: white; border: none; border-radius: 15px; font-size: 18px; cursor: pointer; font-weight: bold;">✅ 我讀好了！</button>
-    </div>
-</div>
 
+    <div id="modal">
+        <div id="timer" style="font-size: 18px; color: #e67e22; font-weight: bold;">⏳ 剩餘時間: 120s</div>
+        <div id="modal-text" onclick="speak()">詞語</div>
+        <div id="ai-sentence-box" style="margin: 15px 0; padding: 15px; background: #f7fafc; border-left: 5px solid #4299e1; border-radius: 10px; text-align: left;">
+            <div style="font-size: 14px; color: #4299e1; font-weight: bold; margin-bottom: 5px;">🤖 AI 老師造句：</div>
+            <div id="ai-sentence-text" style="font-size: 20px; color: #4a5568; line-height: 1.4;">這是一個例句。</div>
+        </div>
+        <p style="font-size: 14px; color: #a0aec0; margin-bottom: 20px;">💡 點擊詞語可重複聽讀音</p>
+        <div style="display: flex; gap: 15px; flex-direction: column;">
+            <button onclick="startRecognition()" style="padding: 12px; background: #5d4037; color: white; border: none; border-radius: 15px; font-size: 18px; cursor: pointer; font-weight: bold;">🎤 AI 老師聽讀音</button>
+            <button onclick="closeModal(true)" style="padding: 12px; background: #48bb78; color: white; border: none; border-radius: 15px; font-size: 18px; cursor: pointer; font-weight: bold;">✅ 我讀好了！</button>
+        </div>
+    </div>
+    
 <script>
 // --- 核心變數與遊戲狀態 ---
 let selectedP1 = "";
@@ -347,13 +342,16 @@ let turn = 0, dice = 0, moving = false, timerInterval;
 let waitingForClick = false; 
 let specialEventActive = false;
 
-// 自由選角函數
-function selectAny(element, imgPath) {
+const players = [{pos: 0, score: 0}, {pos: 0, score: 0}];
+const traps = [1, 16, 39, 48, 61, 76, 96];
+const boosts = [8, 20, 32, 51, 68, 80, 90];
+const dinosaurs = [5, 12, 27, 43, 55, 70, 86, 103]; 
+
+function selectChar(element, imgPath) {
     if (imgPath === selectedP1 || imgPath === selectedP2) {
         alert("這個角色已經被選走囉！請選其他的。");
         return;
     }
-
     if (currentSelectingPlayer === 1) {
         selectedP1 = imgPath;
         document.getElementById('p1-choice-name').innerText = imgPath.split('/').pop().replace('.png', '');
@@ -408,39 +406,6 @@ function startGame() {
     if (typeof audio !== 'undefined' && audio.bgm.paused) toggleBGM();
 }
 
-// --- 接下來接原本的語音辨識、移動邏輯 (不需要重複寫 <script>) ---
-
-// 預設的角色路徑
-let selectedP1 = 'images/p1.png';
-let selectedP2 = 'images/p2.png';
-
-// 選擇角色的函式
-function selectChar(playerNum, imgSrc, element) {
-    if (playerNum === 1) {
-        selectedP1 = imgSrc;
-        // 清除其他選項的邊框
-        document.querySelectorAll('#p1-options .char-opt').forEach(img => img.style.borderColor = 'transparent');
-        element.style.borderColor = 'var(--p1-color)';
-    } else {
-        selectedP2 = imgSrc;
-        document.querySelectorAll('#p2-options .char-opt').forEach(img => img.style.borderColor = 'transparent');
-        element.style.borderColor = 'var(--p2-color)';
-    }
-}
-
-// 開始遊戲，將選擇的角色套用到棋子上
-function startGame() {
-    // 1. 設定棋子圖片
-    document.getElementById('p1').style.backgroundImage = `url('${selectedP1}')`;
-    document.getElementById('p2').style.backgroundImage = `url('${selectedP2}')`;
-    
-    // 2. 隱藏主頁
-    document.getElementById('start-screen').style.display = 'none';
-    
-    // 3. 播放音樂 (如果需要)
-    if (audio.bgm.paused) toggleBGM();
-}
-    
 // --- 音效初始化 ---
 const audio = {
     bgm: new Audio('sounds/bgm.mp3'),
@@ -509,11 +474,6 @@ async function checkEndOrModal(pid) {
         showModal();
     }
 }
-
-const players = [{pos: 0, score: 0}, {pos: 0, score: 0}];
-const traps = [1, 16, 39, 48, 61, 76, 96];
-const boosts = [8, 20, 32, 51, 68, 80, 90];
-const dinosaurs = [5, 12, 27, 43, 55, 70, 86, 103]; 
 
 // --- 1. 建立自定義詞語與特定句子對應表 ---
 // 你可以在這裡輸入你想要的句子，確保邏輯百分之百正確
@@ -693,19 +653,6 @@ function updateDisplay() {
     });
 }
 
-async function roll() {
-    if(moving || waitingForClick) return;
-    document.getElementById('btn-roll').disabled = true;
-    for(let i=0; i<8; i++) {
-        dice = Math.floor(Math.random()*6)+1;
-        document.getElementById('dice-box').innerText = dice;
-        await new Promise(r => setTimeout(r, 60));
-    }
-    waitingForClick = true;
-    document.getElementById('p' + (turn + 1)).classList.add('can-move');
-    document.getElementById('player-turn-name').innerText = "👈 請點擊棋子行走！";
-}
-
 // ✨ 修復核心：處理玩家點擊（包含正常移動與特殊事件後續移動）
 async function handlePlayerClick(pid) {
     if (!waitingForClick || pid !== turn || moving) return;
@@ -786,14 +733,14 @@ async function checkEndOrModal(pid) {
     const isSpecial = traps.includes(pos) || boosts.includes(pos) || dinosaurs.includes(pos);
 
     if (isGoal) {
+        playSound('win'); // 播放獲勝音效
         await fancyAlert(`🏆 玩家 ${pid + 1} 奪冠！`, "goal");
         location.reload();
-    } else if (isSpecial) {
-        // 如果移動後落點是特殊格，不顯示詞語彈窗（已由 move 或 moveSteps 處理完畢後調用此函數）
-        finishTurn();
-    } else if (pos === 0) {
+    } else if (isSpecial || pos === 0) {
+        // 如果落在特殊格（如火箭、香蕉、起點），不彈窗，直接結束回合
         finishTurn();
     } else {
+        // 落在普通詞語格，顯示題目彈窗
         showModal();
     }
 }
@@ -813,7 +760,7 @@ function showModal() {
 
     document.getElementById('modal').style.display = 'block';
     
-    let timeLeft = 60;
+    let timeLeft = 120;
     clearInterval(timerInterval);
     timerInterval = setInterval(() => {
         timeLeft--;
@@ -897,6 +844,5 @@ function finishTurn() {
 
 window.onload = init;
 </script>
-
 </body>
 </html>
