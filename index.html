@@ -604,27 +604,30 @@ const customDictionary = {
     "玩拼圖": "玩拼圖需要耐心和觀察力。"
 };
 
-// --- 2. 處理資料與棋盤生成 (取代舊的 rawWords 和 words 循環) ---
+// --- 1. 建立詞語與地圖對應表 ---
 const rawWords = Object.keys(customDictionary);
 let words = [];
 let wordIdx = 0;
 
+// 生成 110 格的地圖資料
 for (let i = 0; i < 110; i++) {
     if (i === 0) {
         words.push("起點");
     } else if (traps.includes(i) || boosts.includes(i) || dinosaurs.includes(i)) {
-        words.push(""); 
+        words.push(""); // 特殊格不放文字
     } else if (wordIdx < rawWords.length) {
         words.push(rawWords[wordIdx]); 
         wordIdx++;
     } else {
         words.push("終點 🏆"); 
-        break; 
+        break; // 到達詞庫上限或終點就停止
     }
 }
 
+// --- 2. 棋盤渲染函數 ---
 function init() {
     const board = document.getElementById('board');
+    if (!board) return;
     board.innerHTML = "";
     let displayIndex = 1; 
 
@@ -632,18 +635,19 @@ function init() {
         const cell = document.createElement('div');
         cell.className = 'cell';
         cell.id = 'c' + i;
+        
         const isGoal = (i === words.length - 1);
         const isStart = (i === 0);
         const isSpecial = traps.includes(i) || boosts.includes(i) || dinosaurs.includes(i);
 
         if (isGoal) cell.classList.add('goal-cell');
-        if (isSpecial) cell.style.backgroundColor = "rgba(255, 250, 200, 0.8)";
 
         let iconText = "";
         if(traps.includes(i)) iconText = "🍌";
         else if(boosts.includes(i)) iconText = "🚀";
         else if(dinosaurs.includes(i)) iconText = "🦖";
 
+        // 生成編號（僅限普通詞語格）
         let numberHtml = "";
         if (!isStart && !isGoal && !isSpecial) {
             numberHtml = `<span class="cell-index">${displayIndex}</span>`;
@@ -653,33 +657,38 @@ function init() {
         cell.innerHTML = `
             ${numberHtml}
             ${isGoal ? 
-                `<div class="event-icon" style="font-size: 120px; position: static; order: 1;">🏆</div>
-                 <div class="cell-text" style="font-size: 30px; order: 2;">終點</div>` :
+                `<div class="event-icon" style="font-size: 80px;">🏆</div><div class="cell-text">終點</div>` :
                 (w !== "" ? 
-                    `<div class="cell-text">${w}</div>
-                     <span class="event-icon" style="position: absolute; bottom: 5px; right: 8px; font-size: 30px;">${iconText}</span>` :
-                    `<div class="event-icon" style="font-size: 70px;">${iconText}</div>`
+                    `<div class="cell-text">${w}</div><span class="event-icon" style="position: absolute; bottom: 5px; right: 8px; font-size: 24px;">${iconText}</span>` :
+                    `<div class="event-icon" style="font-size: 50px;">${iconText}</div>`
                 )
             }
         `;
         board.appendChild(cell);
     });
-    setTimeout(updateDisplay, 50);
+    
+    // 初始化後立即定位棋子
+    setTimeout(updateDisplay, 100);
 }
 
+// --- 3. 棋子定位函數 ---
 function updateDisplay() {
     players.forEach((p, i) => {
         const cell = document.getElementById('c' + p.pos);
         const pEl = document.getElementById('p' + (i + 1));
         if (!cell || !pEl) return;
-        const centerX = cell.offsetLeft + (cell.offsetWidth / 2) - 32;
+
+        // 計算格子中心位置
+        const centerX = cell.offsetLeft + (cell.offsetWidth / 2) - (pEl.offsetWidth / 2);
         pEl.style.left = centerX + 'px';
+
         if (cell.classList.contains('goal-cell')) {
             const centerY = cell.offsetTop + (cell.offsetHeight / 2) + (i === 0 ? -40 : 20);
             pEl.style.top = centerY + 'px';
         } else {
-            const roadAreaTop = cell.offsetTop + cell.offsetHeight + 20; 
-            pEl.style.top = (i === 0 ? roadAreaTop - 16 : roadAreaTop + 30) + 'px';
+            // 讓棋子站在路徑（Road Area）上
+            const roadAreaTop = cell.offsetTop + cell.offsetHeight + 15; 
+            pEl.style.top = (i === 0 ? roadAreaTop - 10 : roadAreaTop + 35) + 'px';
         }
     });
 }
