@@ -54,9 +54,16 @@ body {
         <div style="text-align: center;">
             <h2 style="color: var(--p1-color);">玩家 1 (P1)</h2>
             <div id="p1-options" style="display: flex; gap: 20px;">
-                <img src="images/p1.png" class="char-opt p1-selected" onclick="selectChar(1, 'images/p1.png', this)" style="width: 100px; cursor: pointer; border: 5px solid var(--p1-color); border-radius: 20px; padding: 10px;">
-                <img src="images/star.png" class="char-opt" onclick="selectChar(1, 'images/star.png', this)" style="width: 100px; cursor: pointer; border: 5px solid transparent; border-radius: 20px; padding: 10px;">
-            </div>
+    <img src="images/characters/3d-cat.png" 
+         class="char-opt" 
+         onclick="selectChar(1, 'images/characters/3d-cat.png', this)"
+         style="width: 100px; cursor: pointer; border: 5px solid transparent; border-radius: 20px; padding: 10px;">
+    
+    <img src="images/characters/3d-dog.png" 
+         class="char-opt" 
+         onclick="selectChar(1, 'images/characters/3d-dog.png', this)"
+         style="width: 100px; cursor: pointer; border: 5px solid transparent; border-radius: 20px; padding: 10px;">
+</div>
         </div>
 
         <div style="text-align: center;">
@@ -186,7 +193,7 @@ body {
     background-position: center;
 
     /* ✨ 3D 核心：加上立體陰影與旋轉視角 */
-    filter: drop-shadow(0 10px 0 rgba(0,0,0,0.2)); /* 模擬厚度的深色側邊 */
+    filter: drop-shadow(0 15px 10px 0 rgba(0,0,0,0.15)); /* 模擬厚度的深色側邊 */
     transform: rotateX(15deg); /* 讓棋子稍微向後傾斜，更有站立感 */
 }
 
