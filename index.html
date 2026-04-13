@@ -47,6 +47,29 @@ body {
     padding-bottom: 200px;
     min-height: 100vh;
 }
+        <div id="start-screen" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.95); z-index: 2000; display: flex; flex-direction: column; align-items: center; justify-content: center; backdrop-filter: blur(15px);">
+    <h1 style="font-size: 48px; color: #5d4037; margin-bottom: 40px;">請選擇你的棋子角色</h1>
+    
+    <div style="display: flex; gap: 50px;">
+        <div style="text-align: center;">
+            <h2 style="color: var(--p1-color);">玩家 1 (P1)</h2>
+            <div id="p1-options" style="display: flex; gap: 20px;">
+                <img src="images/p1.png" class="char-opt p1-selected" onclick="selectChar(1, 'images/p1.png', this)" style="width: 100px; cursor: pointer; border: 5px solid var(--p1-color); border-radius: 20px; padding: 10px;">
+                <img src="images/star.png" class="char-opt" onclick="selectChar(1, 'images/star.png', this)" style="width: 100px; cursor: pointer; border: 5px solid transparent; border-radius: 20px; padding: 10px;">
+            </div>
+        </div>
+
+        <div style="text-align: center;">
+            <h2 style="color: var(--p2-color);">玩家 2 (P2)</h2>
+            <div id="p2-options" style="display: flex; gap: 20px;">
+                <img src="images/p2.png" class="char-opt p2-selected" onclick="selectChar(2, 'images/p2.png', this)" style="width: 100px; cursor: pointer; border: 5px solid var(--p2-color); border-radius: 20px; padding: 10px;">
+                <img src="images/star.png" class="char-opt" onclick="selectChar(2, 'images/star.png', this)" style="width: 100px; cursor: pointer; border: 5px solid transparent; border-radius: 20px; padding: 10px;">
+            </div>
+        </div>
+    </div>
+
+    <button id="start-game-btn" onclick="startGame()" style="margin-top: 60px; padding: 20px 60px; font-size: 28px; background: #48bb78; color: white; border: none; border-radius: 50px; cursor: pointer; font-weight: bold; box-shadow: 0 10px 20px rgba(0,0,0,0.1);">開始森林大作戰！</button>
+</div>
 
         #game-container { position: relative; width: 95%; max-width: 1400px; margin: 20px auto; }
 
@@ -291,6 +314,37 @@ let turn = 0, dice = 0, moving = false, timerInterval;
 let waitingForClick = false; 
 let specialEventActive = false;
 
+// 預設的角色路徑
+let selectedP1 = 'images/p1.png';
+let selectedP2 = 'images/p2.png';
+
+// 選擇角色的函式
+function selectChar(playerNum, imgSrc, element) {
+    if (playerNum === 1) {
+        selectedP1 = imgSrc;
+        // 清除其他選項的邊框
+        document.querySelectorAll('#p1-options .char-opt').forEach(img => img.style.borderColor = 'transparent');
+        element.style.borderColor = 'var(--p1-color)';
+    } else {
+        selectedP2 = imgSrc;
+        document.querySelectorAll('#p2-options .char-opt').forEach(img => img.style.borderColor = 'transparent');
+        element.style.borderColor = 'var(--p2-color)';
+    }
+}
+
+// 開始遊戲，將選擇的角色套用到棋子上
+function startGame() {
+    // 1. 設定棋子圖片
+    document.getElementById('p1').style.backgroundImage = `url('${selectedP1}')`;
+    document.getElementById('p2').style.backgroundImage = `url('${selectedP2}')`;
+    
+    // 2. 隱藏主頁
+    document.getElementById('start-screen').style.display = 'none';
+    
+    // 3. 播放音樂 (如果需要)
+    if (audio.bgm.paused) toggleBGM();
+}
+    
 // --- 音效初始化 ---
 const audio = {
     bgm: new Audio('sounds/bgm.mp3'),
