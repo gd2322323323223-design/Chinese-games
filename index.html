@@ -54,14 +54,14 @@ body {
         <div style="text-align: center;">
             <h2 style="color: var(--p1-color);">玩家 1 (P1)</h2>
             <div id="p1-options" style="display: flex; gap: 20px;">
-    <img src="images/characters/3d-bear.png" 
+    <img src="images/3d.bear.png" 
          class="char-opt" 
-         onclick="selectChar(1, 'images/characters/3d-bear.png', this)"
+         onclick="selectChar(1, 'images/3d.bear.png', this)"
          style="width: 100px; cursor: pointer; border: 5px solid transparent; border-radius: 20px; padding: 10px;">
     
-    <img src="images/characters/3d-chik.png" 
+    <img src="images/3d.chik.png" 
          class="char-opt" 
-         onclick="selectChar(1, 'images/characters/chik-dog.png', this)"
+         onclick="selectChar(1, 'images/3d.chik.png', this)"
          style="width: 100px; cursor: pointer; border: 5px solid transparent; border-radius: 20px; padding: 10px;">
 </div>
         </div>
@@ -216,10 +216,6 @@ body {
             animation: bounce 0.6s infinite alternate; 
             cursor: pointer; 
             filter: drop-shadow(0 0 15px #48bb78) brightness(1.2) !important; 
-        }
-        @keyframes bounce { 
-            from { transform: translateY(0); } 
-            to { transform: translateY(-20px); }
         }
 
         #controls { 
