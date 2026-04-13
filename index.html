@@ -53,18 +53,21 @@ body {
     <div style="display: flex; gap: 50px;">
         <div style="text-align: center;">
             <h2 style="color: var(--p1-color);">玩家 1 (P1)</h2>
-            <div id="p1-options" style="display: flex; gap: 20px;">
-                <img src="images/p1.png" class="char-opt p1-selected" onclick="selectChar(1, 'images/p1.png', this)" style="width: 100px; cursor: pointer; border: 5px solid var(--p1-color); border-radius: 20px; padding: 10px;">
-                <img src="images/star.png" class="char-opt" onclick="selectChar(1, 'images/star.png', this)" style="width: 100px; cursor: pointer; border: 5px solid transparent; border-radius: 20px; padding: 10px;">
-            </div>
-        </div>
+           <div id="character-pool" style="display: flex; gap: 15px; flex-wrap: wrap; justify-content: center; background: #f0f0f0; padding: 20px; border-radius: 15px;">
+    <img src="images/dragon.png" class="char-opt" onclick="selectAny(this, 'images/dragon.png')" style="width: 70px; cursor: pointer; border: 4px solid transparent; border-radius: 10px;">
+    <img src="images/fish.png" class="char-opt" onclick="selectAny(this, 'images/fish.png')" style="width: 70px; cursor: pointer; border: 4px solid transparent; border-radius: 10px;">
+    <img src="images/jelly%20fish.png" class="char-opt" onclick="selectAny(this, 'images/jelly%20fish.png')" style="width: 70px; cursor: pointer; border: 4px solid transparent; border-radius: 10px;">
+    <img src="images/octopus.png" class="char-opt" onclick="selectAny(this, 'images/octopus.png')" style="width: 70px; cursor: pointer; border: 4px solid transparent; border-radius: 10px;">
+    <img src="images/p1.png" class="char-opt" onclick="selectAny(this, 'images/p1.png')" style="width: 70px; cursor: pointer; border: 4px solid transparent; border-radius: 10px;">
+    <img src="images/p2.png" class="char-opt" onclick="selectAny(this, 'images/p2.png')" style="width: 70px; cursor: pointer; border: 4px solid transparent; border-radius: 10px;">
+    <img src="images/star.png" class="char-opt" onclick="selectAny(this, 'images/star.png')" style="width: 70px; cursor: pointer; border: 4px solid transparent; border-radius: 10px;">
+</div>
 
-        <div style="text-align: center;">
-            <h2 style="color: var(--p2-color);">玩家 2 (P2)</h2>
-            <div id="p2-options" style="display: flex; gap: 20px;">
-                <img src="images/p2.png" class="char-opt p2-selected" onclick="selectChar(2, 'images/p2.png', this)" style="width: 100px; cursor: pointer; border: 5px solid var(--p2-color); border-radius: 20px; padding: 10px;">
-                <img src="images/star.png" class="char-opt" onclick="selectChar(2, 'images/star.png', this)" style="width: 100px; cursor: pointer; border: 5px solid transparent; border-radius: 20px; padding: 10px;">
-            </div>
+<div style="text-align: center; margin-top: 10px;">
+    <p>玩家 1 選擇：<span id="p1-choice-name">未選擇</span></p>
+    <p>玩家 2 選擇：<span id="p2-choice-name">未選擇</span></p>
+    <button onclick="startGame()" style="padding: 10px 20px; font-size: 18px; cursor: pointer;">開始遊戲</button>
+</div>
         </div>
     </div>
 
