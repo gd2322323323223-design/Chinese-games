@@ -54,16 +54,9 @@ body {
         <div style="text-align: center;">
             <h2 style="color: var(--p1-color);">玩家 1 (P1)</h2>
             <div id="p1-options" style="display: flex; gap: 20px;">
-    <img src="images/3d.bear.png" 
-         class="char-opt" 
-         onclick="selectChar(1, 'images/3d.bear.png', this)"
-         style="width: 100px; cursor: pointer; border: 5px solid transparent; border-radius: 20px; padding: 10px;">
-    
-    <img src="images/3d.chik.png" 
-         class="char-opt" 
-         onclick="selectChar(1, 'images/3d.chik.png', this)"
-         style="width: 100px; cursor: pointer; border: 5px solid transparent; border-radius: 20px; padding: 10px;">
-</div>
+                <img src="images/p1.png" class="char-opt p1-selected" onclick="selectChar(1, 'images/p1.png', this)" style="width: 100px; cursor: pointer; border: 5px solid var(--p1-color); border-radius: 20px; padding: 10px;">
+                <img src="images/star.png" class="char-opt" onclick="selectChar(1, 'images/star.png', this)" style="width: 100px; cursor: pointer; border: 5px solid transparent; border-radius: 20px; padding: 10px;">
+            </div>
         </div>
 
         <div style="text-align: center;">
@@ -183,32 +176,16 @@ body {
         .cell-index { position: absolute; top: 8px; left: 10px; font-size: 14px; color: #a0aec0; }
 
         .player { 
-    width: 65px; 
-    height: 65px; 
-    position: absolute; 
-    z-index: 100; 
-    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
-    background-size: contain;
-    background-repeat: no-repeat;
-    background-position: center;
-
-    /* ✨ 3D 核心：加上立體陰影與旋轉視角 */
-    filter: drop-shadow(0 15px 10px 0 rgba(0,0,0,0.15)); /* 模擬厚度的深色側邊 */
-    transform: rotateX(15deg); /* 讓棋子稍微向後傾斜，更有站立感 */
-}
-
-/* 當棋子跳動時，陰影也要跟著變化才有 3D 感 */
-@keyframes bounce { 
-    from { 
-        transform: translateY(0) rotateX(15deg); 
-        filter: drop-shadow(0 10px 0 rgba(0,0,0,0.2));
-    } 
-    to { 
-        transform: translateY(-20px) rotateX(15deg); 
-        filter: drop-shadow(0 30px 15px rgba(0,0,0,0.1)); /* 跳起時陰影變淡變遠 */
-    }
-}
-        
+            width: 65px; 
+            height: 65px; 
+            position: absolute; 
+            z-index: 100; 
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            filter: drop-shadow(0 4px 8px rgba(0,0,0,0.3));
+        }
         #p1 { background-image: url('images/p1.png'); }
         #p2 { background-image: url('images/p2.png'); }
 
@@ -216,6 +193,10 @@ body {
             animation: bounce 0.6s infinite alternate; 
             cursor: pointer; 
             filter: drop-shadow(0 0 15px #48bb78) brightness(1.2) !important; 
+        }
+        @keyframes bounce { 
+            from { transform: translateY(0); } 
+            to { transform: translateY(-20px); }
         }
 
         #controls { 
