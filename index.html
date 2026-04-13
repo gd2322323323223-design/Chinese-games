@@ -317,6 +317,70 @@ let turn = 0, dice = 0, moving = false, timerInterval;
 let waitingForClick = false; 
 let specialEventActive = false;
 
+<script>
+// --- 角色選擇邏輯 (新加入) ---
+let selectedP1 = "";
+let selectedP2 = "";
+let currentSelectingPlayer = 1; 
+
+function selectAny(element, imgPath) {
+    if (imgPath === selectedP1 || imgPath === selectedP2) {
+        alert("這個角色已經被選走囉！請選其他的。");
+        return;
+    }
+
+    if (currentSelectingPlayer === 1) {
+        selectedP1 = imgPath;
+        document.getElementById('p1-choice-name').innerText = "已選中"; // 也可以顯示檔名
+        updateHighlight();
+        currentSelectingPlayer = 2; 
+    } else {
+        selectedP2 = imgPath;
+        document.getElementById('p2-choice-name').innerText = "已選中";
+        updateHighlight();
+        currentSelectingPlayer = 1; 
+    }
+}
+
+function updateHighlight() {
+    const opts = document.querySelectorAll('.char-opt');
+    opts.forEach(opt => {
+        // 注意：這裡要用 getAttribute('src') 來比對，因為直接點 .src 有時會變成絕對路徑
+        const path = opt.getAttribute('src');
+        opt.style.border = "4px solid transparent";
+        opt.style.opacity = "1";
+
+        if (path === selectedP1) {
+            opt.style.border = "5px solid #3182ce"; // 你的 P1 藍色
+        } 
+        if (path === selectedP2) {
+            opt.style.border = "5px solid #d53f8c"; // 你的 P2 粉色
+        }
+    });
+}
+
+// 修改你原本的 startGame，確保它能把圖片套用到棋子上
+function startGame() {
+    if (!selectedP1 || !selectedP2) {
+        alert("兩位玩家都必須選擇角色喔！");
+        return;
+    }
+    
+    // 套用選中的圖片到棋子
+    document.getElementById('p1').style.backgroundImage = `url('${selectedP1}')`;
+    document.getElementById('p2').style.backgroundImage = `url('${selectedP2}')`;
+    
+    // 隱藏開始畫面 (對應你 HTML 裡的 id="start-screen")
+    document.getElementById('start-screen').style.display = 'none';
+    
+    // 播放音樂
+    if (audio.bgm.paused) toggleBGM();
+}
+
+// ... 接下來是你原本的語音辨識、移動邏輯等代碼 ...
+    
+</script>
+
 // 預設的角色路徑
 let selectedP1 = 'images/p1.png';
 let selectedP2 = 'images/p2.png';
