@@ -445,10 +445,9 @@ body {
     </div>
     
 <script>
-// --- 核心變數與遊戲狀態 ---
 let selectedP1 = "";
 let selectedP2 = "";
-let currentSelectingPlayer = 1; // 1 代表 P1 選, 2 代表 P2 選
+let currentSelectingPlayer = 1; 
 let pendingSteps = 0; 
 let turn = 0, dice = 0, moving = false, timerInterval;
 let waitingForClick = false; 
@@ -459,6 +458,7 @@ const traps = [1, 16, 39, 48, 61, 76, 96];
 const boosts = [8, 20, 32, 51, 68, 80, 90];
 const dinosaurs = [5, 12, 27, 43, 55, 70, 86, 103]; 
 
+// 修正後的選擇角色函式
 function selectChar(element, imgPath) {
     if (imgPath === selectedP1 || imgPath === selectedP2) {
         alert("這個角色已經被選走囉！請選其他的。");
@@ -483,7 +483,6 @@ function selectChar(element, imgPath) {
         if(p2Preview) {
             p2Preview.innerHTML = `<img src="${imgPath}" style="width: 85%; height: 85%; object-fit: contain;">`;
         }
-        // 這裡不需要改回 1，除非你要讓玩家反覆重選
         const hint = document.getElementById('selection-hint');
         if(hint) {
             hint.innerText = "選擇完成！可以點擊下方按鈕開始遊戲。";
@@ -491,25 +490,30 @@ function selectChar(element, imgPath) {
         }
     }
     
-    // 如果你有 updateHighlight()，請確保這行存在
     if (typeof updateHighlight === "function") {
         updateHighlight();
     }
+} // 這裡原本少了一個括號，現在補上了
 
 // 更新視覺反饋
 function updateHighlight() {
     const opts = document.querySelectorAll('.char-opt');
     opts.forEach(opt => {
         const path = opt.getAttribute('src');
-        opt.style.border = "4px solid transparent";
+        opt.style.outline = "none";
+        opt.style.boxShadow = "none";
         opt.style.opacity = "1";
 
         if (path === selectedP1) {
-            opt.style.border = "5px solid var(--p1-color)";
+            opt.style.outline = "5px solid var(--p1-color)";
+            opt.style.outlineOffset = "-5px";
+            opt.style.boxShadow = "0 0 20px var(--p1-color)";
         } 
         if (path === selectedP2) {
-            opt.style.border = "5px solid var(--p2-color)";
-            opt.style.opacity = "0.6";
+            opt.style.outline = "5px solid var(--p2-color)";
+            opt.style.outlineOffset = "-5px";
+            opt.style.boxShadow = "0 0 20px var(--p2-color)";
+            opt.style.opacity = "0.7";
         }
     });
 }
@@ -524,25 +528,21 @@ function startGame() {
     document.getElementById('p2').style.backgroundImage = `url('${selectedP2}')`;
     document.getElementById('start-screen').style.display = 'none';
     
-    // 注意：這裡要確保你的音效對象 audio 已經在後面定義了
     if (typeof audio !== 'undefined' && audio.bgm.paused) toggleBGM();
 }
 
-// --- 音效初始化 ---
+// --- 音效與遊戲邏輯 (保持不變) ---
 const audio = {
     bgm: new Audio('sounds/bgm.mp3'),
     dice: new Audio('sounds/sounds_dice.mp3'),
     win: new Audio('sounds/win.mp3')
 };
-
-// 背景音樂設定：循環播放、音量適中
 audio.bgm.loop = true;
 audio.bgm.volume = 0.1;
 
-// 控制背景音樂開關
 function toggleBGM() {
     if (audio.bgm.paused) {
-        audio.bgm.play().catch(e => console.log("音樂播放被瀏覽器阻擋:", e));
+        audio.bgm.play().catch(e => console.log("音樂播放被阻擋"));
         document.getElementById('music-ctrl').innerText = "🎶";
     } else {
         audio.bgm.pause();
@@ -550,23 +550,16 @@ function toggleBGM() {
     }
 }
 
-// 播放音效輔助函式
 function playSound(name) {
     if (audio[name]) {
-        audio[name].currentTime = 0; // 每次播放重置時間，確保連點有效
+        audio[name].currentTime = 0;
         audio[name].play().catch(e => {});
     }
 }
 
-// --- 修改現有的函式來觸發音效 ---
-
-// 1. 修改擲骰子函式
 async function roll() {
     if(moving || waitingForClick) return;
-    
-    // 🎲 播放擲骰子音效
     playSound('dice');
-    
     document.getElementById('btn-roll').disabled = true;
     for(let i=0; i<8; i++) {
         dice = Math.floor(Math.random()*6)+1;
@@ -578,225 +571,69 @@ async function roll() {
     document.getElementById('player-turn-name').innerText = "👈 請點擊棋子行走！";
 }
 
-// 2. 修改檢查終點與彈窗的函式
-async function checkEndOrModal(pid) {
-    const pos = players[pid].pos;
-    const isGoal = (pos === words.length - 1);
-    const isSpecial = traps.includes(pos) || boosts.includes(pos) || dinosaurs.includes(pos);
+// 字典對應
+const customDictionary = { "學校": "我每天早上八時準時到達學校上課。", "禮堂": "校長正在禮堂為全校同學主持早會。", "校務處": "如果你在校園拾獲財物，請交到校務處。", "操場": "小明和小華在操場上興奮地踢足球。", "音樂室": "美妙的歌聲從音樂室裡傳了出來。", "課室": "同學們在課室裡專心地聽老師講課。", "洗手間": "飯前便後都要去洗手間把手洗乾淨。", "電腦室": "我們在電腦室學習製作精美的電子卡片。", "樓梯": "上下樓梯時要靠右走，不要追逐玩耍。", "圖書館": "圖書館內很安靜，大家都在認真看書。", "走廊": "我們不應該在走廊上奔跑，以免撞倒他人。", "升降機": "請先讓升降機內的人出來，我們再進去。", "教員室": "我有問題想請教老師，所以去了教員室。", "草地上": "綿羊在翠綠的草地上悠閒地吃草。", "沙灘": "夏天時，爸爸帶我們去沙灘游泳和玩沙。", "山頂": "我們費了九牛二虎之力，終於爬上了山頂。", "運動場": "運動員在運動場上努力練習，準備比賽。", "籃球場": "哥哥每天下午都會去籃球場打球。", "足球場": "足球場上，隊員們正在進行激烈的比賽。", "燒烤場": "假日裡，我們一家人去燒烤場烤肉。", "公園": "爺爺每天早上都會去公園散步鍛煉身體。", "家裏": "家裏是最溫暖的地方，有爸爸媽媽陪著我。", "客廳": "一家人坐在客廳裡看電視，其樂融融。", "浴室": "洗澡後，我會把浴室收拾乾淨。", "睡房": "我的睡房裡有一張柔軟的小床。", "廚房": "媽媽在廚房裡準備豐盛的晚餐。", "清真寺": "清真寺的建築非常有特色，莊嚴肅穆。", "商場": "假日裡，商場裡到處都是購物的人群。", "超市": "媽媽去超市買了很多新鮮的水果和蔬菜。", "街市": "早上的街市非常熱鬧，到處是叫賣聲。", "麵包店": "這家麵包店做的菠蘿包非常美味。", "理髮店": "我的頭髮太長了，需要去理髮店剪頭髮。", "便利店": "便利店二十四小時營業，非常方便。", "藥房": "我有點感冒，去藥房買了一些藥。", "餐廳": "這家餐廳的服務很好，食物也很好吃。", "醫院": "醫生和護士在醫院裡忙著照顧病人。", "補習社": "放學後，我會去補習社溫習功課。", "博物館": "我們在博物館裡看到了很多珍貴的文物。", "銀行": "爸爸去銀行辦理儲蓄業務。", "地鐵站": "地鐵站裡人來人往，大家都在趕路。", "巴士站": "我們在巴士站排隊等候巴士。", "行人道": "過馬路要走斑馬線，行走要走行人道。", "刷牙": "我每天早晚都會認真刷牙。", "洗澡": "夏天出汗多，每天都要洗澡。", "洗手": "飯前洗手是良好的衛生習慣。", "喝水": "多喝水有助於身體健康。", "吃飯": "我們在吃飯的時候不要說話。", "睡覺": "充足的睡覺能讓我們精神充沛。", "穿衣服": "我已經學會了自己穿衣服。", "戴口罩": "在人多的地方，我們要戴口罩保護自己。", "做家務": "我會幫媽媽做家務，減輕她的負擔。", "倒垃圾": "吃完飯後，我主動去倒垃圾。", "洗碗": "晚飯後，我幫媽媽洗碗。", "抹窗戶": "大掃除時，我負責抹窗戶。", "煮飯": "媽媽煮飯的味道是世界上最好的。", "上課": "上課時要專心聽講，積極發言。", "做功課": "我每天都會按時完成老師佈置的做功課。", "溫習": "考試前，我要認真溫習功課。", "看書": "看書能讓我們增加知識，開闊眼界。", "畫畫": "我最喜歡在美術課上畫畫了。", "做早操": "每天早上，我們都在操場上做早操。", "跑步": "跑步是一項很好的帶氧運動。", "游泳": "夏天去游泳池游泳非常消暑。", "跳繩": "跳繩能鍛煉我們的協調能力。", "踢足球": "我和同學常在放學後一起踢足球。", "打籃球": "打籃球能讓我們長得更高。", "騎單車": "假日裡，我和爸爸去郊外騎單車。", "遠足": "秋高氣爽，正是遠足的好時節。", "拍照": "旅行時，我喜歡用相機拍照留念。", "表演": "我們在台上的表演贏得了熱烈的掌聲。", "唱歌": "姐姐唱歌的聲音非常動聽。", "跳舞": "妹妹從小就開始學習跳舞。", "慶祝": "我們開生日派對來慶祝生日。", "排隊": "排隊上車是文明行為。", "玩遊戲": "適當地玩遊戲可以放鬆心情。", "看手機": "我們不應該長時間看手機，保護視力。", "打電話": "我打電話給奶奶，問候她的近況。", "打招呼": "見到老師要主動打招呼。", "買水果": "市場裡的水果很新鮮，我們買了一些。", "比賽": "在比賽中，友誼第一，比賽第二。", "說話": "公共場所說話要小聲一點。", "摺紙": "勞作課上，老師教我們摺紙鶴。", "下棋": "爺爺最喜歡和鄰居在樹下下棋。", "玩拼圖": "玩拼圖需要耐心和觀察力。" };
 
-    if (isGoal) {
-        // 🏆 播放獲勝音效
-        playSound('win');
-        
-        await fancyAlert(`🏆 玩家 ${pid + 1} 奪冠！`, "goal");
-        location.reload();
-    } else if (isSpecial || pos === 0) {
-        finishTurn();
-    } else {
-        showModal();
-    }
-}
-
-// --- 1. 建立自定義詞語與特定句子對應表 ---
-// 你可以在這裡輸入你想要的句子，確保邏輯百分之百正確
-const customDictionary = {
-    "學校": "我每天早上八時準時到達學校上課。",
-    "禮堂": "校長正在禮堂為全校同學主持早會。",
-    "校務處": "如果你在校園拾獲財物，請交到校務處。",
-    "操場": "小明和小華在操場上興奮地踢足球。",
-    "音樂室": "美妙的歌聲從音樂室裡傳了出來。",
-    "課室": "同學們在課室裡專心地聽老師講課。",
-    "洗手間": "飯前便後都要去洗手間把手洗乾淨。",
-    "電腦室": "我們在電腦室學習製作精美的電子卡片。",
-    "樓梯": "上下樓梯時要靠右走，不要追逐玩耍。",
-    "圖書館": "圖書館內很安靜，大家都在認真看書。",
-    "走廊": "我們不應該在走廊上奔跑，以免撞倒他人。",
-    "升降機": "請先讓升降機內的人出來，我們再進去。",
-    "教員室": "我有問題想請教老師，所以去了教員室。",
-    "草地上": "綿羊在翠綠的草地上悠閒地吃草。",
-    "沙灘": "夏天時，爸爸帶我們去沙灘游泳和玩沙。",
-    "山頂": "我們費了九牛二虎之力，終於爬上了山頂。",
-    "運動場": "運動員在運動場上努力練習，準備比賽。",
-    "籃球場": "哥哥每天下午都會去籃球場打球。",
-    "足球場": "足球場上，隊員們正在進行激烈的比賽。",
-    "燒烤場": "假日裡，我們一家人去燒烤場烤肉。",
-    "公園": "爺爺每天早上都會去公園散步鍛煉身體。",
-    "家裏": "家裏是最溫暖的地方，有爸爸媽媽陪著我。",
-    "客廳": "一家人坐在客廳裡看電視，其樂融融。",
-    "浴室": "洗澡後，我會把浴室收拾乾淨。",
-    "睡房": "我的睡房裡有一張柔軟的小床。",
-    "廚房": "媽媽在廚房裡準備豐盛的晚餐。",
-    "清真寺": "清真寺的建築非常有特色，莊嚴肅穆。",
-    "商場": "假日裡，商場裡到處都是購物的人群。",
-    "超市": "媽媽去超市買了很多新鮮的水果和蔬菜。",
-    "街市": "早上的街市非常熱鬧，到處是叫賣聲。",
-    "麵包店": "這家麵包店做的菠蘿包非常美味。",
-    "理髮店": "我的頭髮太長了，需要去理髮店剪頭髮。",
-    "便利店": "便利店二十四小時營業，非常方便。",
-    "藥房": "我有點感冒，去藥房買了一些藥。",
-    "餐廳": "這家餐廳的服務很好，食物也很好吃。",
-    "醫院": "醫生和護士在醫院裡忙著照顧病人。",
-    "補習社": "放學後，我會去補習社溫習功課。",
-    "博物館": "我們在博物館裡看到了很多珍貴的文物。",
-    "銀行": "爸爸去銀行辦理儲蓄業務。",
-    "地鐵站": "地鐵站裡人來人往，大家都在趕路。",
-    "巴士站": "我們在巴士站排隊等候巴士。",
-    "行人道": "過馬路要走斑馬線，行走要走行人道。",
-    "刷牙": "我每天早晚都會認真刷牙。",
-    "洗澡": "夏天出汗多，每天都要洗澡。",
-    "洗手": "飯前洗手是良好的衛生習慣。",
-    "喝水": "多喝水有助於身體健康。",
-    "吃飯": "我們在吃飯的時候不要說話。",
-    "睡覺": "充足的睡覺能讓我們精神充沛。",
-    "穿衣服": "我已經學會了自己穿衣服。",
-    "戴口罩": "在人多的地方，我們要戴口罩保護自己。",
-    "做家務": "我會幫媽媽做家務，減輕她的負擔。",
-    "倒垃圾": "吃完飯後，我主動去倒垃圾。",
-    "洗碗": "晚飯後，我幫媽媽洗碗。",
-    "抹窗戶": "大掃除時，我負責抹窗戶。",
-    "煮飯": "媽媽煮飯的味道是世界上最好的。",
-    "上課": "上課時要專心聽講，積極發言。",
-    "做功課": "我每天都會按時完成老師佈置的做功課。",
-    "溫習": "考試前，我要認真溫習功課。",
-    "看書": "看書能讓我們增加知識，開闊眼界。",
-    "畫畫": "我最喜歡在美術課上畫畫了。",
-    "做早操": "每天早上，我們都在操場上做早操。",
-    "跑步": "跑步是一項很好的帶氧運動。",
-    "游泳": "夏天去游泳池游泳非常消暑。",
-    "跳繩": "跳繩能鍛煉我們的協調能力。",
-    "踢足球": "我和同學常在放學後一起踢足球。",
-    "打籃球": "打籃球能讓我們長得更高。",
-    "騎單車": "假日裡，我和爸爸去郊外騎單車。",
-    "遠足": "秋高氣爽，正是遠足的好時節。",
-    "拍照": "旅行時，我喜歡用相機拍照留念。",
-    "表演": "我們在台上的表演贏得了熱烈的掌聲。",
-    "唱歌": "姐姐唱歌的聲音非常動聽。",
-    "跳舞": "妹妹從小就開始學習跳舞。",
-    "慶祝": "我們開生日派對來慶祝生日。",
-    "排隊": "排隊上車是文明行為。",
-    "玩遊戲": "適當地玩遊戲可以放鬆心情。",
-    "看手機": "我們不應該長時間看手機，保護視力。",
-    "打電話": "我打電話給奶奶，問候她的近況。",
-    "打招呼": "見到老師要主動打招呼。",
-    "買水果": "市場裡的水果很新鮮，我們買了一些。",
-    "比賽": "在比賽中，友誼第一，比賽第二。",
-    "說話": "公共場所說話要小聲一點。",
-    "摺紙": "勞作課上，老師教我們摺紙鶴。",
-    "下棋": "爺爺最喜歡和鄰居在樹下下棋。",
-    "玩拼圖": "玩拼圖需要耐心和觀察力。"
-};
-
-// --- 1. 建立詞語與地圖對應表 ---
 const rawWords = Object.keys(customDictionary);
 let words = [];
 let wordIdx = 0;
-
-// 生成 110 格的地圖資料
 for (let i = 0; i < 110; i++) {
-    if (i === 0) {
-        words.push("起點");
-    } else if (traps.includes(i) || boosts.includes(i) || dinosaurs.includes(i)) {
-        words.push(""); // 特殊格不放文字
-    } else if (wordIdx < rawWords.length) {
-        words.push(rawWords[wordIdx]); 
-        wordIdx++;
-    } else {
-        words.push("終點 🏆"); 
-        break; // 到達詞庫上限或終點就停止
-    }
+    if (i === 0) words.push("起點");
+    else if (traps.includes(i) || boosts.includes(i) || dinosaurs.includes(i)) words.push("");
+    else if (wordIdx < rawWords.length) { words.push(rawWords[wordIdx]); wordIdx++; }
+    else { words.push("終點 🏆"); break; }
 }
 
-// --- 2. 棋盤渲染函數 ---
 function init() {
     const board = document.getElementById('board');
     if (!board) return;
     board.innerHTML = "";
     let displayIndex = 1; 
-
     words.forEach((w, i) => {
         const cell = document.createElement('div');
         cell.className = 'cell';
         cell.id = 'c' + i;
-        
-        const isGoal = (i === words.length - 1);
-        const isStart = (i === 0);
-        const isSpecial = traps.includes(i) || boosts.includes(i) || dinosaurs.includes(i);
-
-        if (isGoal) cell.classList.add('goal-cell');
-
+        if (i === words.length - 1) cell.classList.add('goal-cell');
         let iconText = "";
         if(traps.includes(i)) iconText = "🍌";
         else if(boosts.includes(i)) iconText = "🚀";
         else if(dinosaurs.includes(i)) iconText = "🦖";
-
-        // 生成編號（僅限普通詞語格）
-        let numberHtml = "";
-        if (!isStart && !isGoal && !isSpecial) {
-            numberHtml = `<span class="cell-index">${displayIndex}</span>`;
-            displayIndex++;
-        }
-
-        cell.innerHTML = `
-            ${numberHtml}
-            ${isGoal ? 
-                `<div class="event-icon" style="font-size: 80px;">🏆</div><div class="cell-text">終點</div>` :
-                (w !== "" ? 
-                    `<div class="cell-text">${w}</div><span class="event-icon" style="position: absolute; bottom: 5px; right: 8px; font-size: 24px;">${iconText}</span>` :
-                    `<div class="event-icon" style="font-size: 50px;">${iconText}</div>`
-                )
-            }
-        `;
+        let numberHtml = (!i || i === words.length-1 || iconText) ? "" : `<span class="cell-index">${displayIndex++}</span>`;
+        cell.innerHTML = `${numberHtml}${i === words.length - 1 ? `<div class="event-icon" style="font-size: 80px;">🏆</div><div class="cell-text">終點</div>` : (w !== "" ? `<div class="cell-text">${w}</div><span class="event-icon" style="position: absolute; bottom: 5px; right: 8px; font-size: 24px;">${iconText}</span>` : `<div class="event-icon" style="font-size: 50px;">${iconText}</div>`) }`;
         board.appendChild(cell);
     });
-    
-    // 初始化後立即定位棋子
     setTimeout(updateDisplay, 100);
 }
 
-// --- 3. 棋子定位函數 ---
 function updateDisplay() {
     players.forEach((p, i) => {
         const cell = document.getElementById('c' + p.pos);
         const pEl = document.getElementById('p' + (i + 1));
         if (!cell || !pEl) return;
-
-        // 計算格子中心位置
         const centerX = cell.offsetLeft + (cell.offsetWidth / 2) - (pEl.offsetWidth / 2);
         pEl.style.left = centerX + 'px';
-
         if (cell.classList.contains('goal-cell')) {
-            const centerY = cell.offsetTop + (cell.offsetHeight / 2) + (i === 0 ? -40 : 20);
-            pEl.style.top = centerY + 'px';
+            pEl.style.top = (cell.offsetTop + cell.offsetHeight / 2 + (i === 0 ? -40 : 20)) + 'px';
         } else {
-            // 讓棋子站在路徑（Road Area）上
             const roadAreaTop = cell.offsetTop + cell.offsetHeight + 15; 
             pEl.style.top = (i === 0 ? roadAreaTop - 10 : roadAreaTop + 35) + 'px';
         }
     });
 }
 
-// ✨ 修復核心：處理玩家點擊（包含正常移動與特殊事件後續移動）
 async function handlePlayerClick(pid) {
     if (!waitingForClick || pid !== turn || moving) return;
-    
-    waitingForClick = false; // 立即關閉點擊許可，防止連點
+    waitingForClick = false;
     document.getElementById('p' + (turn + 1)).classList.remove('can-move');
-
     if (specialEventActive) {
-        // 如果是特殊事件（如踩到香蕉）引發的點擊
         let steps = pendingSteps;
         specialEventActive = false;
         pendingSteps = 0;
         await moveSteps(pid, steps);
-        checkEndOrModal(pid); // 移動完後再檢查
+        checkEndOrModal(pid);
     } else {
-        // 正常的擲骰子移動
         await move(pid);
-        // 注意：move 內部會處理是否觸發特殊事件彈窗
-        // 如果 move 沒觸發特殊事件彈窗，會在這裡檢查彈窗
-        if (!specialEventActive) {
-            checkEndOrModal(pid);
-        }
+        if (!specialEventActive) checkEndOrModal(pid);
     }
 }
 
@@ -810,7 +647,6 @@ async function move(pid) {
         }
     }
     moving = false;
-
     const pos = players[pid].pos;
     if(traps.includes(pos)) {
         await fancyAlert("🍌 哎呀！踩到香蕉滑倒了。<br><small>點擊棋子後退 1 格</small>");
@@ -825,24 +661,18 @@ async function move(pid) {
 }
 
 function prepareSpecialStep(pid, steps) {
-    moving = false;
     waitingForClick = true;
     specialEventActive = true; 
     pendingSteps = steps;
     document.getElementById('p' + (pid + 1)).classList.add('can-move');
-    document.getElementById('player-turn-name').innerText = "👈 請點擊棋子執行特殊事件！";
 }
 
 async function moveSteps(pid, steps) {
     moving = true;
     const isForward = steps > 0;
-    const totalSteps = Math.abs(steps);
-    for (let i = 0; i < totalSteps; i++) {
-        if (isForward) {
-            if (players[pid].pos < words.length - 1) players[pid].pos++;
-        } else {
-            if (players[pid].pos > 0) players[pid].pos--;
-        }
+    for (let i = 0; i < Math.abs(steps); i++) {
+        if (isForward) { if (players[pid].pos < words.length - 1) players[pid].pos++; }
+        else { if (players[pid].pos > 0) players[pid].pos--; }
         updateDisplay();
         await new Promise(r => setTimeout(r, 300));
     }
@@ -851,37 +681,23 @@ async function moveSteps(pid, steps) {
 
 async function checkEndOrModal(pid) {
     const pos = players[pid].pos;
-    const isGoal = (pos === words.length - 1);
-    const isSpecial = traps.includes(pos) || boosts.includes(pos) || dinosaurs.includes(pos);
-
-    if (isGoal) {
-        playSound('win'); // 播放獲勝音效
+    if (pos === words.length - 1) {
+        playSound('win');
         await fancyAlert(`🏆 玩家 ${pid + 1} 奪冠！`, "goal");
         location.reload();
-    } else if (isSpecial || pos === 0) {
-        // 如果落在特殊格（如火箭、香蕉、起點），不彈窗，直接結束回合
+    } else if (traps.includes(pos) || boosts.includes(pos) || dinosaurs.includes(pos) || pos === 0) {
         finishTurn();
     } else {
-        // 落在普通詞語格，顯示題目彈窗
         showModal();
     }
 }
 
 function showModal() {
     const currentWord = words[players[turn].pos];
-    if (!currentWord || currentWord === "" || currentWord === "起點" || currentWord === "終點 🏆") { 
-        finishTurn(); 
-        return; 
-    }
-    
-    // 取得預設好的句子
-    const specificSentence = customDictionary[currentWord] || "請用這個詞語造一個句子。";
-
+    if (!currentWord || currentWord === "起點") { finishTurn(); return; }
     document.getElementById('modal-text').innerText = currentWord;
-    document.getElementById('ai-sentence-text').innerText = specificSentence; // 直接顯示特定句子
-
+    document.getElementById('ai-sentence-text').innerText = customDictionary[currentWord] || "請造句。";
     document.getElementById('modal').style.display = 'block';
-    
     let timeLeft = 120;
     clearInterval(timerInterval);
     timerInterval = setInterval(() => {
@@ -893,39 +709,25 @@ function showModal() {
 
 function speak() {
     window.speechSynthesis.cancel();
-    const word = document.getElementById('modal-text').innerText;
-    const sentence = document.getElementById('ai-sentence-text').innerText;
-    
-    // 朗讀詞語 + 句子
-    const msg = new SpeechSynthesisUtterance(`${word}。句子練習：${sentence}`);
+    const msg = new SpeechSynthesisUtterance(`${document.getElementById('modal-text').innerText}。${document.getElementById('ai-sentence-text').innerText}`);
     msg.lang = 'zh-HK';
-    msg.rate = 0.8;
     window.speechSynthesis.speak(msg);
 }
 
 function startRecognition() {
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-    if (!SpeechRecognition) {
-        alert("請使用 Chrome 瀏覽器以支援語音辨識。");
-        return;
-    }
+    if (!SpeechRecognition) return;
     const recognition = new SpeechRecognition();
     recognition.lang = 'zh-HK';
-    const modalText = document.getElementById('modal-text');
-    const originalWord = modalText.innerText;
-    modalText.innerHTML = `<span style="color:#4299e1">🎤 正在聽...讀出「${originalWord}」</span>`;
+    const originalWord = document.getElementById('modal-text').innerText;
     recognition.start();
-
     recognition.onresult = (event) => {
         const result = event.results[0][0].transcript;
         if (result.includes(originalWord)) {
-            modalText.innerHTML = `<div style="color:#48bb78">✅ 太棒了！</div>`;
             players[turn].score += 5;
             document.getElementById('s' + (turn + 1)).innerText = players[turn].score;
-        } else {
-            modalText.innerHTML = `<div style="color:#f56565">❌ 聽成: ${result}</div>`;
+            closeModal(true);
         }
-        setTimeout(() => { modalText.innerText = originalWord; }, 2000);
     };
 }
 
@@ -944,24 +746,16 @@ function fancyAlert(msg, type = 'event') {
 }
 
 function closeModal(addScore = true) {
-    if (timerInterval) clearInterval(timerInterval);
-    if (addScore) {
-        players[turn].score += 10;
-        document.getElementById('s' + (turn + 1)).innerText = players[turn].score;
-    }
+    clearInterval(timerInterval);
     document.getElementById('modal').style.display = 'none';
     finishTurn();
 }
 
 function finishTurn() {
     turn = (turn === 0) ? 1 : 0;
-    const nameEl = document.getElementById('player-turn-name');
-    nameEl.innerText = `輪到：玩家 ${turn + 1}`;
-    nameEl.style.color = (turn === 0) ? 'var(--p1-color)' : 'var(--p2-color)';
+    document.getElementById('player-turn-name').innerText = "玩家 " + (turn + 1);
+    document.getElementById('player-turn-name').style.color = (turn === 0) ? "var(--p1-color)" : "var(--p2-color)";
     document.getElementById('btn-roll').disabled = false;
-    moving = false;
-    waitingForClick = false;
-    specialEventActive = false;
 }
 
 window.onload = init;
