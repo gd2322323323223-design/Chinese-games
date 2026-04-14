@@ -190,15 +190,23 @@ img {
             to { transform: translateY(-20px); }
         }
 
-        #controls { 
-            position: fixed; bottom: 0; left: 0; width: 100%; 
-            background: rgba(255, 255, 255, 0.95); 
-            display: none !important; justify-content: center; align-items: center; 
-            gap: 30px; padding: 20px;  
-            box-shadow: 0 -10px 30px rgba(0,0,0,0.05); 
-            backdrop-filter: blur(10px);
-            z-index: 100;
-        }
+       #controls { 
+    position: fixed; 
+    bottom: 0; 
+    left: 0; 
+    width: 100%; 
+    height: 100px; /* 強制給予高度 */
+    background: rgba(255, 255, 255, 0.95); 
+    display: flex !important; /* 確保內容橫向排列 */
+    justify-content: center;   /* 水平置中 */
+    align-items: center;       /* 垂直置中 */
+    gap: 30px; 
+    padding: 10px; 
+    z-index: 9999 !important; /* 確保在最前面 */
+    box-shadow: 0 -5px 15px rgba(0,0,0,0.1);
+    backdrop-filter: blur(10px);
+}
+        
         body:not(:has(#start-screen:not([style*="display: none"]))) #controls {
             display: flex !important;
             z-index: 9999 !important; /* 同時解決你說的：進入遊戲後要浮在最前方 */
@@ -206,11 +214,19 @@ img {
 
         #dice-box { font-size: 45px; padding: 10px 25px; background: #edf2f7; border-radius: 15px; min-width: 60px; text-align: center; }
 
-        #btn-roll { 
-            padding: 15px 40px; font-size: 22px; background: #48bb78; 
-            color: white; border: none; border-radius: 50px; 
-            cursor: pointer; font-weight: bold; transition: 0.2s;
-        }
+      #btn-roll {
+    position: static !important; /* 讓它回到控制列內，不要在畫面上亂飛 */
+    padding: 15px 40px !important; 
+    font-size: 22px !important; 
+    background: #48bb78 !important; /* 變回綠色 */
+    color: white !important; 
+    border: none !important; 
+    border-radius: 50px !important; 
+    cursor: pointer !important; 
+    display: inline-block !important; /* 確保它是顯示的 */
+    visibility: visible !important;
+}
+        
         #btn-roll:hover { background: #38a169; transform: scale(1.05); }
         #btn-roll:disabled { background: #cbd5e0; transform: scale(1); }
 
@@ -555,7 +571,9 @@ function startGame() {
     
     // 4. 原本的音樂邏輯
     if (typeof audio !== 'undefined' && audio.bgm.paused) toggleBGM();
+    document.getElementById('btn-roll').disabled = false;
 }
+    
     
 // --- 音效與遊戲邏輯 (保持不變) ---
 const audio = {
