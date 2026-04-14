@@ -172,8 +172,6 @@ body {
     background-position: center;
     filter: drop-shadow(0 4px 8px rgba(0,0,0,0.3));
 }
-#p1 { background-image: url('images/p1.png'); }
-#p2 { background-image: url('images/p2.png'); }
 
 .can-move { 
     animation: bounce 0.6s infinite alternate; 
@@ -497,9 +495,6 @@ function selectChar(element, imgPath) {
     if (typeof updateHighlight === "function") {
         updateHighlight();
     }
-} // <--- 確保這最後一個大括號存在
-    updateHighlight();
-}
 
 // 更新視覺反饋
 function updateHighlight() {
