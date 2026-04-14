@@ -360,7 +360,7 @@ body {
     
 </head>
 <body>
-    <div id="start-screen" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.98); z-index: 5000; display: flex; flex-direction: column; align-items: center; justify-content: center; backdrop-filter: blur(15px);">
+    <div id="start-screen" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255, 255, 255, 0.1); z-index: 5000; display: flex; flex-direction: column; align-items: center; justify-content: center; backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);">
     <h1>請選擇你的棋子角色</h1>
         
         <p id="selection-hint" style="font-size: 22px; color: var(--p1-color); font-weight: bold; margin-bottom: 30px;">
@@ -384,16 +384,16 @@ body {
 
         </div>
 
-        <div style="margin-top: 30px; display: flex; gap: 60px; font-size: 20px;">
-            <div style="text-align: center;">
-                <span style="color: var(--p1-color); font-weight: bold;">P1 已選：</span><br>
-                <span id="p1-choice-name">未選擇</span>
-            </div>
-            <div style="text-align: center;">
-                <span style="color: var(--p2-color); font-weight: bold;">P2 已選：</span><br>
-                <span id="p2-choice-name">未選擇</span>
-            </div>
-        </div>
+        <div style="margin-top: 30px; display: flex; gap: 40px; font-size: 20px;">
+    <div style="text-align: center; background: rgba(255,255,255,0.5); padding: 10px 20px; border-radius: 15px;">
+        <span style="color: var(--p1-color); font-weight: bold;">P1 已選</span><br>
+        <span id="p1-choice-name" style="font-weight: 900;">未選擇</span>
+    </div>
+    <div style="text-align: center; background: rgba(255,255,255,0.5); padding: 10px 20px; border-radius: 15px;">
+        <span style="color: var(--p2-color); font-weight: bold;">P2 已選</span><br>
+        <span id="p2-choice-name" style="font-weight: 900;">未選擇</span>
+    </div>
+</div>
 
        <button id="start-game-btn" onclick="startGame()">
     開始詞語大作戰！
