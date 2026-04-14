@@ -25,6 +25,7 @@ body::before {
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
+    z-index: 5;
     
     /* 這裡控制模糊，只會影響這張圖，不會影響你的棋盤文字 */
     filter: none !important; 
@@ -72,7 +73,7 @@ img {
   object-fit: contain; /* 保持比例，完整顯示圖片 */
 }
         
-#game-container { position: relative; z-index: 20; width: 95%; max-width: 1400px; margin: 20px auto; background: transparent !important;}
+#game-container { position: relative; z-index: 1 !important; width: 95%; max-width: 1400px; margin: 20px auto; background: transparent !important;}
 
 #board { 
     display: grid; 
@@ -367,22 +368,15 @@ img {
     justify-content: center;
     box-shadow: 0 10px 30px rgba(0,0,0,0.2);
 }
-/* 強制所有可能擋住背景的大層級變透明 */
-#game-container, 
-#start-screen,
-.selection-container {
-    background-color: transparent !important;
-}
-
-/* 如果你希望棋盤還是白的，但要看到森林，就把棋盤設為半透明 */
-#board {
-    background-color: rgba(255, 255, 255, 0.8) !important;
+        
+body:has(#start-screen[style*="display: flex"]) #game-container {
+    opacity: 0; /* 或者用 visibility: hidden */
 }
     </style>
     
 </head>
 <body>
-  <div id="start-screen" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255, 255, 255, 0.3) !important; z-index: 10; display: flex; flex-direction: column; align-items: center; justify-content: center; backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px);">
+  <div id="start-screen" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255, 255, 255, 0.2) !important; z-index: 100; display: flex; flex-direction: column; align-items: center; justify-content: center; backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px);">
     <h1 style="font-size: 60px; color: #5d4037; font-weight: 900; margin-bottom: 20px;">詞語大作戰</h1>
 
     <div class="selection-container" style="display: flex; align-items: center; gap: 40px; width: 95%; max-width: 1400px; justify-content: center;">
