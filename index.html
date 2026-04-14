@@ -43,27 +43,6 @@ body {
     min-height: 100vh;
 }
         
-.char-opt {
-    width: 90px;
-    height: 90px;
-    padding: 10px;
-    background: #ffffff;
-    border-radius: 20px;
-    cursor: pointer;
-    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-    object-fit: contain;
-    border: 4px solid transparent; /* 預留邊框位置以免抖動 */
-}
-
-.char-opt:hover {
-    transform: translateY(-10px) scale(1.1);
-    box-shadow: 0 15px 30px rgba(0,0,0,0.1);
-    z-index: 10; /* 確保縮放時不會被旁邊遮住 */
-}
-
-/* ...你之前的 .char-opt:hover 樣式 ... */
-
 /* [狀態 A] 被選取後的視覺：發光、加框、不透明 */
 .char-opt[style*="var(--p1-color)"] {
     border: 5px solid var(--p1-color) !important;
@@ -292,7 +271,7 @@ body {
 /* --- 1. 先貼這段：定義基本的美化外觀 --- */
 #character-pool {
     display: grid;
-    grid-template-columns: repeat(4, 90px); /* 建議給固定寬度，背景才不會跑掉 */
+    grid-template-columns: repeat(4, 110px); /* 建議給固定寬度，背景才不會跑掉 */
     gap: 12px;
     width: fit-content; /* 確保背景方格完美包裹 */
     margin: 0 auto;
@@ -356,48 +335,85 @@ body {
     50% { transform: scale(1.05); }
     100% { transform: scale(1); }
 }
+        
+/* 讓中間內容變成橫向排列 */
+.selection-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    width: 100%;
+}
+
+/* 預覽框的基礎大小 */
+.preview-box {
+    width: 250px; /* 這裡改為 250px 以配合我剛才給你的 HTML */
+    height: 250px;
+    background: #4a90e2; /* 給它一個基礎藍色，像你的設計圖一樣 */
+    border: 8px solid white;
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+}
     </style>
     
 </head>
 <body>
-    <div id="start-screen" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255, 255, 255, 0.1); z-index: 5000; display: flex; flex-direction: column; align-items: center; justify-content: center; backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);">
-    <h1>請選擇你的棋子角色</h1>
+   <div id="start-screen" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255, 255, 255, 0.1); z-index: 5000; display: flex; flex-direction: column; align-items: center; justify-content: center; backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);">
+    
+    <h1 style="font-size: 60px; color: #5d4037; font-weight: 900; margin-bottom: 20px;">詞語大作戰</h1>
+
+    <div class="selection-container" style="display: flex; align-items: center; gap: 40px; width: 95%; max-width: 1400px; justify-content: center;">
         
-        <p id="selection-hint" style="font-size: 22px; color: var(--p1-color); font-weight: bold; margin-bottom: 30px;">
-        請 玩家 1 點擊一個角色
-    </p>
-
-        <div id="character-pool" style="display: grid; grid-template-columns: repeat(4, 110px); gap: 20px; width: fit-content; max-width: 95%; margin: 0 auto; background: rgba(255, 255, 255, 0.6); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); padding: 30px; border: 2px solid rgba(255, 255, 255, 0.8); border-radius: 40px; box-shadow: 0 10px 50px rgba(0,0,0,0.1); justify-items: center;">
-            
-            <img src="images/dragon.png" class="char-opt" onclick="selectChar(this, 'images/dragon.png')">
-            <img src="images/fish.png" class="char-opt" onclick="selectChar(this, 'images/fish.png')">
-            <img src="images/snail.png" class="char-opt" onclick="selectChar(this, 'images/snail.png')">
-            <img src="images/octopus.png" class="char-opt" onclick="selectChar(this, 'images/octopus.png')">
-            <img src="images/cat.png" class="char-opt" onclick="selectChar(this, 'images/cat.png')">
-            <img src="images/dog.png" class="char-opt" onclick="selectChar(this, 'images/dog.png')">
-            <img src="images/bee.png" class="char-opt" onclick="selectChar(this, 'images/bee.png')">
-            <img src="images/fairy.png" class="char-opt" onclick="selectChar(this, 'images/fairy.png')">
-            <img src="images/turtle.png" class="char-opt" onclick="selectChar(this, 'images/turtle.png')">
-            <img src="images/knight.png" class="char-opt" onclick="selectChar(this, 'images/knight.png')">
-            <img src="images/star.png" class="char-opt" onclick="selectChar(this, 'images/star.png')">
-            <img src="images/panda.png" class="char-opt" onclick="selectChar(this, 'images/panda.png')">
-
+        <div class="player-preview" style="flex: 1; display: flex; flex-direction: column; align-items: center;">
+            <h3 style="color: #5d4037; font-size: 20px; margin-bottom: 10px;">p1玩家已經選擇了</h3>
+            <div id="p1-big-preview" class="preview-box" style="width: 250px; height: 250px; background: #4a90e2; border-radius: 20px; border: 8px solid white; display: flex; align-items: center; justify-content: center; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.2);">
+                <span style="color: white; font-weight: bold;">顯示 P1 棋子圖片</span>
+            </div>
         </div>
 
-        <div style="margin-top: 30px; display: flex; gap: 40px; font-size: 20px;">
-    <div style="text-align: center; background: rgba(255,255,255,0.5); padding: 10px 20px; border-radius: 15px;">
-        <span style="color: var(--p1-color); font-weight: bold;">P1 已選</span><br>
-        <span id="p1-choice-name" style="font-weight: 900;">未選擇</span>
-    </div>
-    <div style="text-align: center; background: rgba(255,255,255,0.5); padding: 10px 20px; border-radius: 15px;">
-        <span style="color: var(--p2-color); font-weight: bold;">P2 已選</span><br>
-        <span id="p2-choice-name" style="font-weight: 900;">未選擇</span>
-    </div>
-</div>
+        <div id="character-pool-wrapper" style="text-align: center;">
+            <p id="selection-hint" style="font-size: 22px; color: var(--p1-color); font-weight: bold; margin-bottom: 15px;">請 玩家 1 點擊一個角色</p>
+            <div id="character-pool" style="display: grid; grid-template-columns: repeat(4, 110px); gap: 20px; width: fit-content; background: rgba(255, 255, 255, 0.6); padding: 30px; border: 2px solid rgba(255, 255, 255, 0.8); border-radius: 40px; box-shadow: 0 10px 50px rgba(0,0,0,0.1); justify-items: center;">
+                <img src="images/dragon.png" class="char-opt" onclick="selectChar(this, 'images/dragon.png')">
+                <img src="images/fish.png" class="char-opt" onclick="selectChar(this, 'images/fish.png')">
+                <img src="images/snail.png" class="char-opt" onclick="selectChar(this, 'images/snail.png')">
+                <img src="images/octopus.png" class="char-opt" onclick="selectChar(this, 'images/octopus.png')">
+                <img src="images/cat.png" class="char-opt" onclick="selectChar(this, 'images/cat.png')">
+                <img src="images/dog.png" class="char-opt" onclick="selectChar(this, 'images/dog.png')">
+                <img src="images/bee.png" class="char-opt" onclick="selectChar(this, 'images/bee.png')">
+                <img src="images/fairy.png" class="char-opt" onclick="selectChar(this, 'images/fairy.png')">
+                <img src="images/turtle.png" class="char-opt" onclick="selectChar(this, 'images/turtle.png')">
+                <img src="images/knight.png" class="char-opt" onclick="selectChar(this, 'images/knight.png')">
+                <img src="images/star.png" class="char-opt" onclick="selectChar(this, 'images/star.png')">
+                <img src="images/panda.png" class="char-opt" onclick="selectChar(this, 'images/panda.png')">
+            </div>
+        </div>
 
-       <button id="start-game-btn" onclick="startGame()">
-    開始詞語大作戰！
-       </button>
+        <div class="player-preview" style="flex: 1; display: flex; flex-direction: column; align-items: center;">
+            <h3 style="color: #5d4037; font-size: 20px; margin-bottom: 10px;">p2玩家已經選擇了</h3>
+            <div id="p2-big-preview" class="preview-box" style="width: 250px; height: 250px; background: #4a90e2; border-radius: 20px; border: 8px solid white; display: flex; align-items: center; justify-content: center; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.2);">
+                <span style="color: white; font-weight: bold;">顯示 P2 棋子圖片</span>
+            </div>
+        </div>
+    </div>
+
+    <div style="margin-top: 30px; display: flex; gap: 40px; font-size: 20px;">
+        <div style="text-align: center; background: rgba(255,255,255,0.5); padding: 10px 20px; border-radius: 15px;">
+            <span style="color: var(--p1-color); font-weight: bold;">P1 已選</span><br>
+            <span id="p1-choice-name" style="font-weight: 900;">未選擇</span>
+        </div>
+        <div style="text-align: center; background: rgba(255,255,255,0.5); padding: 10px 20px; border-radius: 15px;">
+            <span style="color: var(--p2-color); font-weight: bold;">P2 已選</span><br>
+            <span id="p2-choice-name" style="font-weight: 900;">未選擇</span>
+        </div>
+    </div>
+
+    <button id="start-game-btn" onclick="startGame()" style="margin-top: 20px;">
+        開始大作戰
+    </button>
 </div>
 
     <div id="music-ctrl" onclick="toggleBGM()" style="position:fixed; top:20px; right:20px; z-index:1000; cursor:pointer; font-size:30px; background:white; border-radius:50%; width:50px; height:50px; display:flex; align-items:center; justify-content:center; box-shadow:0 4px 10px rgba(0,0,0,0.2);">
