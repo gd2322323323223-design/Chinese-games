@@ -537,13 +537,26 @@ function startGame() {
         alert("兩位玩家都必須選擇角色喔！");
         return;
     }
+
+    // 1. 設定角色圖片
     document.getElementById('p1').style.backgroundImage = `url('${selectedP1}')`;
     document.getElementById('p2').style.backgroundImage = `url('${selectedP2}')`;
+
+    // 2. 隱藏首頁 (這會觸發你的 CSS :has 邏輯)
     document.getElementById('start-screen').style.display = 'none';
+
+    // 3. 【關鍵補回】強制讓控制列顯示出來
+    const controls = document.getElementById('controls');
+    if (controls) {
+        controls.style.setProperty('display', 'flex', 'important'); 
+        // 額外確保它在最前面，不會被棋盤擋住
+        controls.style.zIndex = '9999';
+    }
     
+    // 4. 原本的音樂邏輯
     if (typeof audio !== 'undefined' && audio.bgm.paused) toggleBGM();
 }
-
+    
 // --- 音效與遊戲邏輯 (保持不變) ---
 const audio = {
     bgm: new Audio('sounds/bgm.mp3'),
