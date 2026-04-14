@@ -15,11 +15,12 @@
 /* --- 第一部分：專門控制背景圖和模糊效果 --- */
 body::before {
     content: "";
-    position: fixed;   /* 固定住，不隨捲軸滾動 */
+    position: fixed; 
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
+    background-color: red !important;
     background-image: url('images/board-bg-frontpage.png'); !important
     background-size: cover;
     background-position: center;
