@@ -43,15 +43,20 @@ body {
     min-height: 100vh;
 }
         
-/* [狀態 A] 被選取後的視覺：發光、加框、不透明 */
+/* P1 選中效果：改用 outline 代替 border */
 .char-opt[style*="var(--p1-color)"] {
-    border: 5px solid var(--p1-color) !important;
+    outline: 5px solid var(--p1-color); /* ✨ outline 不佔空間 */
+    outline-offset: -5px;              /* 讓框線往內縮 */
     box-shadow: 0 0 20px var(--p1-color) !important;
+    border: none !important;           /* 移除原本可能撐開空間的 border */
 }
+
+/* P2 選中效果 */
 .char-opt[style*="var(--p2-color)"] {
-    border: 5px solid var(--p2-color) !important;
+    outline: 5px solid var(--p2-color);
+    outline-offset: -5px;
     box-shadow: 0 0 20px var(--p2-color) !important;
-    opacity: 1 !important; 
+    border: none !important;
 }
 
 /* [狀態 B] 被選取後的動作：hover 時乖乖站好不要亂跳 */
@@ -291,6 +296,7 @@ body {
     background: white;
     border-radius: 25px;
     padding: 5px;
+    box-sizing: border-box;
     transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     box-shadow: 0 8px 15px rgba(0,0,0,0.05);
 }
