@@ -466,9 +466,16 @@ function selectChar(element, imgPath) {
         alert("這個角色已經被選走囉！請選其他的。");
         return;
     }
+
     if (currentSelectingPlayer === 1) {
         selectedP1 = imgPath;
-        document.getElementById('p1-choice-name').innerText = imgPath.split('/').pop().replace('.png', '');
+        
+        // ✨ 新增：更新左邊大方格顯示圖片
+        const p1Preview = document.getElementById('p1-big-preview');
+        if(p1Preview) {
+            p1Preview.innerHTML = `<img src="${imgPath}" style="width: 85%; height: 85%; object-fit: contain;">`;
+        }
+
         currentSelectingPlayer = 2;
         const hint = document.getElementById('selection-hint');
         if(hint) {
@@ -477,14 +484,22 @@ function selectChar(element, imgPath) {
         }
     } else {
         selectedP2 = imgPath;
-        document.getElementById('p2-choice-name').innerText = imgPath.split('/').pop().replace('.png', '');
-        currentSelectingPlayer = 1;
+
+        // ✨ 新增：更新右邊大方格顯示圖片
+        const p2Preview = document.getElementById('p2-big-preview');
+        if(p2Preview) {
+            p2Preview.innerHTML = `<img src="${imgPath}" style="width: 85%; height: 85%; object-fit: contain;">`;
+        }
+
+        currentSelectingPlayer = 1; // 這裡通常選完 P2 就結束了，如果你有後續邏輯可保持原樣
         const hint = document.getElementById('selection-hint');
         if(hint) {
             hint.innerText = "選擇完成！可以點擊下方按鈕開始遊戲。";
             hint.style.color = "#48bb78";
         }
     }
+}
+    
     updateHighlight();
 }
 
