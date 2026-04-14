@@ -42,18 +42,45 @@ body {
     padding-bottom: 200px;
     min-height: 100vh;
 }
-.char-opt {
-    width: 85px; 
-    height: 85px; 
-    object-fit: contain; 
-    cursor: pointer; 
-    border: 4px solid transparent; 
-    border-radius: 15px; 
-    background: white;
-    transition: transform 0.2s, border 0.2s; /* 建議加上轉場效果，看起來更順手 */
-        } 
         
+.char-opt {
+    width: 90px;
+    height: 90px;
+    padding: 10px;
+    background: #ffffff;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+    object-fit: contain;
+    border: 4px solid transparent; /* 預留邊框位置以免抖動 */
+}
 
+.char-opt:hover {
+    transform: translateY(-10px) scale(1.1);
+    box-shadow: 0 15px 30px rgba(0,0,0,0.1);
+    z-index: 10; /* 確保縮放時不會被旁邊遮住 */
+}
+
+/* ...你之前的 .char-opt:hover 樣式 ... */
+
+/* [狀態 A] 被選取後的視覺：發光、加框、不透明 */
+.char-opt[style*="var(--p1-color)"] {
+    border: 5px solid var(--p1-color) !important;
+    box-shadow: 0 0 20px var(--p1-color) !important;
+}
+.char-opt[style*="var(--p2-color)"] {
+    border: 5px solid var(--p2-color) !important;
+    box-shadow: 0 0 20px var(--p2-color) !important;
+    opacity: 1 !important; 
+}
+
+/* [狀態 B] 被選取後的動作：hover 時乖乖站好不要亂跳 */
+.char-opt[style*="var(--p1-color)"]:hover,
+.char-opt[style*="var(--p2-color)"]:hover {
+    transform: scale(1.05) translateY(0) !important; 
+}
+        
 #game-container { position: relative; width: 95%; max-width: 1400px; margin: 20px auto; }
 
 #board { 
@@ -260,6 +287,18 @@ body {
     border-left: 5px solid #4299e1;
     font-size: 18px;
     color: #4a5568;
+}
+        
+@media (max-width: 768px) {
+    #character-pool {
+        grid-template-columns: repeat(4, 1fr) !important; /* 手機版改為 4 欄 */
+        max-width: 95%;
+        padding: 20px;
+    }
+    .char-opt {
+        width: 70px;
+        height: 70px;
+    }
 }
     </style>
     
