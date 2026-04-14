@@ -73,7 +73,7 @@ img {
   object-fit: contain; /* 保持比例，完整顯示圖片 */
 }
         
-#game-container { position: relative; z-index: 1 !important; width: 95%; max-width: 1400px; margin: 20px auto; background: transparent !important;}
+#game-container { position: relative; z-index: 10 !important; width: 95%; max-width: 1400px; margin: 20px auto; background: transparent !important;}
 
 #board { 
     display: grid; 
@@ -197,6 +197,7 @@ img {
             gap: 30px; padding: 20px; z-index: 100; 
             box-shadow: 0 -10px 30px rgba(0,0,0,0.05); 
             backdrop-filter: blur(10px);
+            z-index: 5 !important;
         }
 
         #dice-box { font-size: 45px; padding: 10px 25px; background: #edf2f7; border-radius: 15px; min-width: 60px; text-align: center; }
@@ -376,7 +377,7 @@ body:has(#start-screen[style*="display: flex"]) #game-container {
     
 </head>
 <body>
-  <div id="start-screen" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255, 255, 255, 0.2) !important; z-index: 100; display: flex; flex-direction: column; align-items: center; justify-content: center; backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px);">
+  <div id="start-screen" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255, 255, 255, 0.2) !important; z-index: 1000; display: flex; flex-direction: column; align-items: center; justify-content: center; backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px);">
     <h1 style="font-size: 60px; color: #5d4037; font-weight: 900; margin-bottom: 20px;">詞語大作戰</h1>
 
     <div class="selection-container" style="display: flex; align-items: center; gap: 40px; width: 95%; max-width: 1400px; justify-content: center;">
