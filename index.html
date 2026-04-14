@@ -191,21 +191,34 @@ img {
         }
 
        /* 預設狀態：徹底消失，且不准點擊 */
-#controls { 
-    position: fixed; 
-    bottom: 0; 
-    left: 0; 
-    width: 100%; 
-    height: 100px;
-    background: rgba(255, 255, 255, 0.95); 
-    display: none !important; /* 第一道防線：預設完全關閉 */
-    justify-content: center; 
-    align-items: center; 
-    gap: 30px; 
-    padding: 20px; 
-    z-index: 9999;
-    box-shadow: 0 -5px 15px rgba(0,0,0,0.1);
-    backdrop-filter: blur(10px);
+/* 預設絕對隱藏 */
+#controls {
+    position: fixed !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+    height: 120px !important; /* 加高確保看得到 */
+    background: white !important; /* 先用純白，好觀察 */
+    display: none !important; /* 初始隱藏 */
+    justify-content: center !important;
+    align-items: center !important;
+    gap: 30px !important;
+    z-index: 10000 !important; /* 攻頂級層級 */
+    border-top: 3px solid #48bb78 !important; /* 加一條綠邊確認它有出來 */
+}
+
+/* 針對按鈕的暴力樣式 */
+#btn-roll {
+    min-width: 150px !important;
+    min-height: 50px !important;
+    background-color: #48bb78 !important; /* 綠色 */
+    color: white !important;
+    font-size: 20px !important;
+    font-weight: bold !important;
+    border-radius: 10px !important;
+    display: inline-block !important; /* 確保它是區塊 */
+    visibility: visible !important;
+    cursor: pointer !important;
 }
 
 /* 只有當 body 標籤被加上 .game-active 類別時，控制列才會出現 */
@@ -457,9 +470,10 @@ body:has(#start-screen[style*="display: flex"]) #game-container {
     </div>
     
     <div id="controls">
-            <span style="color:var(--p1-color)">P1: <span id="s1">0</span></span> | 
-            <span style="color:var(--p2-color)">P2: <span id="s2">0</span></span>
-        </div>
+    <div id="p1-score">P1: 0</div>
+    <div id="p2-score">P2: 0</div>
+    <button id="btn-roll" onclick="rollDice()">擲骰子</button>
+</div>
         <div id="status" style="font-size: 20px; font-weight: bold;">輪到：<span id="player-turn-name" style="color:var(--p1-color)">玩家 1</span></div>
         <div id="dice-box">🎲</div>
         <button id="btn-roll" onclick="roll()">擲骰子</button>
@@ -567,10 +581,21 @@ function startGame() {
     // 2. 隱藏首頁
     document.getElementById('start-screen').style.display = 'none';
 
-    // 3. 【核心修正】給 body 加上一個標籤，告訴 CSS 遊戲開始了
-    document.body.classList.add('game-active'); 
+    // 3. 核心動作：強行把控制列推上台
+    const ctrl = document.getElementById('controls');
+    if (ctrl) {
+        ctrl.style.setProperty('display', 'flex', 'important');
+    }
 
-    // 4. 音樂邏輯
+    // 4. 強行檢查按鈕是否存在並顯示
+    const rollBtn = document.getElementById('btn-roll');
+    if (rollBtn) {
+        rollBtn.style.setProperty('display', 'inline-block', 'important');
+        console.log("按鈕已強制啟動"); 
+    } else {
+        console.error("找不到 ID 為 btn-roll 的按鈕！請檢查 HTML");
+    }
+
     if (typeof audio !== 'undefined' && audio.bgm.paused) toggleBGM();
 }
     
