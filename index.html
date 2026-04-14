@@ -626,17 +626,47 @@ function playSound(name) {
 }
 
 async function roll() {
+    // 檢查變數鎖定狀態
     if(moving || waitingForClick) return;
-    playSound('dice');
-    document.getElementById('btn-roll').disabled = true;
+
+    // 1. 修正音效呼叫 (改用你之前定義的 audio 物件)
+    try {
+        if (typeof audio !== 'undefined' && audio.dice) {
+            audio.dice.currentTime = 0;
+            audio.dice.play();
+        }
+    } catch (e) { console.log("音效播放失敗，但不影響遊戲"); }
+
+    // 禁用按鈕防止連點
+    const rollBtn = document.getElementById('btn-roll');
+    if (rollBtn) rollBtn.disabled = true;
+
+    const diceBox = document.getElementById('dice-box');
+
+    // 2. 轉動動畫
     for(let i=0; i<8; i++) {
-        dice = Math.floor(Math.random()*6)+1;
-        document.getElementById('dice-box').innerText = dice;
-        await new Promise(r => setTimeout(r, 60));
+        dice = Math.floor(Math.random() * 6) + 1; // 產生 1-6
+        if (diceBox) {
+            diceBox.innerText = dice; // 顯示數字
+            diceBox.style.transform = `scale(${1 + Math.random() * 0.2})`; // 增加震動感
+        }
+        await new Promise(r => setTimeout(r, 80)); // 稍微拉長間隔，動畫更順
     }
+
+    // 3. 動畫結束後的狀態
     waitingForClick = true;
-    document.getElementById('p' + (turn + 1)).classList.add('can-move');
-    document.getElementById('player-turn-name').innerText = "👈 請點擊棋子行走！";
+    
+    // 讓當前玩家的棋子閃爍，提醒玩家點擊
+    const currentPlayerElement = document.getElementById('p' + (turn + 1));
+    if (currentPlayerElement) {
+        currentPlayerElement.classList.add('can-move');
+    }
+
+    // 修改提示文字
+    const turnName = document.getElementById('player-turn-name');
+    if (turnName) {
+        turnName.innerText = (turn === 0 ? "玩家 1" : "玩家 2") + " 👈 請點擊棋子行走！";
+    }
 }
 
 // 字典對應
