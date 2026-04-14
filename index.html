@@ -476,6 +476,7 @@ body:has(#start-screen[style*="display: flex"]) #game-container {
 </div>
         <div id="status" style="font-size: 20px; font-weight: bold;">輪到：<span id="player-turn-name" style="color:var(--p1-color)">玩家 1</span></div>
         <div id="dice-box">🎲</div>
+        <button id="btn-roll" onclick="roll()">擲骰子</button>
     </div>
 
     <div id="modal">
@@ -571,11 +572,6 @@ function startGame() {
     if (!selectedP1 || !selectedP2) {
         alert("兩位玩家都必須選擇角色喔！");
         return;
-    oving = false;
-    waitingForClick = false;
-    
-    console.log("遊戲狀態已重置，準備擲骰子");
-}
     }
 
     // 1. 設定角色圖片
@@ -601,6 +597,7 @@ function startGame() {
     }
 
     if (typeof audio !== 'undefined' && audio.bgm.paused) toggleBGM();
+}
     
 // --- 音效與遊戲邏輯 (保持不變) ---
 const audio = {
