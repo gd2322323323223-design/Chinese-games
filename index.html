@@ -193,11 +193,15 @@ img {
         #controls { 
             position: fixed; bottom: 0; left: 0; width: 100%; 
             background: rgba(255, 255, 255, 0.95); 
-            display: flex; justify-content: center; align-items: center; 
-            gap: 30px; padding: 20px; z-index: 100; 
+            display: none !important; justify-content: center; align-items: center; 
+            gap: 30px; padding: 20px;  
             box-shadow: 0 -10px 30px rgba(0,0,0,0.05); 
             backdrop-filter: blur(10px);
-            z-index: 5 !important;
+            z-index: 100;
+        }
+        body:not(:has(#start-screen:not([style*="display: none"]))) #controls {
+            display: flex !important;
+            z-index: 9999 !important; /* 同時解決你說的：進入遊戲後要浮在最前方 */
         }
 
         #dice-box { font-size: 45px; padding: 10px 25px; background: #edf2f7; border-radius: 15px; min-width: 60px; text-align: center; }
@@ -431,7 +435,6 @@ body:has(#start-screen[style*="display: flex"]) #game-container {
     </div>
     
     <div id="controls">
-        <div style="font-size: 20px; font-weight: bold; color: #4a5568;">
             <span style="color:var(--p1-color)">P1: <span id="s1">0</span></span> | 
             <span style="color:var(--p2-color)">P2: <span id="s2">0</span></span>
         </div>
