@@ -36,7 +36,8 @@ body::before {
 body {
     font-family: "Microsoft JhengHei", sans-serif;
     margin: 0;
-    background-color: transparent !important;   
+    background-color: transparent !important;  
+    background: transparent !important;  
     position: relative;
     overflow-y: scroll;
     padding-bottom: 200px;
@@ -79,7 +80,6 @@ img {
     gap: 140px 15px; 
     padding: 40px 40px 150px 40px; 
     border-radius: 40px; 
-    background-image: url("images/board-bg.png") !important; 
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
@@ -382,8 +382,7 @@ img {
     
 </head>
 <body>
-   <div id="start-screen" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255, 255, 255, 0.2); z-index: 5000; display: flex; flex-direction: column; align-items: center; justify-content: center; backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px);">
-    
+  <div id="start-screen" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255, 255, 255, 0.1) !important; z-index: 5000; display: flex; flex-direction: column; align-items: center; justify-content: center; backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px);">
     <h1 style="font-size: 60px; color: #5d4037; font-weight: 900; margin-bottom: 20px;">詞語大作戰</h1>
 
     <div class="selection-container" style="display: flex; align-items: center; gap: 40px; width: 95%; max-width: 1400px; justify-content: center;">
