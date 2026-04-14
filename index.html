@@ -27,8 +27,8 @@ body::before {
     background-repeat: no-repeat;
     
     /* 這裡控制模糊，只會影響這張圖，不會影響你的棋盤文字 */
-    filter: blur(5px); 
-    -webkit-filter: blur(5px);
+    filter: none !important; 
+    -webkit-filter: none !important;
     z-index: -1;       /* 確保它在最底層 */
 }
 
@@ -371,7 +371,7 @@ img {
     
 </head>
 <body>
-   <div id="start-screen" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255, 255, 255, 0.1) ; z-index: 5000; display: flex; flex-direction: column; align-items: center; justify-content: center; backdrop-filter: blur(4px) ; -webkit-backdrop-filter: blur(15px);">
+   <div id="start-screen" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255, 255, 255, 0.2); z-index: 5000; display: flex; flex-direction: column; align-items: center; justify-content: center; backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px);">
     
     <h1 style="font-size: 60px; color: #5d4037; font-weight: 900; margin-bottom: 20px;">詞語大作戰</h1>
 
