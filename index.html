@@ -289,15 +289,10 @@ body {
     color: #4a5568;
 }
         
-@media (max-width: 768px) {
+@media (max-width: 600px) {
     #character-pool {
-        grid-template-columns: repeat(4, 1fr) !important; /* 手機版改為 4 欄 */
-        max-width: 95%;
-        padding: 20px;
-    }
-    .char-opt {
-        width: 70px;
-        height: 70px;
+        /* 手機版改為 2 欄，避免圖片太小 */
+        grid-template-columns: repeat(2, 110px) !important;
     }
 }
     </style>
@@ -311,7 +306,8 @@ body {
             請 玩家 1 點擊一個角色
         </p>
 
-        <div id="character-pool" style="display: grid; grid-template-columns: repeat(6, 1fr); gap: 20px; max-width: 750px; background: rgba(255, 255, 255, 0.6); backdrop-filter: blur(10px); padding: 40px; border: 2px solid rgba(255, 255, 255, 0.8); border-radius: 40px; box-shadow: 0 2px 50px rgba(0,0,0,0.1);">
+        <div id="character-pool" style="display: grid; grid-template-columns: repeat(4, 110px); gap: 20px; width: fit-content; max-width: 95%; margin: 0 auto; background: rgba(255, 255, 255, 0.6); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); padding: 30px; border: 2px solid rgba(255, 255, 255, 0.8); border-radius: 40px; box-shadow: 0 10px 50px rgba(0,0,0,0.1); justify-items: center;">
+            
             <img src="images/dragon.png" class="char-opt" onclick="selectChar(this, 'images/dragon.png')">
             <img src="images/fish.png" class="char-opt" onclick="selectChar(this, 'images/fish.png')">
             <img src="images/snail.png" class="char-opt" onclick="selectChar(this, 'images/snail.png')">
