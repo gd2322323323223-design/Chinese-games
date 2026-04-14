@@ -64,6 +64,12 @@ body {
 .char-opt[style*="var(--p2-color)"]:hover {
     transform: scale(1.05) translateY(0) !important; 
 }
+
+img {
+  width: 100%;     /* 佔滿容器寬度 */
+  height: 100%;    /* 佔滿容器高度 */
+  object-fit: contain; /* 保持比例，完整顯示圖片 */
+}
         
 #game-container { position: relative; width: 95%; max-width: 1400px; margin: 20px auto; }
 
