@@ -190,21 +190,27 @@ img {
             to { transform: translateY(-20px); }
         }
 
-       #controls { 
+       /* 預設狀態：徹底消失，且不准點擊 */
+#controls { 
     position: fixed; 
     bottom: 0; 
     left: 0; 
     width: 100%; 
-    height: 100px; /* 強制給予高度 */
+    height: 100px;
     background: rgba(255, 255, 255, 0.95); 
-    display: flex !important; /* 確保內容橫向排列 */
-    justify-content: center;   /* 水平置中 */
-    align-items: center;       /* 垂直置中 */
+    display: none !important; /* 第一道防線：預設完全關閉 */
+    justify-content: center; 
+    align-items: center; 
     gap: 30px; 
-    padding: 10px; 
-    z-index: 9999 !important; /* 確保在最前面 */
+    padding: 20px; 
+    z-index: 9999;
     box-shadow: 0 -5px 15px rgba(0,0,0,0.1);
     backdrop-filter: blur(10px);
+}
+
+/* 只有當 body 標籤被加上 .game-active 類別時，控制列才會出現 */
+body.game-active #controls {
+    display: flex !important; /* 遊戲開始後才打開 */
 }
         
         body:not(:has(#start-screen:not([style*="display: none"]))) #controls {
@@ -558,22 +564,15 @@ function startGame() {
     document.getElementById('p1').style.backgroundImage = `url('${selectedP1}')`;
     document.getElementById('p2').style.backgroundImage = `url('${selectedP2}')`;
 
-    // 2. 隱藏首頁 (這會觸發你的 CSS :has 邏輯)
+    // 2. 隱藏首頁
     document.getElementById('start-screen').style.display = 'none';
 
-    // 3. 【關鍵補回】強制讓控制列顯示出來
-    const controls = document.getElementById('controls');
-    if (controls) {
-        controls.style.setProperty('display', 'flex', 'important'); 
-        // 額外確保它在最前面，不會被棋盤擋住
-        controls.style.zIndex = '9999';
-    }
-    
-    // 4. 原本的音樂邏輯
+    // 3. 【核心修正】給 body 加上一個標籤，告訴 CSS 遊戲開始了
+    document.body.classList.add('game-active'); 
+
+    // 4. 音樂邏輯
     if (typeof audio !== 'undefined' && audio.bgm.paused) toggleBGM();
-    document.getElementById('btn-roll').disabled = false;
 }
-    
     
 // --- 音效與遊戲邏輯 (保持不變) ---
 const audio = {
