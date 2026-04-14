@@ -367,6 +367,17 @@ img {
     justify-content: center;
     box-shadow: 0 10px 30px rgba(0,0,0,0.2);
 }
+/* 強制所有可能擋住背景的大層級變透明 */
+#game-container, 
+#start-screen,
+.selection-container {
+    background-color: transparent !important;
+}
+
+/* 如果你希望棋盤還是白的，但要看到森林，就把棋盤設為半透明 */
+#board {
+    background-color: rgba(255, 255, 255, 0.8) !important;
+}
     </style>
     
 </head>
