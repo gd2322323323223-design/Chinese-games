@@ -80,9 +80,20 @@ img {
     gap: 140px 15px; 
     padding: 40px 40px 150px 40px; 
     border-radius: 40px; 
+
+    /* ✨ 這裡改為帶有質感的半透明背板 */
+    /* background: rgba(255, 255, 255, 0.15) !important;  <- 這是極簡白 */
+    background: rgba(255, 248, 225, 0.2) !important; /* 這是淡淡的奶油黃，跟森林更搭 */
+    
+    /* 磨砂玻璃效果：讓背後的森林圖變模糊，格子會非常立體 */
+    backdrop-filter: blur(12px); 
+    -webkit-backdrop-filter: blur(12px);
+
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
+    
+    /* 原有的邊框與陰影設定 */
     border: 12px solid #8d6e63;
     outline: 6px solid #5d4037;
     box-shadow: 
