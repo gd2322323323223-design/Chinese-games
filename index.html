@@ -124,25 +124,52 @@ img {
 
 /* 2. 火箭氣流效果 */
 .boost-cell {
-    background: linear-gradient(to top, #e3fafc, #ffffff) !important;
+   background: linear-gradient(to top, #e3fafc, #ffffff) !important;
     border: 2px solid #339af0 !important;
     position: relative;
-    overflow: hidden;
+    overflow: hidden; /* 確保星星不會飄出格子 */
+    z-index: 1; 
 }
+/* 第一群小星星 */
 .boost-cell::before {
     content: "✨";
     position: absolute;
-    top: 0; left: 0; width: 100%; height: 100%;
-    font-size: 30px; opacity: 0.3;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 25px;
+    opacity: 0;
     animation: boost-float 1.5s infinite;
-    pointer-events: none;
+    pointer-events: none; /* 防止擋住點擊 */
+    z-index: 2; /* 確保在背景之上 */
 }
+
+/* 第二群小星星（稍微偏移，增加層次） */
 .boost-cell::after {
-    content: "✨";
+    content: "🌟";
     position: absolute;
-    bottom: 0; right: 0; width: 100%; height: 100%;
-    font-size: 40px; opacity: 0.2;
-    animation: boost-float 2s infinite;
+    width: 100%;
+    height: 100%;
+    top: 10px;
+    right: 10px;
+    display: flex;
+    justify-content: flex-end;
+    align-items: flex-start;
+    font-size: 15px;
+    opacity: 0;
+    animation: boost-float 2s infinite linear;
+    pointer-events: none;
+    z-index: 2;
+}
+
+@keyframes boost-float {
+    0% { transform: translateY(20px) scale(0.5); opacity: 0; }
+    50% { opacity: 0.8; transform: translateY(0px) scale(1.2); }
+    100% { transform: translateY(-20px) scale(0.5); opacity: 0; }
 }
 /* 補上缺少的動畫劇本 */
 @keyframes boost-float {
