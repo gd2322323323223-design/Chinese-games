@@ -1085,11 +1085,34 @@ async function roll() {
     }
 } // 這裡結束 roll 函式
 
+// --- 1. 確保這段在 init() 之前執行 ---
+const rawWords = Object.keys(customDictionary); // 取得字典所有題目
+let words = [];
+let wordIdx = 0;
+
+// 生成 110 個格子的內容
+for (let i = 0; i < 110; i++) {
+    if (i === 0) {
+        words.push("起點");
+    } else if (traps.includes(i) || boosts.includes(i) || dinosaurs.includes(i)) {
+        words.push(""); // 特殊格子不放文字
+    } else if (wordIdx < rawWords.length) {
+        words.push(rawWords[wordIdx]); // 放題目
+        wordIdx++; 
+    } else {
+        words.push("終點 🏆"); // 題目放完後設為終點
+        break; 
+    }
+}
+
+// --- 2. 你的 init() 函式 (保持基本不變，但確保 words 已存在) ---
 function init() {
     const board = document.getElementById('board');
     if (!board) return;
     board.innerHTML = "";
     let displayIndex = 1; 
+
+    // ✅ 現在執行到這行時，words 已經有資料了，不會報錯
     words.forEach((w, i) => {
         const cell = document.createElement('div');
         cell.className = 'cell';
@@ -1108,7 +1131,6 @@ function init() {
     });
     setTimeout(updateDisplay, 100);
 }
-
 function updateDisplay() {
     players.forEach((p, i) => {
         const cell = document.getElementById('c' + p.pos);
