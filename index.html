@@ -81,19 +81,17 @@ img {
     padding: 40px 40px 150px 40px !important; 
     border-radius: 40px; 
 
-    /* ✨ 關鍵修改 1：實色深泥土棕 (Solid Ground) */
-    background: #5d4037 !important; /* 紮實的深褐色 */
-    
-    /* 🔴 關鍵修改 2：彻底移除朦朧效果 */
+    /* ✨ 關鍵修改：嫩草綠實色背景 */
+    background: #92b45e !important; 
     backdrop-filter: none !important; 
     -webkit-backdrop-filter: none !important;
     
-    /* 邊框維持原本好看的木頭色 */
-    border: 14px solid #3d2b1f; /* 深巧克力木 */
+    /* 邊框改為深一點的森林綠，增加層次 */
+    border: 12px solid #556b2f;
     outline: none; 
     
-    /* 強化陰影，讓實色底板更有重量感 */
-   box-shadow: inset 0 0 80px rgba(0,0,0,0.6), 0 20px 60px rgba(0,0,0,0.4);
+    /* 稍微減輕內陰影，保持明亮感 */
+    box-shadow: inset 0 0 60px rgba(255, 255, 255, 0.2), 0 20px 50px rgba(0,0,0,0.2);
     
     width: 95%;
     max-width: 1400px;
@@ -116,14 +114,14 @@ img {
 
 .cell:not(.trap-cell):not(.boost-cell):not(.dino-cell) {
     /* ✨ 關鍵修改 1：極淡的陽光灰綠 (Pistachio Cream) */
-    background: #f0f4ef !important; /* 近乎白色的淡綠 */
+    background: #fdfaf1 !important; /* 近乎白色的淡綠 */
     
     /* 🟢 關鍵修改 2：文字改回深色 (深森林綠)，確保絕對清晰 */
-    color: #2f4f4f !important; 
+    color: #3d4a22 !important; 
     
     /* 🟢 關鍵修改 3：柔和的邊框與立體陰影 */
-    border: 2px solid #e0eae0 !important;
-    box-shadow: 0 4px 0 #c0d0c0 !important; /* 紮實的立體感 */
+    border: 2px solid #e2e8d5 !important;
+    box-shadow: 0 5px 0 #b5c0a0
     border-radius: 15px;
     transition: all 0.2s ease;
 }
@@ -132,7 +130,7 @@ img {
 .cell:not(.trap-cell):not(.boost-cell):not(.dino-cell):hover {
     background: #ffffff !important;
     transform: translateY(-5px);
-    box-shadow: 0 6px 0 #a0b0a0 !important;
+    box-shadow: 0 8px 0 #9ba67e !important;
 }
 
 /* 鼠標移上去時的連動效果 */
@@ -373,12 +371,12 @@ img {
     right: -5px;
     height: var(--road-height);
 
-    /* ✨ 關鍵修改：紮實的暖沙色 (Desert Sand) */
-    background: #e3c4a8 !important; 
-    background-image: none !important; /* 保持實色 */
+    /* ✨ 關鍵修改：明亮的暖土黃色 */
+    background: #e9d19a !important; 
+    background-image: none !important;
     
-    /* 立體厚度邊框 */
-    border-bottom: 8px solid #c9a07a; 
+    /* 邊框厚度 */
+    border-bottom: 8px solid #c2ac78; 
     z-index: 1;
     border-radius: 12px;
     box-shadow: 0 4px 10px rgba(0,0,0,0.1);
