@@ -151,20 +151,33 @@ img {
 
 /* --- 3. 恐龍格：叢林冒險版 --- */
 
+/* --- 3. 恐龍格：危險禁區版 --- */
+
 .dino-cell {
-    /* 深綠色叢林漸層背景 */
-    background: linear-gradient(135deg, #1b4332 0%, #2d6a4f 100%) !important;
-    border: 3px solid #74c365 !important;
+    /* ✨ 核心修改：土黃色荒野背景，並加上邊緣的黃黑警告斜紋 */
+    background: #795548 !important; /* 深土色背景 */
+    background-image: 
+        linear-gradient(45deg, #f1c40f 25%, transparent 25%, transparent 50%, #f1c40f 50%, #f1c40f 75%, transparent 75%, transparent) !important;
+    background-size: 20px 20px !important; /* 斜紋大小 */
+    border: 4px solid #000 !important; /* 粗黑邊框 */
     position: relative;
     overflow: hidden;
     z-index: 1;
-    box-shadow: inset 0 0 15px rgba(0,0,0,0.5);
+    box-shadow: inset 0 0 20px rgba(0,0,0,0.8);
+}
+
+/* 在斜紋之上蓋一層半透明底色，讓格子中心比較好讀 */
+.dino-cell::after {
+    content: "";
+    position: absolute;
+    top: 5px; left: 5px; right: 5px; bottom: 5px;
+    background: rgba(8d, 6e, 63, 0.9); /* 遮蓋掉中間的斜紋，只留邊緣 */
+    z-index: -1;
+    border-radius: 5px;
 }
 
 /* 移除道路偽元素防止干擾 */
-.dino-cell::before,
-.dino-cell::after {
-    content: none !important;
+.dino-cell::before {
     display: none !important;
 }
 
@@ -172,21 +185,25 @@ img {
 .dino-cell .event-icon {
     font-size: 55px !important;
     display: inline-block;
-    filter: drop-shadow(2px 4px 8px rgba(0,0,0,0.4));
+    filter: drop-shadow(0 0 10px rgba(255, 0, 0, 0.5)); /* 紅色發光，增加危險感 */
     
-    /* ✅ 讓恐龍自己動起來：呼吸般的上下浮動 */
-    animation: dino-breath 2s infinite ease-in-out;
+    /* ✅ 讓恐龍每隔 3 秒咆哮（震動）一次 */
+    animation: dino-roar-period 3s infinite;
 }
 
-/* 恐龍呼吸動畫 */
-@keyframes dino-breath {
-    0%, 100% { transform: translateY(0) scale(1); }
-    50% { transform: translateY(-5px) scale(1.05); }
+/* 週期性咆哮動畫 */
+@keyframes dino-roar-period {
+    0%, 80%, 100% { transform: scale(1) rotate(0deg); }
+    85% { transform: scale(1.1) translate(2px, -2px) rotate(2deg); }
+    90% { transform: scale(1.1) translate(-2px, 2px) rotate(-2deg); }
+    95% { transform: scale(1.1) translate(2px, 2px) rotate(2deg); }
 }
 
-/* 鼠標移過去時的效果強化 */
-.dino-cell:hover .event-icon {
-    animation: dino-roar 0.3s infinite; /* 移過去會變成生氣的震動 */
+/* 鼠標移過去時的效果：邊框發紅光 */
+.dino-cell:hover {
+    border-color: #e74c3c !important;
+    box-shadow: inset 0 0 30px rgba(231, 76, 60, 0.5);
+    transition: 0.3s;
 }
 
 @keyframes dino-roar {
