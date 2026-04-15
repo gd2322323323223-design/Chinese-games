@@ -553,14 +553,26 @@ function selectChar(element, imgPath) {
 // ✅ 重設選擇函數
 function resetSelection(playerNum) {
     if (playerNum === 1) {
+        // 只有在 P1 已經選了棋子的情況下，點擊才觸發重選
+        if (selectedP1 === "") return; 
+        
         selectedP1 = "";
-        currentSelectingPlayer = 1;
-        document.getElementById('p1-big-preview').innerHTML = `<span style="color: white; font-weight: bold;">P1 棋子</span>`;
+        currentSelectingPlayer = 1; // 權限交回給 P1
+        const p1Preview = document.getElementById('p1-big-preview');
+        if(p1Preview) {
+            p1Preview.innerHTML = `<span style="color: white; font-weight: bold;">顯示 P1 棋子圖片</span>`;
+        }
         updateHint("請 玩家 1 重新選擇角色", "var(--p1-color)");
     } else {
+        // 只有在 P2 已經選了棋子的情況下，點擊才觸發重選
+        if (selectedP2 === "") return; 
+
         selectedP2 = "";
-        currentSelectingPlayer = 2;
-        document.getElementById('p2-big-preview').innerHTML = `<span style="color: white; font-weight: bold;">P2 棋子</span>`;
+        currentSelectingPlayer = 2; // 權限交回給 P2
+        const p2Preview = document.getElementById('p2-big-preview');
+        if(p2Preview) {
+            p2Preview.innerHTML = `<span style="color: white; font-weight: bold;">顯示 P2 棋子圖片</span>`;
+        }
         updateHint("請 玩家 2 重新選擇角色", "var(--p2-color)");
     }
     updateHighlight();
