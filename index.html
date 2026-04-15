@@ -434,6 +434,64 @@ body.game-active #controls {
 body:has(#start-screen[style*="display: flex"]) #game-container {
     opacity: 0; /* 或者用 visibility: hidden */
 }
+
+/* 呼吸燈動畫 */
+@keyframes breathing-p1 {
+    0% { box-shadow: 0 0 5px var(--p1-color); }
+    100% { box-shadow: 0 0 25px var(--p1-color), 0 0 10px var(--p1-color); }
+}
+@keyframes breathing-p2 {
+    0% { box-shadow: 0 0 5px var(--p2-color); }
+    100% { box-shadow: 0 0 25px var(--p2-color), 0 0 10px var(--p2-color); }
+}
+
+/* 棋子懸停時的跳動旋轉 */
+.char-opt:hover {
+    transform: translateY(-15px) rotate(8deg) scale(1.2) !important;
+    filter: brightness(1.1);
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    z-index: 10;
+}
+
+/* 選定後的「砰」動畫 */
+@keyframes pop-in {
+    0% { transform: scale(0); opacity: 0; }
+    80% { transform: scale(1.2); }
+    100% { transform: scale(1); opacity: 1; }
+}
+.pop-effect {
+    animation: pop-in 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+/* --- 角色選中後的發光與呼吸動畫 --- */
+
+/* 當玩家 1 選中時 */
+.char-opt.selected-p1 {
+    outline: 5px solid var(--p1-color) !important;
+    outline-offset: -5px;
+    animation: breathing-p1 0.8s infinite alternate !important;
+    z-index: 5;
+    transform: scale(1.1); /* 選中時稍微放大 */
+}
+
+/* 當玩家 2 選中時 */
+.char-opt.selected-p2 {
+    outline: 5px solid var(--p2-color) !important;
+    outline-offset: -5px;
+    animation: breathing-p2 0.8s infinite alternate !important;
+    z-index: 5;
+    transform: scale(1.1);
+}
+
+/* 定義呼吸燈動畫劇本 */
+@keyframes breathing-p1 {
+    0% { box-shadow: 0 0 5px var(--p1-color); }
+    100% { box-shadow: 0 0 25px var(--p1-color), 0 0 10px var(--p1-color); }
+}
+
+@keyframes breathing-p2 {
+    0% { box-shadow: 0 0 5px var(--p2-color); }
+    100% { box-shadow: 0 0 25px var(--p2-color), 0 0 10px var(--p2-color); }
+}
     </style>
     
 </head>
@@ -529,8 +587,7 @@ const traps = [1, 16, 39, 48, 61, 76, 96];
 const boosts = [8, 20, 32, 51, 68, 80, 90];
 const dinosaurs = [5, 12, 27, 43, 55, 70, 86, 103]; 
 
-// 修正後的選擇角色函式
-// ✅ 這是修正後的 selectChar，確保函數獨立且括號正確
+// ✅ 修正後的 selectChar 函數（唯一版本，請勿重複嵌套）
 function selectChar(element, imgPath) {
     // 1. 如果點選的是已經選好的角色，就取消它 (觸發重設)
     if (currentSelectingPlayer === 1 && selectedP1 === imgPath) {
@@ -542,49 +599,62 @@ function selectChar(element, imgPath) {
         return;
     }
 
-    // 2. 防止兩人選到同一個
+    // 2. 防止兩人選到同一個角色
     if (imgPath === selectedP1 || imgPath === selectedP2) {
         alert("這個角色已經被選走囉！");
         return;
     }
 
-    // 3. 處理選擇邏輯
+    // 3. 處理選擇邏輯 (這部分整合了美化特效)
     if (currentSelectingPlayer === 1) {
         selectedP1 = imgPath;
         const p1Preview = document.getElementById('p1-big-preview');
         if(p1Preview) {
-            p1Preview.innerHTML = `<img src="${imgPath}" style="width: 85%; height: 85%; object-fit: contain;">`;
+            // ✅ 加入藍色漸層底色與「砰」動畫 (pop-effect)
+            p1Preview.style.background = "linear-gradient(135deg, rgba(49, 130, 206, 0.4), rgba(255, 255, 255, 0.3))";
+            p1Preview.innerHTML = `<img src="${imgPath}" class="pop-effect" style="width: 85%; height: 85%; object-fit: contain;">`;
         }
-        currentSelectingPlayer = 2; // 選完 P1 自動切換到 P2
+        currentSelectingPlayer = 2; // 自動換成 P2 選
         updateHint("請 玩家 2 選擇一個角色", "var(--p2-color)");
     } else {
         selectedP2 = imgPath;
         const p2Preview = document.getElementById('p2-big-preview');
         if(p2Preview) {
-            p2Preview.innerHTML = `<img src="${imgPath}" style="width: 85%; height: 85%; object-fit: contain;">`;
+            // ✅ 加入粉色漸層底色與「砰」動畫 (pop-effect)
+            p2Preview.style.background = "linear-gradient(135deg, rgba(213, 63, 140, 0.4), rgba(255, 255, 255, 0.3))";
+            p2Preview.innerHTML = `<img src="${imgPath}" class="pop-effect" style="width: 85%; height: 85%; object-fit: contain;">`;
+            
+            // 只有選好後才讓 P2 方框可以點擊重選
+            p2Preview.onclick = function() { resetSelection(2); };
+            p2Preview.style.cursor = "pointer";
         }
         updateHint("選擇完成！可以點擊下方按鈕開始遊戲。", "#48bb78");
     }
-    
-    updateHighlight(); // 更新下方棋子池的發光外框
+
+    // 4. 更新下方角色池的發光動畫 (呼吸燈)
+    updateHighlight();
 }
 
-// ✅ 這是重設選擇的函數
 function resetSelection(playerNum) {
     if (playerNum === 1) {
         selectedP1 = "";
-        currentSelectingPlayer = 1; // 權限交回給 P1
+        currentSelectingPlayer = 1;
         const p1Preview = document.getElementById('p1-big-preview');
         if(p1Preview) {
+            p1Preview.style.background = "rgba(255, 255, 255, 0.3)"; 
             p1Preview.innerHTML = `<span style="color: white; font-weight: bold;">顯示 P1 棋子圖片</span>`;
         }
         updateHint("請 玩家 1 重新選擇角色", "var(--p1-color)");
     } else {
         selectedP2 = "";
-        currentSelectingPlayer = 2; // 權限交回給 P2
+        currentSelectingPlayer = 2;
         const p2Preview = document.getElementById('p2-big-preview');
         if(p2Preview) {
+            p2Preview.style.background = "rgba(255, 255, 255, 0.3)"; 
             p2Preview.innerHTML = `<span style="color: white; font-weight: bold;">顯示 P2 棋子圖片</span>`;
+            // ✅ 重置時關閉點擊功能
+            p2Preview.onclick = null;
+            p2Preview.style.cursor = "default";
         }
         updateHint("請 玩家 2 重新選擇角色", "var(--p2-color)");
     }
@@ -603,25 +673,25 @@ function updateHint(text, color) {
         updateHighlight();
     }
 
-// 更新視覺反饋
+// 更新視覺反饋：透過切換 Class 來觸發 CSS 動畫
 function updateHighlight() {
     const opts = document.querySelectorAll('.char-opt');
     opts.forEach(opt => {
         const path = opt.getAttribute('src');
-        opt.style.outline = "none";
-        opt.style.boxShadow = "none";
-        opt.style.opacity = "1";
+        
+        // 1. 先移除所有選中狀態的 Class 和樣式重置
+        opt.classList.remove('selected-p1', 'selected-p2');
+        opt.style.opacity = "1"; 
+        opt.style.animation = "none"; // 清除舊動畫
+        opt.style.outline = "none";   // 清除舊框線
 
+        // 2. 根據目前選擇的角色，重新加上對應的 Class
         if (path === selectedP1) {
-            opt.style.outline = "5px solid var(--p1-color)";
-            opt.style.outlineOffset = "-5px";
-            opt.style.boxShadow = "0 0 20px var(--p1-color)";
+            opt.classList.add('selected-p1');
         } 
         if (path === selectedP2) {
-            opt.style.outline = "5px solid var(--p2-color)";
-            opt.style.outlineOffset = "-5px";
-            opt.style.boxShadow = "0 0 20px var(--p2-color)";
-            opt.style.opacity = "0.7";
+            opt.classList.add('selected-p2');
+            opt.style.opacity = "0.6"; // 玩家 2 選中的角色稍微變暗，表示已被選走
         }
     });
 }
@@ -751,10 +821,12 @@ function init() {
         cell.className = 'cell';
         cell.id = 'c' + i;
         if (i === words.length - 1) cell.classList.add('goal-cell');
+        
         let iconText = "";
-        if(traps.includes(i)) iconText = "🍌";
-        else if(boosts.includes(i)) iconText = "🚀";
-        else if(dinosaurs.includes(i)) iconText = "🦖";
+        if(traps.includes(i)) { iconText = "🍌"; cell.classList.add('trap-cell'); }
+        else if(boosts.includes(i)) { iconText = "🚀"; cell.classList.add('boost-cell'); }
+        else if(dinosaurs.includes(i)) { iconText = "🦖"; cell.classList.add('dino-cell'); }
+        
         let numberHtml = (!i || i === words.length-1 || iconText) ? "" : `<span class="cell-index">${displayIndex++}</span>`;
         cell.innerHTML = `${numberHtml}${i === words.length - 1 ? `<div class="event-icon" style="font-size: 80px;">🏆</div><div class="cell-text">終點</div>` : (w !== "" ? `<div class="cell-text">${w}</div><span class="event-icon" style="position: absolute; bottom: 5px; right: 8px; font-size: 24px;">${iconText}</span>` : `<div class="event-icon" style="font-size: 50px;">${iconText}</div>`) }`;
         board.appendChild(cell);
