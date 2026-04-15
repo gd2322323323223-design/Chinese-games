@@ -679,56 +679,53 @@ body:has(#start-screen[style*="display: flex"]) #game-container {
     100% { box-shadow: 0 0 25px var(--p2-color), 0 0 10px var(--p2-color); }
 }
 
-/* --- 特殊格子下移：取代馬路位置 --- */
-
-/* --- 特殊格子下移：地圖元素延伸版 --- */
+/* --- 特殊格子下移：地圖元素延伸版 (最終確認) --- */
 
 .trap-cell, .boost-cell, .dino-cell {
     transform: translateY(110px) !important;
     z-index: 100 !important; 
     position: relative;
-    overflow: visible !important; 
+    overflow: visible !important; /* 必須為 visible 才能看到上方的 Emoji */
 }
 
-/* 移除馬路偽元素 */
+/* 僅移除馬路用的 ::after，因為 ::before 現在要拿來放裝飾圖標 */
 .trap-cell::after, .boost-cell::after, .dino-cell::after {
     display: none !important;
 }
 
-/* 1. 定義上方位置的通用樣式 */
+/* 1. 定義上方位置的裝飾樣式 */
 .trap-cell::before, 
 .boost-cell::before, 
 .dino-cell::before {
+    content: ""; /* 初始為空，後面各別指定 */
     position: absolute;
-    top: -110px; /* 回到原本文字格的位置 */
+    top: -110px; 
     left: 0;
     width: 100%;
     height: 100%;
-    display: flex;
+    /* 強制顯示，蓋過之前的 none */
+    display: flex !important; 
     justify-content: center;
     align-items: center;
-    font-size: 40px; /* 圖標大小 */
+    font-size: 40px; 
     z-index: -1;
     transition: all 0.3s ease;
+    pointer-events: none; /* 讓滑鼠點擊可以穿過 Emoji 點到下方的格線 */
 }
 
-/* 2. 針對不同格子放入專屬裝飾 */
-
-/* 香蕉格上方：放一個警告標誌，提醒這裡有陷阱 */
+/* 2. 針對不同格子放入專屬 Emoji */
 .trap-cell::before {
     content: "⚠️" !important;
     filter: drop-shadow(0 0 10px rgba(241, 196, 15, 0.5));
 }
 
-/* 火箭格上方：放一個星光或推進器火花，延續外太空感 */
 .boost-cell::before {
-    content: "🌌" !important; /* 或者用 ☄️ (流星) */
+    content: "🌌" !important;
     font-size: 45px;
     filter: drop-shadow(0 0 10px rgba(99, 179, 237, 0.6));
     opacity: 0.7;
 }
 
-/* 恐龍格上方：放一個骨頭或驚悚標誌，增加禁區感 */
 .dino-cell::before {
     content: "☠️" !important;
     font-size: 35px;
@@ -736,7 +733,7 @@ body:has(#start-screen[style*="display: flex"]) #game-container {
     opacity: 0.8;
 }
 
-/* 3. 互動效果：鼠標移上去時，上方的圖標會跳動 */
+/* 3. 互動：鼠標移到下方格子，上方圖標會放大跳動 */
 .trap-cell:hover::before, .boost-cell:hover::before, .dino-cell:hover::before {
     transform: scale(1.2) translateY(-5px);
     opacity: 1;
