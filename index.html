@@ -404,21 +404,17 @@ body.game-active #controls {
     /* 1. 設定半透明背景色 (白色，透明度 0.3) */
     background: rgba(255, 255, 255, 0.3) !important; 
     
-    /* 2. 這是核心：開啟背景模糊效果，數值越大越朦朧 */
-    backdrop-filter: blur(15px) !important;
-    -webkit-backdrop-filter: blur(15px); /* 針對 Safari 瀏覽器的相容性 */
-    
-    /* 3. 調整邊框，讓它看起來更精緻 */
+    /* 2. 調整邊框，讓它看起來更精緻 */
     border: 2px solid rgba(255, 255, 255, 0.5) !important;
     border-radius: 30px; /* 圓角稍微調大一點，看起來更柔和 */
     
-    /* 4. 其他保持不變的排版設定 */
+    /* 3. 其他保持不變的排版設定 */
     display: flex;
     align-items: center;
     justify-content: center;
     overflow: hidden; /* 確保選中的圖片不會超出圓角 */
     
-    /* 5. 調整陰影，讓它更輕盈 */
+    /* 4. 調整陰影，讓它更輕盈 */
     box-shadow: 0 15px 35px rgba(0,0,0,0.1) !important;
 }
 
@@ -435,7 +431,7 @@ body:has(#start-screen[style*="display: flex"]) #game-container {
     
 </head>
 <body>
-  <div id="start-screen" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255, 255, 255, 0.2) !important; z-index: 1000; display: flex; flex-direction: column; align-items: center; justify-content: center; backdrop-filter: none; -webkit-backdrop-filter: none;">
+  <div id="start-screen" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255, 255, 255, 0.2) !important; z-index: 1000; display: flex; flex-direction: column; align-items: center; justify-content: center;">
     <h1 style="font-size: 60px; color: #5d4037; font-weight: 900; margin-bottom: 20px;">詞語大作戰</h1>
 
     <div class="selection-container" style="display: flex; align-items: center; gap: 40px; width: 95%; max-width: 1400px; justify-content: center;">
