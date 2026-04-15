@@ -125,35 +125,25 @@ img {
 /* --- 2. 火箭格：靜態純淨版 --- */
 
 .boost-cell {
-    /* 1. 保留藍黑夜空背景 */
-    background: linear-gradient(180deg, #0b1e3b 0%, #1a365d 100%) !important;
+    /* ✨ 核心修改：在夜空漸層之上，疊加三組不同位置的小白點 (星光) */
+    background: 
+        radial-gradient(1px 1px at 20% 30%, white, rgba(255,255,255,0)),
+        radial-gradient(1.5px 1.5px at 70% 20%, white, rgba(255,255,255,0)),
+        radial-gradient(1px 1px at 40% 70%, white, rgba(255,255,255,0)),
+        radial-gradient(1.2px 1.2px at 80% 80%, white, rgba(255,255,255,0)),
+        linear-gradient(180deg, #0b1e3b 0%, #1a365d 100%) !important;
+    
     border: 3px solid #63b3ed !important;
     position: relative;
-    
-    /* 2. 取消所有動態與溢出裁剪 */
-    animation: none !important;
     overflow: visible !important; 
     z-index: 1;
+    box-shadow: 0 0 10px rgba(99, 179, 237, 0.3); /* 淡淡的藍色氛圍光 */
 }
 
-/* 移除所有星星動態與偽元素 */
+/* 確保完全取消所有偽元素，防止陰影重疊 */
 .boost-cell::before,
 .boost-cell::after {
     content: none !important;
-    animation: none !important;
-    display: none !important;
-}
-
-/* 確保格子內的圖標（🚀）是靜止的 */
-.boost-cell .event-icon {
-    animation: none !important;
-    transform: none !important;
-}
-
-/* 額外修正：解決你截圖中那個「半透明黑區」的問題 */
-/* 這通常是通用道路樣式溢出造成的，我們強制在火箭格關閉它 */
-.boost-cell::after, 
-.boost-cell::before {
     display: none !important;
 }
 
