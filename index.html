@@ -161,12 +161,12 @@ img {
     /* 移過去時香蕉會快速旋轉，表示陷阱觸發 */
     animation: rotate-trap 0.5s infinite linear;
 }
-/* --- 2. 火箭格：靜態純淨版 --- */
+/* --- 2. 火箭格：星際穿越版 --- */
 
 .boost-cell {
-    /* ✨ 核心修改：在夜空漸層之上，疊加三組不同位置的小白點 (星光) */
+    /* ✨ 保留你最愛的 6 光點背景 */
     background: 
-       radial-gradient(1.2px 1.2px at 15% 20%, white, rgba(255,255,255,0)),
+        radial-gradient(1.2px 1.2px at 15% 20%, white, rgba(255,255,255,0)),
         radial-gradient(1.5px 1.5px at 80% 15%, white, rgba(255,255,255,0)),
         radial-gradient(1px 1px at 50% 40%, white, rgba(255,255,255,0)),
         radial-gradient(1.3px 1.3px at 25% 75%, white, rgba(255,255,255,0)),
@@ -176,16 +176,59 @@ img {
     
     border: 3px solid #63b3ed !important;
     position: relative;
-    overflow: visible !important; 
-    z-index: 1;
-    box-shadow: 0 0 10px rgba(99, 179, 237, 0.3); /* 淡淡的藍色氛圍光 */
+    overflow: hidden !important; /* 為了讓流星效果不超出格線 */
+    z-index: 10;
+    box-shadow: 0 0 15px rgba(99, 179, 237, 0.4), inset 0 0 10px rgba(0,0,0,0.5);
+    transition: all 0.5s ease;
 }
 
-/* 確保完全取消所有偽元素，防止陰影重疊 */
-.boost-cell::before,
-.boost-cell::after {
-    content: none !important;
+/* 移除通用道路偽元素 */
+.boost-cell::after, 
+.boost-cell::before {
     display: none !important;
+    content: none !important;
+}
+
+/* 火箭圖示設定 */
+.boost-cell .event-icon {
+    font-size: 50px !important;
+    display: inline-block;
+    filter: drop-shadow(0 0 8px rgba(66, 153, 225, 0.8));
+    position: relative;
+    z-index: 5;
+    
+    /* ✅ 常駐動態：火箭引擎的微小震動感 */
+    animation: rocket-engine 0.2s infinite alternate;
+}
+
+/* 火箭引擎震動動畫 */
+@keyframes rocket-engine {
+    from { transform: translate(0, 0) rotate(-2deg); }
+    to { transform: translate(1px, 1px) rotate(2deg); }
+}
+
+/* 鼠標移過去：啟動「超空間跳躍」效果 */
+.boost-cell:hover {
+    /* 背景光點拉長變成流星線條 */
+    background: 
+        linear-gradient(90deg, transparent, #fff, transparent) 10% 20% / 20px 1px no-repeat,
+        linear-gradient(90deg, transparent, #fff, transparent) 80% 15% / 30px 1px no-repeat,
+        linear-gradient(90deg, transparent, #fff, transparent) 40% 70% / 25px 1px no-repeat,
+        linear-gradient(180deg, #0b1e3b 0%, #2c5282 100%) !important;
+    
+    box-shadow: 0 0 25px rgba(66, 153, 225, 0.8);
+    transform: scale(1.05);
+}
+
+.boost-cell:hover .event-icon {
+    /* 移過去時火箭向右上方衝刺出去 */
+    animation: rocket-launch 0.5s infinite ease-in-out;
+}
+
+@keyframes rocket-launch {
+    0% { transform: translate(0, 0) scale(1); }
+    50% { transform: translate(5px, -5px) scale(1.1); }
+    100% { transform: translate(0, 0) scale(1); }
 }
 
 /* --- 3. 恐龍格：原始禁區綜合版 (方案A氛圍 + 方案B邊框) --- */
