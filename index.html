@@ -1202,23 +1202,35 @@ function closeModal(addScore = true) {
 
 function finishTurn() {
     turn = (turn === 0) ? 1 : 0;
-    document.getElementById('player-turn-name').innerText = "玩家 " + (turn + 1);
-    document.getElementById('player-turn-name').style.color = (turn === 0) ? "var(--p1-color)" : "var(--p2-color)";
-    document.getElementById('btn-roll').disabled = false;
+    const turnName = document.getElementById('player-turn-name');
+    if (turnName) {
+        turnName.innerText = "玩家 " + (turn + 1);
+        turnName.style.color = (turn === 0) ? "var(--p1-color)" : "var(--p2-color)";
+    }
+    const rollBtn = document.getElementById('btn-roll');
+    if (rollBtn) rollBtn.disabled = false;
 }
 
-// 使用事件監聽，確保只有「真人點擊」才會觸發
-document.querySelectorAll('.speak-trigger').forEach(el => {
-    el.addEventListener('click', function() {
-        speak(true);
+// ✅ 核心修正：將所有「點擊監聽器」放在 window.onload 確保元素已載入
+window.onload = function() {
+    // 1. 執行棋盤初始化
+    init();
+
+    // 2. 綁定「真人點擊」監聽器 (解決自動朗讀問題)
+    // 只要元素有 class="speak-trigger" 或是指定的 ID 都會生效
+    document.addEventListener('click', function(e) {
+        const target = e.target;
+        
+        // 檢查是否點擊了詞語文字或讀音按鈕
+        if (target && (
+            target.id === 'modal-text' || 
+            target.classList.contains('speak-trigger') || 
+            target.innerText.includes('🔊')
+        )) {
+            speak(true); // 只有這裡傳入 true，語音才會發聲
+        }
     });
-});
-
-// 在開啟 Modal 時，先強制停止所有之前的語音，防止殘留
-function showModal() {
-    window.speechSynthesis.cancel(); // 加上這一行，清空語音隊列
-
-window.onload = init;
+};
 </script>
 </body>
 </html>
