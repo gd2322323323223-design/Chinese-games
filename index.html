@@ -108,59 +108,58 @@ img {
         }
 /* --- 針對你目前結構的相容版 CSS --- */
 
-/* --- 1. 香蕉格：惡作劇陷阱版 --- */
+/* --- 1. 香蕉格：修正空轉動態版 --- */
 
 .trap-cell {
-    /* ✨ 亮黃到橘色的放射漸層，像是在發光的陷阱 */
     background: radial-gradient(circle, #fff3bf 0%, #fab005 100%) !important;
-    
-    /* ✨ 使用深褐色虛線邊框，像是在地圖上畫出的標記圈 */
     border: 3px dashed #873800 !important;
-    
     position: relative;
     overflow: visible !important; 
     z-index: 10;
     box-shadow: inset 0 0 15px rgba(0,0,0,0.2);
 }
 
-/* 移除通用道路偽元素防止干擾 */
+/* 確保馬路被關閉 */
 .trap-cell::after, 
 .trap-cell::before {
     display: none !important;
-    content: none !important;
 }
 
-/* 香蕉皮圖示設定 */
+/* 香蕉圖示：平時的搖擺動態 */
 .trap-cell .event-icon {
     font-size: 50px !important;
     display: inline-block;
     filter: drop-shadow(2px 4px 6px rgba(0,0,0,0.2));
-    position: relative;
-    z-index: 5;
-    
-    /* ✅ 動態：結合旋轉與搖擺，看起來更欠揍 */
-    animation: banana-wiggle 2s infinite ease-in-out;
+    /* ✅ 這裡改用 animation 複合寫法，確保初次載入會動 */
+    animation: banana-wiggle 2s infinite ease-in-out; 
 }
 
-/* 香蕉搖擺動畫：旋轉的同時左右晃動 */
+/* 鼠標移上去時：強制更換動畫為快速空轉 */
+.trap-cell:hover .event-icon {
+    /* 0.3s 表示轉一圈只要 0.3 秒，非常快 */
+    animation: rotate-trap 0.3s infinite linear !important; 
+}
+
+/* --- 這裡是最重要的兩個動畫劇本 --- */
+
+/* 1. 平時的搖擺 (Wiggle) */
 @keyframes banana-wiggle {
     0%, 100% { transform: rotate(0deg) scale(1); }
-    25% { transform: rotate(-15deg) scale(1.1); }
-    50% { transform: rotate(0deg) scale(1.2); }
-    75% { transform: rotate(15deg) scale(1.1); }
+    50% { transform: rotate(15deg) scale(1.1); }
 }
 
-/* 鼠標移過去時的效果：背景變紅，警告感增加 */
+/* 2. 觸發時的快速空轉 (Spin) - 確保這段在 CSS 裡 */
+@keyframes rotate-trap {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+/* 鼠標移過去的背景變化 */
 .trap-cell:hover {
     background: radial-gradient(circle, #fff3bf 0%, #e67e22 100%) !important;
-    border-style: solid !important; /* 虛線變實線 */
-    transition: 0.3s;
+    border-style: solid !important;
 }
-
-.trap-cell:hover .event-icon {
-    /* 移過去時香蕉會快速旋轉，表示陷阱觸發 */
-    animation: rotate-trap 0.5s infinite linear;
-}
+        
 /* --- 2. 火箭格：星際穿越版 --- */
 
 .boost-cell {
