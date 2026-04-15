@@ -683,42 +683,58 @@ body:has(#start-screen[style*="display: flex"]) #game-container {
 
 /* --- 建議 C：透明玻璃棧道版 --- */
 
+/* --- 🛠️ 特殊格結構重組：玻璃棧道方案 --- */
+
 .trap-cell, .boost-cell, .dino-cell {
+    /* 1. 下移本體（特殊圖案層） */
     transform: translateY(110px) !important;
-    z-index: 100 !important; 
+    z-index: 10 !important; 
     position: relative;
-    overflow: visible !important; 
+    overflow: visible !important; /* 關鍵：允許裝飾物向上延伸 */
+    background-image: none !important; /* 移除原本可能的馬路背景 */
 }
 
-/* 1. 設定上方「玻璃平台」 */
-.trap-cell::before, 
-.boost-cell::before, 
-.dino-cell::before {
+/* 2. 徹底關閉本體自帶的偽元素，避免馬路干擾 */
+.trap-cell::before, .trap-cell::after,
+.boost-cell::before, .boost-cell::after,
+.dino-cell::before, .dino-cell::after {
+    display: none !important;
+}
+
+/* 3. 使用 JavaScript 產生的 event-icon 之兄弟元素或利用額外層級 */
+/* 為了保險起見，我們直接在格子物件上掛載一個「浮空棧道」 */
+/* 這裡改用一個絕對定位的 div 模擬，但在 CSS 裡我們用 :parent 的邏輯 */
+
+.trap-cell::before, .boost-cell::before, .dino-cell::before {
+    /* 強制重新開啟 ::before 作為玻璃層 */
+    display: flex !important; 
     content: "" !important;
     position: absolute;
-    top: -110px; 
+    top: -110px; /* 移回上方空缺處 */
     left: 0;
     width: 100%;
     height: 100%;
     
-    /* 玻璃質感：半透明背景 + 模糊效果 */
-    background: rgba(255, 255, 255, 0.1) !important;
-    backdrop-filter: blur(2px); /* 讓底下的背景微微模糊 */
+    /* ✨ 玻璃質感設定 */
+    background: rgba(255, 255, 255, 0.15) !important;
+    backdrop-filter: blur(4px); /* 磨砂玻璃效果 */
+    border: 2px solid rgba(255, 255, 255, 0.4) !important;
+    border-radius: 15px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1), inset 0 0 10px rgba(255,255,255,0.2);
     
-    /* 玻璃邊框與內陰影 */
-    border: 1px solid rgba(255, 255, 255, 0.3) !important;
-    box-shadow: inset 0 0 10px rgba(255, 255, 255, 0.2);
-    
-    border-radius: 12px;
-    z-index: -1;
-    display: block !important;
+    z-index: 20 !important; /* 確保在馬路之上，棋子之下 */
     pointer-events: none;
 }
 
-/* 2. 在玻璃四角加上「固定螺絲」的小點 */
+/* 4. 為不同事件的玻璃棧道加上微弱的光邊 */
+.trap-cell::before { border-color: rgba(241, 196, 15, 0.5) !important; }
+.boost-cell::before { border-color: rgba(99, 179, 237, 0.5) !important; }
+.dino-cell::before { border-color: rgba(231, 76, 60, 0.5) !important; }
+
+/* 5. 裝飾：在玻璃上加一點「能量節點」點綴，更有科幻感 */
 .trap-cell::after, .boost-cell::after, .dino-cell::after {
-    content: "•   •\n\n•   •" !important;
-    white-space: pre;
+    display: block !important;
+    content: "◦" !important;
     position: absolute;
     top: -110px;
     left: 0;
@@ -727,17 +743,10 @@ body:has(#start-screen[style*="display: flex"]) #game-container {
     display: flex !important;
     justify-content: center;
     align-items: center;
-    color: rgba(255, 255, 255, 0.5);
-    font-size: 20px;
-    z-index: 0;
-    pointer-events: none;
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 24px;
+    z-index: 21;
 }
-
-/* 3. 根據事件給玻璃邊框加點顏色，產生共鳴 */
-.trap-cell::before { border-color: rgba(241, 196, 15, 0.4) !important; }
-.boost-cell::before { border-color: rgba(99, 179, 237, 0.4) !important; }
-.dino-cell::before { border-color: rgba(231, 76, 60, 0.4) !important; }
-
     </style>
     
 </head>
