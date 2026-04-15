@@ -122,78 +122,39 @@ img {
     to { transform: rotate(360deg); }
 }
 
-/* --- 2. 火箭氣流效果 - 精確修正版 --- */
+/* --- 2. 火箭格：靜態純淨版 --- */
 
 .boost-cell {
-    /* ✨ 修正：背景顏色改為藍黑色的深邃夜空漸層 */
+    /* 1. 保留藍黑夜空背景 */
     background: linear-gradient(180deg, #0b1e3b 0%, #1a365d 100%) !important;
-    border: 3px solid #63b3ed !important; /* 邊框也調亮一點，看起來更像科技風 */
+    border: 3px solid #63b3ed !important;
     position: relative;
-    z-index: 1;
     
-    /* ✨ 重點修正 1：移除 overflow: hidden，徹底根除黑幕問題 */
+    /* 2. 取消所有動態與溢出裁剪 */
+    animation: none !important;
     overflow: visible !important; 
-    
-    box-shadow: 0 0 15px rgba(66, 153, 225, 0.5); /* 增加淡淡的藍光暈 */
+    z-index: 1;
 }
 
-/* 定義一個通用的星星樣式，方便管理層級 */
+/* 移除所有星星動態與偽元素 */
 .boost-cell::before,
 .boost-cell::after {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    top: 0;
-    left: 0;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    pointer-events: none;
-    z-index: 2; /* 強制提升層級，確保在背景之上 */
-    
-    /* ✨ 重點修正 2：初始設定徹底透明，並縮小，防止瞬間閃現 */
-    opacity: 0;
-    transform: translateY(0px) scale(0);
+    content: none !important;
+    animation: none !important;
+    display: none !important;
 }
 
-/* 第一群小星星 (使用 ::before) */
+/* 確保格子內的圖標（🚀）是靜止的 */
+.boost-cell .event-icon {
+    animation: none !important;
+    transform: none !important;
+}
+
+/* 額外修正：解決你截圖中那個「半透明黑區」的問題 */
+/* 這通常是通用道路樣式溢出造成的，我們強制在火箭格關閉它 */
+.boost-cell::after, 
 .boost-cell::before {
-    content: "✨";
-    font-size: 30px;
-    /* 呼叫修正後的動畫劇本 */
-    animation: boost-float-clean 1.5s infinite ease-out;
-}
-
-/* 第二群小星星 (使用 ::after，稍微偏移增加層次) */
-.boost-cell::after {
-    content: "🌟";
-    font-size: 20px;
-    left: 15px;
-    top: -10px;
-    animation: boost-float-clean 2s infinite 0.5s ease-out; /* 加一點延遲和不同的速度 */
-}
-
-/* ✨ 修正：全新的乾淨動畫劇本，不從超下方開始，徹底避免黑幕 */
-@keyframes boost-float-clean {
-    0% { 
-        /* 從格子中間偏下一點點開始 */
-        transform: translateY(15px) scale(0.3); 
-        opacity: 0; 
-    }
-    30% { 
-        /* 在格子中間最亮 */
-        opacity: 1; 
-        transform: translateY(0px) scale(1.1); 
-    }
-    80% {
-        /* 在格子上方慢慢消失 */
-        opacity: 0.3;
-    }
-    100% { 
-        /* 升到格子上方的空中消失 */
-        transform: translateY(-25px) scale(0.5); 
-        opacity: 0; 
-    }
+    display: none !important;
 }
 
 /* 3. 恐龍稍微變大 */
