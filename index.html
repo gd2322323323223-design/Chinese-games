@@ -1217,7 +1217,6 @@ document.querySelectorAll('.speak-trigger').forEach(el => {
 // 在開啟 Modal 時，先強制停止所有之前的語音，防止殘留
 function showModal() {
     window.speechSynthesis.cancel(); // 加上這一行，清空語音隊列
-    // ...其餘原本 showModal 的代碼
 
 window.onload = init;
 </script>
