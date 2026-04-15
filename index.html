@@ -75,29 +75,19 @@ img {
 #game-container { position: relative; z-index: 10 !important; width: 95%; max-width: 1400px; margin: 20px auto; background: transparent !important;}
 
 #board { 
-    display: grid !important; 
-    grid-template-columns: repeat(10, 1fr) !important; 
-    gap: 140px 15px !important; 
-    padding: 40px 40px 150px 40px !important; 
+    display: grid; 
+    grid-template-columns: repeat(10, 1fr); 
+    gap: 140px 15px; 
+    padding: 40px 40px 150px 40px; 
     border-radius: 40px; 
-
-    /* ✨ 關鍵修改：白色背景 + 70% 透明度 */
-    background: rgba(255, 255, 255, 0.7) !important; 
-    
-    /* 🔴 徹底拿掉模糊，讓森林的光影直接透出來 */
-    backdrop-filter: none !important; 
-    -webkit-backdrop-filter: none !important;
-    
-    /* 邊框改為淡淡的暖灰色，不搶戲 */
-    border: 12px solid rgba(255, 255, 255, 0.5);
-    outline: none; 
-    
-    /* 輕盈的投影，營造浮空感 */
-    box-shadow: 0 20px 60px rgba(0,0,0,0.1);
-    
-    width: 95%;
-    max-width: 1400px;
-    margin: 20px auto;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    border: 12px solid #8d6e63;
+    outline: 6px solid #5d4037;
+    box-shadow: 
+        0 15px 0 #5d4037,           
+        0 30px 60px rgba(0,0,0,0.4); 
 }
 
 /* --- 基礎結構 (保留你的 height, flex 等設定) --- */
