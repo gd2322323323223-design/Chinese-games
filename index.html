@@ -438,7 +438,7 @@ body:has(#start-screen[style*="display: flex"]) #game-container {
         
         <div class="player-preview" style="flex: 1; display: flex; flex-direction: column; align-items: center;">
             <h3 style="background: #ffffff; color: black; padding: 8px 25px; border-radius: 15px; font-size: 20px; margin-bottom: 15px; box-shadow: 0 4px 8px rgba(0,0,0,0.2); border: 2px solid white;">P1 玩家選擇了</h3>
-            <div id="p1-big-preview" class="preview-box" onclick="resetSelection(1)" style="cursor: pointer; ...">
+            <div id="p1-big-preview" class="preview-box" style="width: 250px; height: 250px; background: #4a90e2; border-radius: 20px; border: 8px solid white; display: flex; align-items: center; justify-content: center; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.2);">
                 <span style="color: white; font-weight: bold;">P1 棋子</span>
             </div>
         </div>
@@ -462,7 +462,7 @@ body:has(#start-screen[style*="display: flex"]) #game-container {
 
         <div class="player-preview" style="flex: 1; display: flex; flex-direction: column; align-items: center;">
             <h3 style="background: #ffffff; color: black; padding: 8px 25px; border-radius: 15px; font-size: 20px; margin-bottom: 15px; box-shadow: 0 4px 8px rgba(0,0,0,0.2); border: 2px solid white;">P2 玩家選擇了</h3>
-            <div id="p2-big-preview" class="preview-box" onclick="resetSelection(2)" style="cursor: pointer; ...">
+            <div id="p2-big-preview" class="preview-box" style="width: 250px; height: 250px; background: #4a90e2; border-radius: 20px; border: 8px solid white; display: flex; align-items: center; justify-content: center; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.2);">
                 <span style="color: white; font-weight: bold;">P2 棋子</span>
             </div>
         </div>
@@ -528,73 +528,31 @@ function selectChar(element, imgPath) {
         return;
     }
 
-   function selectChar(element, imgPath) {
-    // 1. 【新增判斷】如果點選的是已經選好的角色，就取消它 (觸發重選)
-    if (currentSelectingPlayer === 1 && selectedP1 === imgPath) {
-        resetSelection(1);
-        return;
-    }
-    if (currentSelectingPlayer === 2 && selectedP2 === imgPath) {
-        resetSelection(2);
-        return;
-    }
-
-    // 2. 防止兩人選到同一個
-    if (imgPath === selectedP1 || imgPath === selectedP2) {
-        alert("這個角色已經被選走囉！");
-        return;
-    }
-
-    // 3. 處理選擇邏輯
     if (currentSelectingPlayer === 1) {
         selectedP1 = imgPath;
         const p1Preview = document.getElementById('p1-big-preview');
         if(p1Preview) {
             p1Preview.innerHTML = `<img src="${imgPath}" style="width: 85%; height: 85%; object-fit: contain;">`;
         }
-        currentSelectingPlayer = 2; // 選完 P1 自動切換到 P2
-        updateHint("請 玩家 2 選擇一個角色", "var(--p2-color)");
+        currentSelectingPlayer = 2;
+        const hint = document.getElementById('selection-hint');
+        if(hint) {
+            hint.innerText = "請 玩家 2 選擇一個角色";
+            hint.style.color = "var(--p2-color)";
+        }
     } else {
         selectedP2 = imgPath;
         const p2Preview = document.getElementById('p2-big-preview');
         if(p2Preview) {
             p2Preview.innerHTML = `<img src="${imgPath}" style="width: 85%; height: 85%; object-fit: contain;">`;
         }
-        updateHint("選擇完成！可以點擊下方按鈕開始遊戲。", "#48bb78");
+        const hint = document.getElementById('selection-hint');
+        if(hint) {
+            hint.innerText = "選擇完成！可以點擊下方按鈕開始遊戲。";
+            hint.style.color = "#48bb78";
+        }
     }
     
-    updateHighlight(); // 更新下方棋子池的發光外框
-}
-
-function resetSelection(playerNum) {
-    if (playerNum === 1) {
-        selectedP1 = "";
-        currentSelectingPlayer = 1; // 權限交回給 P1
-        const p1Preview = document.getElementById('p1-big-preview');
-        if(p1Preview) {
-            p1Preview.innerHTML = `<span style="color: white; font-weight: bold;">顯示 P1 棋子圖片</span>`;
-        }
-        updateHint("請 玩家 1 重新選擇角色", "var(--p1-color)");
-    } else {
-        selectedP2 = "";
-        currentSelectingPlayer = 2; // 權限交回給 P2
-        const p2Preview = document.getElementById('p2-big-preview');
-        if(p2Preview) {
-            p2Preview.innerHTML = `<span style="color: white; font-weight: bold;">顯示 P2 棋子圖片</span>`;
-        }
-        updateHint("請 玩家 2 重新選擇角色", "var(--p2-color)");
-    }
-    updateHighlight();
-}
-
-// 輔助更新文字用的
-function updateHint(text, color) {
-    const hint = document.getElementById('selection-hint');
-    if(hint) {
-        hint.innerText = text;
-        hint.style.color = color;
-    }
-}
     if (typeof updateHighlight === "function") {
         updateHighlight();
     }
