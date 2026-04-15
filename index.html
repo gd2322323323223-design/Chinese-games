@@ -986,18 +986,27 @@ function playSound(name) {
     if (audio[name]) { audio[name].currentTime = 0; audio[name].play().catch(e => {}); }
 }
 
-// 🔊 修改後的語音函式 (手動鎖定)
-function speak(manualFlag = false) {
-    // 只有點擊按鈕傳入 true 時才會發聲
+// 🔊 修改後的語音函式：支援「只讀詞語」或「讀全句」
+function speak(manualFlag = false, mode = 'full') {
+    // 防禦機制
     if (manualFlag !== true) return;
 
     window.speechSynthesis.cancel();
+    
     const word = document.getElementById('modal-text').innerText;
     const sentence = document.getElementById('ai-sentence-text').innerText;
     
     if (!word || word === "詞語") return;
 
-    const msg = new SpeechSynthesisUtterance(`${word}。${sentence}`);
+    // 根據 mode 決定讀什麼
+    let textToSpeak = "";
+    if (mode === 'wordOnly') {
+        textToSpeak = word; // 只讀詞語
+    } else {
+        textToSpeak = `${word}。${sentence}`; // 讀詞語+句子
+    }
+
+    const msg = new SpeechSynthesisUtterance(textToSpeak);
     msg.lang = 'zh-HK';
     msg.rate = 0.9;
     window.speechSynthesis.speak(msg);
@@ -1213,21 +1222,18 @@ function finishTurn() {
 
 // ✅ 核心修正：將所有「點擊監聽器」放在 window.onload 確保元素已載入
 window.onload = function() {
-    // 1. 執行棋盤初始化
     init();
 
-    // 2. 綁定「真人點擊」監聽器 (解決自動朗讀問題)
-    // 只要元素有 class="speak-trigger" 或是指定的 ID 都會生效
     document.addEventListener('click', function(e) {
         const target = e.target;
         
-        // 檢查是否點擊了詞語文字或讀音按鈕
-        if (target && (
-            target.id === 'modal-text' || 
-            target.classList.contains('speak-trigger') || 
-            target.innerText.includes('🔊')
-        )) {
-            speak(true); // 只有這裡傳入 true，語音才會發聲
+        // 1. 如果點擊的是大字詞語 (ID 為 modal-text) -> 只讀詞語
+        if (target && target.id === 'modal-text') {
+            speak(true, 'wordOnly');
+        } 
+        // 2. 如果點擊的是「讀出句子」按鈕 -> 讀全句
+        else if (target && (target.classList.contains('speak-trigger') || target.innerText.includes('🔊'))) {
+            speak(true, 'full');
         }
     });
 };
