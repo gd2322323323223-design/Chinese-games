@@ -690,15 +690,7 @@ body:has(#start-screen[style*="display: flex"]) #game-container {
     100% { box-shadow: 0 0 25px var(--p2-color), 0 0 10px var(--p2-color); }
 }
 
-/* --- 特殊格子下移：地圖元素延伸版 (最終確認) --- */
-
-/* --- 建議 C：透明玻璃棧道版 --- */
-
-/* --- 🛠️ 特殊格結構重組：玻璃棧道方案 --- */
-
-/* --- 建議 D：垂直能量光束版 --- */
-
-/* --- 建議 D：高強光能量光束版 --- */
+/* --- 建議 D：柔邊版能量光束 (消除長方形感) --- */
 
 .trap-cell, .boost-cell, .dino-cell {
     transform: translateY(110px) !important;
@@ -714,59 +706,58 @@ body:has(#start-screen[style*="display: flex"]) #game-container {
     display: none !important;
 }
 
-/* 核心：增強版光束本體 */
+/* 核心：柔邊光束本體 */
 .trap-cell .event-icon::before, 
 .boost-cell .event-icon::before, 
 .dino-cell .event-icon::before {
     content: "" !important;
     position: absolute;
-    bottom: 20%; /* 從更靠近圖示中心的位置出發 */
+    bottom: 50%; /* 從圖示中心出發 */
     left: 50%;
     transform: translateX(-50%);
-    width: 60px;   /* 稍微縮窄，讓光束更集中 */
-    height: 140px; /* 增加高度，確保衝破上方空位 */
     
-    /* 這裡提高透明度從 0.4 -> 0.8 */
-    background: linear-gradient(to top, rgba(255,255,255,0.8) 0%, rgba(255,255,255,0) 100%) !important;
+    /* 1. 寬高設定 (維持原樣或稍微加寬) */
+    width: 100px;  
+    height: 140px; 
     
-    /* 核心強化：增加外發光效果 (Glow) */
-    box-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+    /* 2. ✨ ✨ ✨ 關鍵修正：使用 radial-gradient 讓光束呈「梭形」發散 ✨ ✨ ✨ */
+    /* 這會讓光束中間亮、四周（上下左右）全部漸隱，消除長方形邊界 */
+    background: radial-gradient(ellipse at bottom, 
+        rgba(255, 255, 255, 0.8) 0%, 
+        rgba(255, 255, 255, 0.2) 40%, 
+        rgba(255, 255, 255, 0) 70%
+    ) !important;
     
-    filter: blur(4px); /* 縮小模糊，讓邊界清晰一點 */
+    /* 3. ✨ 增加模糊度：從 4px -> 15px，讓邊緣徹底軟化 */
+    filter: blur(15px);
+    
+    /* 增加基礎外發光，讓它看起來更有能量，但邊緣是軟的 */
+    box-shadow: 0 0 30px rgba(255, 255, 255, 0.3);
+    
     z-index: -1;
     display: block !important;
     pointer-events: none;
-    animation: super-pulse 1.5s infinite alternate ease-in-out;
+    animation: soft-pulse 2s infinite ease-in-out;
 }
 
-/* 針對不同格子設定強烈色彩 */
+/* --- 這裡維持各別顏色的設定 --- */
 .trap-cell .event-icon::before {
-    background: linear-gradient(to top, #fab005 0%, rgba(250, 176, 5, 0) 100%) !important;
-    box-shadow: 0 0 25px rgba(250, 176, 5, 0.6);
+    background: radial-gradient(ellipse at bottom, #fab005 0%, rgba(250, 176, 5, 0.3) 40%, rgba(250, 176, 5, 0) 70%) !important;
+    box-shadow: 0 0 30px rgba(250, 176, 5, 0.4);
 }
-
 .boost-cell .event-icon::before {
-    background: linear-gradient(to top, #339af0 0%, rgba(51, 154, 240, 0) 100%) !important;
-    box-shadow: 0 0 25px rgba(51, 154, 240, 0.6);
+    background: radial-gradient(ellipse at bottom, #339af0 0%, rgba(51, 154, 240, 0.3) 40%, rgba(51, 154, 240, 0) 70%) !important;
+    box-shadow: 0 0 30px rgba(51, 154, 240, 0.4);
 }
-
 .dino-cell .event-icon::before {
-    background: linear-gradient(to top, #40c057 0%, rgba(64, 192, 87, 0) 100%) !important;
-    box-shadow: 0 0 25px rgba(64, 192, 87, 0.6);
+    background: radial-gradient(ellipse at bottom, #40c057 0%, rgba(64, 192, 87, 0.3) 40%, rgba(64, 192, 87, 0) 70%) !important;
+    box-shadow: 0 0 30px rgba(64, 192, 87, 0.4);
 }
 
-/* 更劇烈的呼吸動態 */
-@keyframes super-pulse {
-    from { 
-        opacity: 0.5; 
-        height: 120px; 
-        filter: blur(4px);
-    }
-    to { 
-        opacity: 1; 
-        height: 150px; 
-        filter: blur(2px); /* 變亮時更銳利 */
-    }
+/* 呼吸動畫調整為柔和版 */
+@keyframes soft-pulse {
+    0%, 100% { opacity: 0.6; transform: translateX(-50%) scaleY(1); filter: blur(15px); }
+    50% { opacity: 1; transform: translateX(-50%) scaleY(1.1); filter: blur(10px); }
 }
     </style>
     
