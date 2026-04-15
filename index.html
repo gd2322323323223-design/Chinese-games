@@ -81,15 +81,19 @@ img {
     padding: 40px 40px 150px 40px !important; 
     border-radius: 40px; 
 
-    /* ✨ 關鍵修改：極淡的背景 + 強模糊 */
-    background: rgba(255, 252, 240, 0.4) !important; 
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(15px);
+    /* ✨ 關鍵修改 1：實色深泥土棕 (Solid Ground) */
+    background: #5d4037 !important; /* 紮實的深褐色 */
     
-    /* 邊框維持深木頭色，增加層次感 */
-    border: 12px solid #5d4037;
+    /* 🔴 關鍵修改 2：彻底移除朦朧效果 */
+    backdrop-filter: none !important; 
+    -webkit-backdrop-filter: none !important;
+    
+    /* 邊框維持原本好看的木頭色 */
+    border: 12px solid #8d6e63;
     outline: none; 
-    box-shadow: inset 0 0 50px rgba(0,0,0,0.1), 0 20px 60px rgba(0,0,0,0.4);
+    
+    /* 強化陰影，讓實色底板更有重量感 */
+    box-shadow: inset 0 0 100px rgba(0,0,0,0.3), 0 30px 60px rgba(0,0,0,0.5); 
     
     width: 95%;
     max-width: 1400px;
@@ -110,16 +114,25 @@ img {
     box-sizing: border-box;
 }
 
-/* --- 文字格專屬樣式 (排除掉特殊格) --- */
 .cell:not(.trap-cell):not(.boost-cell):not(.dino-cell) {
-    /* ✨ 基礎狀態：帶綠調的米色 */
-    background: rgba(248, 249, 240, 0.6) !important; 
-    color: #4a5d23 !important; 
-    border: 2px solid #d4d9bc !important;
-    box-shadow: 0 4px 0 #b5bd98 !important; 
+    /* ✨ 關鍵修改 1：實色深苔蘚綠 (Moss Green) */
+    background: #1b4332 !important; /* 深邃的森林綠 */
+    
+    /* 🟢 關鍵修改 2：文字改為淡黃色，與深綠形成對比 */
+    color: #fef3c7 !important; 
+    
+    /* 🟢 關鍵修改 3：苔蘚綠的立體邊框與陰影 */
+    border: 3px solid #2d6a4f !important;
+    box-shadow: 0 5px 0 #081c15 !important; /* 深綠色的紮實厚度感 */
     border-radius: 15px;
-    transition: all 0.2s ease; /* 讓動作更滑順 */
-    backdrop-filter: blur(5px); /* 增加玉石質感 */
+    transition: all 0.2s ease;
+}
+
+/* 懸停效果：亮起來的苔蘚 */
+.cell:not(.trap-cell):not(.boost-cell):not(.dino-cell):hover {
+    background: #2d6a4f !important; /* 變淺一點的綠 */
+    transform: translateY(-5px);
+    box-shadow: 0 8px 0 #081c15 !important;
 }
 
 /* 鼠標移上去時的連動效果 */
@@ -350,20 +363,32 @@ img {
     background-color: #fff !important;
     box-shadow: 0 10px 20px rgba(0,0,0,0.15);
 }
+        
+/* 修改後的實色沙地馬路 */
 .cell::after {
     content: "";
     position: absolute;
     bottom: -110px;
-    left: -10px; 
-    right: -10px;
+    left: -5px; 
+    right: -5px;
     height: var(--road-height);
-    background: rgba(141, 110, 99, 0.4) !important; 
-    background-image: radial-gradient(#a1887f 10%, transparent 20%);
-    border-bottom: 3px solid rgba(121, 85, 72, 0.5) !important;
+    
+    /* ✨ 關鍵修改：實色沙棕色，不再透明 */
+    background: #d2b48c !important; 
+    
+    /* 增加一點路面的質感點綴 (可選，若想要純實色可刪除下一行) */
+    background-image: radial-gradient(rgba(0,0,0,0.05) 10%, transparent 20%);
+    
+    /* 紮實的邊框感 */
+    border-bottom: 8px solid #a1887f; 
+    border-top: 2px solid rgba(255,255,255,0.2);
+    
     z-index: 1;
     border-radius: 15px;
     background-size: 30px 30px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
 }
+        
 .cell::before {
     content: "";
     position: absolute;
@@ -729,6 +754,8 @@ body:has(#start-screen[style*="display: flex"]) #game-container {
     mix-blend-mode: overlay; 
     filter: blur(25px) !important;
     opacity: 0.6 !important;
+    mix-blend-mode: screen;  /* 讓彩色光束在深色底板上「濾光」噴發，亮度翻倍 */
+    opacity: 0.9 !important; /* 確保光束夠紮實 */
     
     z-index: -1;
     display: block !important;
