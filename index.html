@@ -75,19 +75,29 @@ img {
 #game-container { position: relative; z-index: 10 !important; width: 95%; max-width: 1400px; margin: 20px auto; background: transparent !important;}
 
 #board { 
-    display: grid; 
-    grid-template-columns: repeat(10, 1fr); 
-    gap: 140px 15px; 
-    padding: 40px 40px 150px 40px; 
+    display: grid !important; 
+    grid-template-columns: repeat(10, 1fr) !important; 
+    gap: 140px 15px !important; 
+    padding: 40px 40px 150px 40px !important; 
     border-radius: 40px; 
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
+
+    /* ✨ 關鍵修改 1：沙褐色 + 70% 透明度 (如同你原本馬路的設定) */
+    background: rgba(226, 210, 180, 0.7) !important; 
+    
+    /* 🔴 徹底拿掉模糊，讓森林的光影直接透出來 */
+    backdrop-filter: none !important; 
+    -webkit-backdrop-filter: none !important;
+    
+    /* ✨ 關鍵修改 2：邊框改為紮實的實色木頭褐色 */
     border: 12px solid #8d6e63;
-    outline: 6px solid #5d4037;
-    box-shadow: 
-        0 15px 0 #5d4037,           
-        0 30px 60px rgba(0,0,0,0.4); 
+    outline: none; 
+    
+    /* 輕盈的投影，營造浮空感 */
+    box-shadow: 0 20px 60px rgba(0,0,0,0.1);
+    
+    width: 95%;
+    max-width: 1400px;
+    margin: 20px auto;
 }
 
 /* --- 基礎結構 (保留你的 height, flex 等設定) --- */
@@ -105,21 +115,23 @@ img {
 }
 
 .cell:not(.trap-cell):not(.boost-cell):not(.dino-cell) {
-    /* ✨ 關鍵修改：淡奶油白 + 85% 透明度 */
-    background: rgba(255, 253, 245, 0.85) !important; 
+    /* ✨ 關鍵修改 1：全實色純白，與底板拉開層次 */
+    background: #ffffff !important; 
     
-    /* 增加磨砂感，讓文字更清晰 */
-    backdrop-filter: blur(4px);
-    -webkit-backdrop-filter: blur(4px);
-
-    /* 文字改為深森林綠，增加一致感 */
+    /* 文字使用深軍綠色，對比清晰 */
     color: #3d4a22 !important; 
     
-    /* 邊框改為淡淡的暖灰綠，不要太死白 */
-    border: 1px solid rgba(181, 192, 160, 0.5) !important;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.05) !important;
+    /* 邊框與立體陰影調紮實 */
+    border: 1px solid #e2e8f0 !important;
+    box-shadow: 0 4px 0 #cbd5e1 !important; /* 紮實的立體感 */
     border-radius: 15px;
+}
+
+/* 懸停效果：變亮並彈起 */
+.cell:not(.trap-cell):not(.boost-cell):not(.dino-cell):hover {
+    background: #f8fafc !important;
     transform: translateY(-5px);
+    box-shadow: 0 6px 0 #94a3b8 !important;
 }
 
 /* 鼠標移上去時的連動效果 */
@@ -351,7 +363,6 @@ img {
     box-shadow: 0 10px 20px rgba(0,0,0,0.15);
 }
         
-/* 修改馬路：從深褐轉為暖沙色 */
 .cell::after {
     content: "";
     position: absolute;
@@ -360,16 +371,18 @@ img {
     right: -5px;
     height: var(--road-height);
 
-    /* ✨ 關鍵修改：淺沙色 + 70% 透明度 */
-    background: rgba(226, 210, 180, 0.7) !important; 
+    /* ✨ 關鍵修改：紮實的深古道棕色 (如同你原本馬路的顏色) */
+    background: #8d6e63 !important; 
     
-    /* 移除原本生硬的圖片紋路 */
-    background-image: none !important;
+    /* 🔴 關鍵修改 2：移除透明度 */
+    opacity: 1 !important; 
+    background-image: none !important; /* 保持實色 */
     
-    /* 邊框改為柔和的淺褐色 */
-    border-bottom: 5px solid rgba(161, 136, 127, 0.6); 
+    /* 立體厚度邊框 */
+    border-bottom: 6px solid #795548; 
     z-index: 1;
     border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
 }
         
 .cell::before {
