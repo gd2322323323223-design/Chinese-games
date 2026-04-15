@@ -149,44 +149,57 @@ img {
     display: none !important;
 }
 
-/* --- 3. 恐龍格：叢林冒險版 --- */
+/* --- 3. 恐龍格：原始禁區綜合版 (方案A氛圍 + 方案B邊框) --- */
 
 .dino-cell {
-    /* 深綠色叢林漸層背景 */
+    /* ✨ 核心修改 1：深綠色原始叢林漸層背景 */
     background: linear-gradient(135deg, #1b4332 0%, #2d6a4f 100%) !important;
-    border: 3px solid #74c365 !important;
     position: relative;
-    overflow: hidden;
-    z-index: 1;
-    box-shadow: inset 0 0 15px rgba(0,0,0,0.5);
+    overflow: hidden !important; /* 確保圓角裁剪 */
+    z-index: 10;
+    border-radius: 20px; /* 保持圓角一致 */
+    
+    /* ✨ 核心修改 2：使用 border-image 製作黃黑警告斜紋邊框 */
+    border: 10px solid transparent !important; /* 設定邊框寬度 */
+    border-image: repeating-linear-gradient(45deg, #f1c40f, #f1c40f 10px, #000 10px, #000 20px) 10 !important;
+    
+    box-shadow: inset 0 0 25px rgba(0,0,0,0.7); /* 強化內陰影，增加幽暗感 */
+    transition: 0.3s;
 }
 
-/* 移除道路偽元素防止干擾 */
-.dino-cell::before,
-.dino-cell::after {
-    content: none !important;
+/* 移除通用道路偽元素防止干擾 */
+.dino-cell::after, 
+.dino-cell::before {
     display: none !important;
+    content: none !important;
 }
 
 /* 恐龍圖示設定 */
 .dino-cell .event-icon {
     font-size: 55px !important;
     display: inline-block;
-    filter: drop-shadow(2px 4px 8px rgba(0,0,0,0.4));
+    filter: drop-shadow(2px 4px 10px rgba(0,0,0,0.6)); /* 強化陰影，更立體 */
+    position: relative;
+    z-index: 5;
     
-    /* ✅ 讓恐龍自己動起來：呼吸般的上下浮動 */
+    /* ✅ 保留方案 A 的常駐動態：呼吸般的上下浮動 */
     animation: dino-breath 2s infinite ease-in-out;
 }
 
-/* 恐龍呼吸動畫 */
+/* 恐龍呼吸動畫 (方案 A) */
 @keyframes dino-breath {
     0%, 100% { transform: translateY(0) scale(1); }
-    50% { transform: translateY(-5px) scale(1.05); }
+    50% { transform: translateY(-6px) scale(1.03); }
 }
 
-/* 鼠標移過去時的效果強化 */
+/* 鼠標移過去時的效果強化 (結合方案 B 的震動咆哮) */
+.dino-cell:hover {
+    box-shadow: inset 0 0 40px rgba(0,0,0,0.8), 0 0 15px rgba(116, 195, 101, 0.4);
+}
+
 .dino-cell:hover .event-icon {
-    animation: dino-roar 0.3s infinite; /* 移過去會變成生氣的震動 */
+    /* 移過去會變成生氣的咆哮震動 (方案 B 動態) */
+    animation: dino-roar 0.3s infinite;
 }
 
 @keyframes dino-roar {
