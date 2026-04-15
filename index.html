@@ -122,17 +122,24 @@ img {
     to { transform: rotate(360deg); }
 }
 
-/* 2. 火箭氣流效果 */
+/* --- 2. 火箭氣流效果 - 精確修正版 --- */
+
 .boost-cell {
-   background: linear-gradient(to top, #e3fafc, #ffffff) !important;
-    border: 2px solid #339af0 !important;
+    /* ✨ 修正：背景顏色改為藍黑色的深邃夜空漸層 */
+    background: linear-gradient(180deg, #0b1e3b 0%, #1a365d 100%) !important;
+    border: 3px solid #63b3ed !important; /* 邊框也調亮一點，看起來更像科技風 */
     position: relative;
-    overflow: hidden; /* 確保星星不會飄出格子 */
-    z-index: 1; 
+    z-index: 1;
+    
+    /* ✨ 重點修正 1：移除 overflow: hidden，徹底根除黑幕問題 */
+    overflow: visible !important; 
+    
+    box-shadow: 0 0 15px rgba(66, 153, 225, 0.5); /* 增加淡淡的藍光暈 */
 }
-/* 第一群小星星 */
-.boost-cell::before {
-    content: "✨";
+
+/* 定義一個通用的星星樣式，方便管理層級 */
+.boost-cell::before,
+.boost-cell::after {
     position: absolute;
     width: 100%;
     height: 100%;
@@ -141,41 +148,52 @@ img {
     display: flex;
     justify-content: center;
     align-items: center;
-    font-size: 25px;
+    pointer-events: none;
+    z-index: 2; /* 強制提升層級，確保在背景之上 */
+    
+    /* ✨ 重點修正 2：初始設定徹底透明，並縮小，防止瞬間閃現 */
     opacity: 0;
-    animation: boost-float 1.5s infinite;
-    pointer-events: none; /* 防止擋住點擊 */
-    z-index: 2; /* 確保在背景之上 */
+    transform: translateY(0px) scale(0);
 }
 
-/* 第二群小星星（稍微偏移，增加層次） */
+/* 第一群小星星 (使用 ::before) */
+.boost-cell::before {
+    content: "✨";
+    font-size: 30px;
+    /* 呼叫修正後的動畫劇本 */
+    animation: boost-float-clean 1.5s infinite ease-out;
+}
+
+/* 第二群小星星 (使用 ::after，稍微偏移增加層次) */
 .boost-cell::after {
     content: "🌟";
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    top: 10px;
-    right: 10px;
-    display: flex;
-    justify-content: flex-end;
-    align-items: flex-start;
-    font-size: 15px;
-    opacity: 0;
-    animation: boost-float 2s infinite linear;
-    pointer-events: none;
-    z-index: 2;
+    font-size: 20px;
+    left: 15px;
+    top: -10px;
+    animation: boost-float-clean 2s infinite 0.5s ease-out; /* 加一點延遲和不同的速度 */
 }
 
-@keyframes boost-float {
-    0% { transform: translateY(20px) scale(0.5); opacity: 0; }
-    50% { opacity: 0.8; transform: translateY(0px) scale(1.2); }
-    100% { transform: translateY(-20px) scale(0.5); opacity: 0; }
-}
-/* 補上缺少的動畫劇本 */
-@keyframes boost-float {
-    0% { transform: translateY(15px); opacity: 0; }
-    50% { opacity: 0.4; }
-    100% { transform: translateY(-15px); opacity: 0; }
+/* ✨ 修正：全新的乾淨動畫劇本，不從超下方開始，徹底避免黑幕 */
+@keyframes boost-float-clean {
+    0% { 
+        /* 從格子中間偏下一點點開始 */
+        transform: translateY(15px) scale(0.3); 
+        opacity: 0; 
+    }
+    30% { 
+        /* 在格子中間最亮 */
+        opacity: 1; 
+        transform: translateY(0px) scale(1.1); 
+    }
+    80% {
+        /* 在格子上方慢慢消失 */
+        opacity: 0.3;
+    }
+    100% { 
+        /* 升到格子上方的空中消失 */
+        transform: translateY(-25px) scale(0.5); 
+        opacity: 0; 
+    }
 }
 
 /* 3. 恐龍稍微變大 */
