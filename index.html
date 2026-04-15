@@ -166,7 +166,7 @@ img {
 
 /* 鼠標移上去時：強制更換動畫為快速空轉 */
 .trap-cell:hover .event-icon {
-    /* 0.7s 表示轉一圈只要 0.7 秒，非常快 */
+    /* 1s 表示轉一圈只要 1 秒，非常快 */
     animation: rotate-trap 0.3s infinite linear !important; 
 }
 
@@ -1027,7 +1027,7 @@ const audio = {
     win: new Audio('sounds/win.mp3')
 };
 audio.bgm.loop = true;
-audio.bgm.volume = 0.1;
+audio.bgm.volume = 0.05;
 
 function toggleBGM() {
     if (audio.bgm.paused) {
