@@ -679,6 +679,29 @@ body:has(#start-screen[style*="display: flex"]) #game-container {
     100% { box-shadow: 0 0 25px var(--p2-color), 0 0 10px var(--p2-color); }
 }
 
+/* --- 特殊格子下移：取代馬路位置 --- */
+
+.trap-cell, .boost-cell, .dino-cell {
+    /* ✨ 關鍵：將格子向下位移，數字請根據你的馬路位置微調 */
+    /* 如果你的 --road-height 是 100px，位移約 110px 會剛好蓋住馬路 */
+    transform: translateY(110px) !important;
+    
+    /* 確保下移後不會被後面的格子馬路擋住 */
+    z-index: 100 !important; 
+}
+
+/* ✨ 移除這些格子的馬路偽元素，因為格子現在自己就是馬路了 */
+.trap-cell::after, .trap-cell::before,
+.boost-cell::after, .boost-cell::before,
+.dino-cell::after, .dino-cell::before {
+    display: none !important;
+}
+
+/* 讓鼠標移上去時保持在原位，不要觸發原本的向上浮動 */
+.trap-cell:hover, .boost-cell:hover, .dino-cell:hover {
+    transform: translateY(110px) scale(1.05) !important;
+}
+
     </style>
     
 </head>
