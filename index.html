@@ -75,49 +75,49 @@ img {
 #game-container { position: relative; z-index: 10 !important; width: 95%; max-width: 1400px; margin: 20px auto; background: transparent !important;}
 
 #board { 
-    display: grid !important; 
-    /* 強制恢復 10 列佈局，防止變成長條 */
-    grid-template-columns: repeat(10, 1fr) !important; 
-    gap: 140px 15px !important; 
-    padding: 40px !important; 
+    display: grid; 
+    grid-template-columns: repeat(10, 1fr); 
+    gap: 140px 15px; 
+    padding: 40px 40px 150px 40px; 
     border-radius: 40px; 
 
-    /* 回歸較穩定的背景，暫時不要太透明以免找不到邊界 */
-    background: rgba(255, 255, 255, 0.4) !important; 
-    backdrop-filter: blur(15px);
+    /* ✨ 改用暖米色 (Ivory)，並提高透明度讓森林綠透進來 */
+    background: rgba(252, 251, 242, 0.4) !important; 
+    
+    /* 增加磨砂感，讓背景森林與棋盤融合 */
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
     
     border: 12px solid #8d6e63;
-    box-shadow: 0 15px 0 #5d4037, 0 30px 60px rgba(0,0,0,0.4);
-    
-    /* 確保寬度正確 */
-    width: 100%;
-    box-sizing: border-box;
+    outline: 6px solid #5d4037;
+    box-shadow: 
+        0 15px 0 #5d4037,           
+        0 30px 60px rgba(0,0,0,0.3); 
 }
 
 /* --- 基礎結構 (保留你的 height, flex 等設定) --- */
-.cell {
-    /* 確保高度與 JS 設定的變數一致 */
-    height: var(--cell-size) !important;
-    width: 100% !important;
-    display: flex !important;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    border-radius: 20px;
-    position: relative;
-    z-index: 5;
+.cell { 
+    height: var(--cell-size);
+    border-radius: 20px; 
+    display: flex; 
+    flex-direction: column; 
+    align-items: center; 
+    justify-content: center; 
+    position: relative; 
+    transition: 0.3s; 
+    padding: 5px; 
+    box-sizing: border-box;
 }
 
-/* 文字格專屬樣式 */
+/* --- 文字格專屬樣式 (排除掉特殊格) --- */
 .cell:not(.trap-cell):not(.boost-cell):not(.dino-cell) {
-    background: rgba(255, 255, 255, 0.8) !important;
-    border: 1px solid #ddd !important;
-}
-}
-/* 馬路：讓深褐色變淡，才不會像一塊塊黑炭 */
-.cell[style*="background-color: rgb(139, 115, 85)"] {
-    background-color: rgba(93, 64, 55, 0.4) !important; /* 降低馬路存在感 */
-    border-radius: 10px;
+    /* ✨ 基礎狀態：帶綠調的米色 */
+    background: rgba(248, 249, 240, 0.9) !important; 
+    color: #4a5d23 !important; 
+    border: 2px solid #d4d9bc !important;
+    box-shadow: 0 4px 0 #b5bd98 !important; 
+    border-radius: 15px;
+    transition: all 0.2s ease; /* 讓動作更滑順 */
 }
 
 /* 鼠標移上去時的連動效果 */
