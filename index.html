@@ -149,45 +149,58 @@ img {
     display: none !important;
 }
 
-/* --- 3. 恐龍格：叢林冒險版 --- */
-
-/* --- 3. 恐龍格：危險禁區版 --- */
+/* --- 3. 恐龍格：禁區修正版 --- */
 
 .dino-cell {
-    /* ✨ 核心修改：土黃色荒野背景，並加上邊緣的黃黑警告斜紋 */
-    background: #795548 !important; /* 深土色背景 */
-    background-image: 
-        linear-gradient(45deg, #f1c40f 25%, transparent 25%, transparent 50%, #f1c40f 50%, #f1c40f 75%, transparent 75%, transparent) !important;
-    background-size: 20px 20px !important; /* 斜紋大小 */
+    /* ✨ 核心修改 1：確保格子本身有正確層級與圓角裁剪 */
+    background-color: transparent !important; /* 背景由偽元素負責，這裡設透明 */
     border: 4px solid #000 !important; /* 粗黑邊框 */
     position: relative;
-    overflow: hidden;
-    z-index: 1;
+    overflow: hidden !important; /* ✨ 關鍵：強制裁剪所有溢出（包括馬路） */
+    z-index: 10; /* ✅ 提拔格子層級，確保在馬路之上 */
+    border-radius: 20px; /* 確保圓角跟其他格子一致 */
     box-shadow: inset 0 0 20px rgba(0,0,0,0.8);
+}
+
+/* ✨ 核心修改 2：使用 ::before 來負責禁區背景與紋理 */
+.dino-cell::before {
+    content: "" !important;
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    
+    /* 深土色背景 */
+    background-color: #795548 !important; 
+    
+    /* 黃黑警告斜紋 */
+    background-image: 
+        linear-gradient(45deg, #f1c40f 25%, transparent 25%, transparent 50%, #f1c40f 50%, #f1c40f 75%, transparent 75%, transparent) !important;
+    background-size: 20px 20px !important; 
+    
+    /* ✨ 關鍵：確保紋理在格子內容物之下，但在馬路之上 */
+    z-index: -2 !important; 
+    display: block !important;
 }
 
 /* 在斜紋之上蓋一層半透明底色，讓格子中心比較好讀 */
 .dino-cell::after {
-    content: "";
+    content: "" !important;
     position: absolute;
     top: 5px; left: 5px; right: 5px; bottom: 5px;
-    background: rgba(8d, 6e, 63, 0.9); /* 遮蓋掉中間的斜紋，只留邊緣 */
-    z-index: -1;
+    background: rgba(109, 94, 85, 0.95); /* 遮蓋掉中間的斜紋 */
+    z-index: -1 !important; /* 確保在斜紋之上，但仍低於恐龍 */
     border-radius: 5px;
-}
-
-/* 移除道路偽元素防止干擾 */
-.dino-cell::before {
-    display: none !important;
+    display: block !important;
 }
 
 /* 恐龍圖示設定 */
 .dino-cell .event-icon {
     font-size: 55px !important;
     display: inline-block;
-    filter: drop-shadow(0 0 10px rgba(255, 0, 0, 0.5)); /* 紅色發光，增加危險感 */
+    filter: drop-shadow(0 0 10px rgba(255, 0, 0, 0.5)); /* 紅色發光 */
+    position: relative;
+    z-index: 5; /* 確保恐龍在最上面 */
     
-    /* ✅ 讓恐龍每隔 3 秒咆哮（震動）一次 */
+    /* 咆哮（震動）動畫 */
     animation: dino-roar-period 3s infinite;
 }
 
@@ -199,13 +212,12 @@ img {
     95% { transform: scale(1.1) translate(2px, 2px) rotate(2deg); }
 }
 
-/* 鼠標移過去時的效果：邊框發紅光 */
+/* 鼠標移過去時的效果強化 */
 .dino-cell:hover {
     border-color: #e74c3c !important;
     box-shadow: inset 0 0 30px rgba(231, 76, 60, 0.5);
     transition: 0.3s;
 }
-
 @keyframes dino-roar {
     0% { transform: translate(1px, 1px) rotate(0deg); }
     20% { transform: translate(-1px, -1px) rotate(-1deg); }
