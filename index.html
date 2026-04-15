@@ -104,7 +104,14 @@ img {
     box-sizing: border-box; 
     border: 2px solid #e2e8f0;
     backdrop-filter: blur(5px);
+    box-shadow: 0 4px 0 rgba(0,0,0,0.1);
         }
+        
+.cell:hover {
+    transform: translateY(-5px);
+    background-color: #fff !important;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+}
 
 .cell.goal-cell {
     grid-column: span 2;
@@ -368,16 +375,16 @@ body.game-active #controls {
     border-radius: 50px;
     cursor: pointer;
     background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
-    box-shadow: 0 10px 0 #2f855a, 0 15px 30px rgba(0,0,0,0.2);
-    transition: all 0.2s ease;
+    box-shadow: 0 8px 0 #2f855a, 0 15px 20px rgba(0,0,0,0.3);
+    transition: all 0.1s ease;
     text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
     letter-spacing: 2px;
     animation: pulse 2s infinite;
 }
 
 #start-game-btn:active {
-    transform: translateY(5px);
-    box-shadow: 0 5px 0 #2f855a, 0 10px 20px rgba(0,0,0,0.2);
+    transform: translateY(4px);
+    box-shadow: 0 4px 0 #2f855a, 0 8px 10px rgba(0,0,0,0.2);
 }
 
 @keyframes pulse {
