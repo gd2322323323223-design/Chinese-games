@@ -853,14 +853,14 @@ body:has(#start-screen[style*="display: flex"]) #game-container {
 
     <div id="modal">
         <div id="timer" style="font-size: 18px; color: #e67e22; font-weight: bold;">⏳ 剩餘時間: 120s</div>
-        <div id="modal-text" onclick="speak(true)">詞語</div>
+        <div id="modal-text" onclick="(true)">詞語</div>
         <div id="ai-sentence-box" style="margin: 15px 0; padding: 15px; background: #f7fafc; border-left: 5px solid #4299e1; border-radius: 10px; text-align: left;">
             <div style="font-size: 14px; color: #4299e1; font-weight: bold; margin-bottom: 5px;">🤖 AI 老師造句：</div>
             <div id="ai-sentence-text" style="font-size: 20px; color: #4a5568; line-height: 1.4;">這是一個例句。</div>
         </div>
         <p style="font-size: 14px; color: #a0aec0; margin-bottom: 20px;">💡 點擊詞語可重複聽讀音</p>
         <div style="display: flex; gap: 15px; flex-direction: column;">
-            <button onclick="speak(true)">讀出句子 🔊</button>
+            <button onclick="(true)">讀出句子 🔊</button>
             <button onclick="startRecognition()" style="padding: 12px; background: #5d4037; color: white; border: none; border-radius: 15px; font-size: 18px; cursor: pointer; font-weight: bold;">🎤 AI老師聽讀音</button>
             <button onclick="closeModal(true)" style="padding: 12px; background: #48bb78; color: white; border: none; border-radius: 15px; font-size: 18px; cursor: pointer; font-weight: bold;">✅ 我讀好了！</button>
         </div>
@@ -1250,7 +1250,7 @@ function showModal() {
 
 // 只有當玩家點擊「喇叭按鈕」時才會觸發此函式
 // 增加一個 manualFlag 參數，預設是 false
-function speak(manualFlag = false) {
+function playTeacherVoice(manualFlag = false) {
     // 🌟 這是最強防線：如果不是手動點擊（沒有傳 true），就直接結束不說話
     if (manualFlag !== true) {
         console.log("阻擋了一次自動語音播放");
@@ -1264,7 +1264,7 @@ function speak(manualFlag = false) {
     const msg = new SpeechSynthesisUtterance(`${word}。${sentence}`);
     msg.lang = 'zh-HK';
     msg.rate = 0.9;
-    window.speechSynthesis.speak(msg);
+    window.speechSynthesis.playTeacherVoice(msg);
 }
 
 function startRecognition() {
