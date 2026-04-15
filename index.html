@@ -81,19 +81,11 @@ img {
     padding: 40px 40px 150px 40px; 
     border-radius: 40px; 
 
-    /* ✨ 這裡改為帶有質感的半透明背板 */
-    /* background: rgba(255, 255, 255, 0.15) !important;  <- 這是極簡白 */
-    background: rgba(255, 248, 225, 0.2) !important; /* 這是淡淡的奶油黃，跟森林更搭 */
+    /* ✨ 這裡改為較紮實的白色背板，讓光束更有底色可以反射 */
+    background: rgba(255, 255, 255, 0.9) !important; 
+    backdrop-filter: blur(10px); 
     
-    /* 磨砂玻璃效果：讓背後的森林圖變模糊，格子會非常立體 */
-    backdrop-filter: blur(12px); 
-    -webkit-backdrop-filter: blur(12px);
-
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-    
-    /* 原有的邊框與陰影設定 */
+    /* 保持你原本好看的邊框設定 */
     border: 12px solid #8d6e63;
     outline: 6px solid #5d4037;
     box-shadow: 
@@ -101,6 +93,7 @@ img {
         0 30px 60px rgba(0,0,0,0.4); 
 }
 
+/* --- 基礎結構 (保留你的 height, flex 等設定) --- */
 .cell { 
     height: var(--cell-size);
     border-radius: 20px; 
@@ -110,14 +103,26 @@ img {
     justify-content: center; 
     position: relative; 
     transition: 0.3s; 
-    background-color: rgba(255, 255, 255, 0.9); 
     padding: 5px; 
-    box-sizing: border-box; 
-    border: 2px solid #e2e8f0;
-    backdrop-filter: blur(5px);
-    box-shadow: 0 4px 0 rgba(0,0,0,0.1);
-        }
-/* --- 針對你目前結構的相容版 CSS --- */
+    box-sizing: border-box;
+}
+
+/* --- 文字格專屬樣式 (排除掉特殊格) --- */
+.cell:not(.trap-cell):not(.boost-cell):not(.dino-cell) {
+    /* ✨ 這裡換成你想要的顏色，例如淡淡的灰色或莫蘭迪色 */
+    background-color: #f8fafc !important; 
+    border: 2px solid #cbd5e1 !important;
+    box-shadow: 0 4px 0 #94a3b8 !important; /* 增加紮實的立體厚度感 */
+    color: #334155 !important;
+}
+
+/* 鼠標移上去時的連動效果 */
+.cell:not(.trap-cell):not(.boost-cell):not(.dino-cell):hover {
+    background-color: #ffffff !important;
+    transform: translateY(-3px);
+    box-shadow: 0 7px 0 #64748b !important;
+}
+        
 
 /* --- 1. 香蕉格：修正空轉動態版 --- */
 
@@ -712,32 +717,38 @@ body:has(#start-screen[style*="display: flex"]) #game-container {
 .dino-cell .event-icon::before {
     content: "" !important;
     position: absolute;
-    bottom: 50%; /* 從圖示中心出發 */
+    bottom: 50%;
     left: 50%;
     transform: translateX(-50%);
+    width: 120px;   /* 稍微加寬，讓發散效果更自然 */
+    height: 160px;  /* 稍微加高 */
     
-    /* 1. 寬高設定 (維持原樣或稍微加寬) */
-    width: 100px;  
-    height: 140px; 
+    /* ✨ 關鍵 1：針對白底優化混合模式 */
+    /* multiply 會讓光束顏色與白底融合，顏色會變得很紮實、濃郁 */
+    mix-blend-mode: multiply; 
     
-    /* 2. ✨ ✨ ✨ 關鍵修正：使用 radial-gradient 讓光束呈「梭形」發散 ✨ ✨ ✨ */
-    /* 這會讓光束中間亮、四周（上下左右）全部漸隱，消除長方形邊界 */
-    background: radial-gradient(ellipse at bottom, 
-        rgba(255, 255, 255, 0.8) 0%, 
-        rgba(255, 255, 255, 0.2) 40%, 
-        rgba(255, 255, 255, 0) 70%
-    ) !important;
+    /* ✨ 關鍵 2：增加模糊度到 20px，徹底消除長方形感 */
+    filter: blur(20px) !important;
     
-    /* 3. ✨ 增加模糊度：從 4px -> 15px，讓邊緣徹底軟化 */
-    filter: blur(15px);
-    
-    /* 增加基礎外發光，讓它看起來更有能量，但邊緣是軟的 */
-    box-shadow: 0 0 30px rgba(255, 255, 255, 0.3);
-    
+    opacity: 0.8 !important;
     z-index: -1;
     display: block !important;
     pointer-events: none;
     animation: soft-pulse 2s infinite ease-in-out;
+}
+
+/* --- 分別設定三種光束的顏色 (這部分也要更新成 radial-gradient) --- */
+
+.trap-cell .event-icon::before {
+    background: radial-gradient(ellipse at bottom, #fab005 0%, rgba(250, 176, 5, 0.4) 40%, transparent 75%) !important;
+}
+
+.boost-cell .event-icon::before {
+    background: radial-gradient(ellipse at bottom, #339af0 0%, rgba(51, 154, 240, 0.4) 40%, transparent 75%) !important;
+}
+
+.dino-cell .event-icon::before {
+    background: radial-gradient(ellipse at bottom, #40c057 0%, rgba(64, 192, 87, 0.4) 40%, transparent 75%) !important;
 }
 
 /* --- 這裡維持各別顏色的設定 --- */
