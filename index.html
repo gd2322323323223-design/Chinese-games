@@ -1020,12 +1020,15 @@ function startGame() {
     if (typeof audio !== 'undefined' && audio.bgm.paused) toggleBGM();
 }
     
-// --- 音效與遊戲邏輯 (保持不變) ---
+// --- 音效與遊戲邏輯 ---
 const audio = {
     bgm: new Audio('sounds/bgm.mp3'),
     dice: new Audio('sounds/sounds_dice.mp3'),
     win: new Audio('sounds/win.mp3')
 };
+
+// ✨ 在這裡設定音量，不要放在上面的大括號裡面
+audio.dice.volume = 0.3;  // 設定骰子音量
 audio.bgm.loop = true;
 audio.bgm.volume = 0.05;
 
@@ -1045,10 +1048,6 @@ function playSound(name) {
         audio[name].play().catch(e => {});
     }
 }
-
-async function roll() {
-    // 檢查變數鎖定狀態
-    if(moving || waitingForClick) return;
 
     // 1. 修正音效呼叫 (改用你之前定義的 audio 物件)
     try {
