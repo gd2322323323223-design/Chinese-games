@@ -435,16 +435,15 @@ body:has(#start-screen[style*="display: flex"]) #game-container {
     <h1 style="font-size: 60px; color: #5d4037; font-weight: 900; margin-bottom: 40px; background: rgba(255, 255, 255, 0.8); padding: 10px 40px; border-radius: 50px; border: 4px solid #8d6e63; box-shadow: 0 4px 15px rgba(0,0,0,0.1); text-shadow: 2px 2px 0px rgba(255,255,255,0.8);">詞語大作戰</h1>
 
 <div class="selection-container" style="display: flex; align-items: center; gap: 40px; width: 95%; max-width: 1400px; justify-content: center;">
-    
     <div class="player-preview" style="flex: 1; display: flex; flex-direction: column; align-items: center;">
-        <h3 id="p1-hint" style="background: #3182ce; color: white; padding: 8px 25px; border-radius: 15px; font-size: 20px; margin-bottom: 15px; box-shadow: 0 4px 8px rgba(0,0,0,0.2); border: 2px solid white;">P1 玩家已選擇</h3>
+        <h3 style="background: #3182ce; color: white; padding: 8px 25px; border-radius: 15px;">P1 玩家已選擇</h3>
         <div id="p1-big-preview" class="preview-box" onclick="resetSelection(1)" style="cursor: pointer;">
             <span style="color: white; font-weight: bold;">P1 棋子</span>
         </div>
     </div>
 
-    <div id="character-pool-wrapper" style="text-align: center;">
-        <div id="selection-hint" style="font-size: 24px; font-weight: bold; margin-bottom: 15px; color: #5d4037;">請 玩家 1 選擇一個角色</div>
+   <div id="character-pool-wrapper" style="text-align: center;">
+        <div id="selection-hint" style="font-size: 20px; font-weight: bold; margin-bottom: 10px; color: #5d4037;">請 玩家 1 選擇一個角色</div>
         <div id="character-pool">
             <img src="images/dragon.png" class="char-opt" onclick="selectChar(this, 'images/dragon.png')">
             <img src="images/fish.png" class="char-opt" onclick="selectChar(this, 'images/fish.png')">
@@ -462,7 +461,7 @@ body:has(#start-screen[style*="display: flex"]) #game-container {
     </div>
 
     <div class="player-preview" style="flex: 1; display: flex; flex-direction: column; align-items: center;">
-        <h3 id="p2-hint" style="background: #d53f8c; color: white; padding: 8px 25px; border-radius: 15px; font-size: 20px; margin-bottom: 15px; box-shadow: 0 4px 8px rgba(0,0,0,0.2); border: 2px solid white;">P2 玩家已選擇</h3>
+        <h3 style="background: #d53f8c; color: white; padding: 8px 25px; border-radius: 15px;">P2 玩家已選擇</h3>
         <div id="p2-big-preview" class="preview-box" onclick="resetSelection(2)" style="cursor: pointer;">
             <span style="color: white; font-weight: bold;">P2 棋子</span>
         </div>
@@ -512,20 +511,10 @@ body:has(#start-screen[style*="display: flex"]) #game-container {
 let selectedP1 = "";
 let selectedP2 = "";
 let currentSelectingPlayer = 1; 
-let pendingSteps = 0; 
-let turn = 0, dice = 0, moving = false, timerInterval;
-let waitingForClick = false; 
-let specialEventActive = false;
 
-const players = [{pos: 0, score: 0}, {pos: 0, score: 0}];
-const traps = [1, 16, 39, 48, 61, 76, 96];
-const boosts = [8, 20, 32, 51, 68, 80, 90];
-const dinosaurs = [5, 12, 27, 43, 55, 70, 86, 103]; 
-
-// 修正後的選擇角色函式
-// ✅ 這是修正後的 selectChar，確保函數獨立且括號正確
+// ✅ 正確的選擇角色函數
 function selectChar(element, imgPath) {
-    // 1. 如果點選的是已經選好的角色，就取消它 (觸發重設)
+    // 1. 如果點選的是已經選好的角色，就取消它
     if (currentSelectingPlayer === 1 && selectedP1 === imgPath) {
         resetSelection(1);
         return;
@@ -535,56 +524,49 @@ function selectChar(element, imgPath) {
         return;
     }
 
-    // 2. 防止兩人選到同一個
+    // 2. 防止重複選擇
     if (imgPath === selectedP1 || imgPath === selectedP2) {
         alert("這個角色已經被選走囉！");
         return;
     }
 
-    // 3. 處理選擇邏輯
+    // 3. 執行選擇邏輯
     if (currentSelectingPlayer === 1) {
         selectedP1 = imgPath;
         const p1Preview = document.getElementById('p1-big-preview');
         if(p1Preview) {
             p1Preview.innerHTML = `<img src="${imgPath}" style="width: 85%; height: 85%; object-fit: contain;">`;
         }
-        currentSelectingPlayer = 2; // 選完 P1 自動切換到 P2
-        updateHint("請 玩家 2 選擇一個角色", "var(--p2-color)");
+        currentSelectingPlayer = 2; // 自動換玩家 2
+        updateHint("請 玩家 2 選擇角色", "var(--p2-color)");
     } else {
         selectedP2 = imgPath;
         const p2Preview = document.getElementById('p2-big-preview');
         if(p2Preview) {
             p2Preview.innerHTML = `<img src="${imgPath}" style="width: 85%; height: 85%; object-fit: contain;">`;
         }
-        updateHint("選擇完成！可以點擊下方按鈕開始遊戲。", "#48bb78");
+        updateHint("選擇完成！可以點擊下方按鈕開始遊戲", "#48bb78");
     }
-    
-    updateHighlight(); // 更新下方棋子池的發光外框
+    updateHighlight();
 }
 
-// ✅ 這是重設選擇的函數
+// ✅ 重設選擇函數
 function resetSelection(playerNum) {
     if (playerNum === 1) {
         selectedP1 = "";
-        currentSelectingPlayer = 1; // 權限交回給 P1
-        const p1Preview = document.getElementById('p1-big-preview');
-        if(p1Preview) {
-            p1Preview.innerHTML = `<span style="color: white; font-weight: bold;">顯示 P1 棋子圖片</span>`;
-        }
+        currentSelectingPlayer = 1;
+        document.getElementById('p1-big-preview').innerHTML = `<span style="color: white; font-weight: bold;">P1 棋子</span>`;
         updateHint("請 玩家 1 重新選擇角色", "var(--p1-color)");
     } else {
         selectedP2 = "";
-        currentSelectingPlayer = 2; // 權限交回給 P2
-        const p2Preview = document.getElementById('p2-big-preview');
-        if(p2Preview) {
-            p2Preview.innerHTML = `<span style="color: white; font-weight: bold;">顯示 P2 棋子圖片</span>`;
-        }
+        currentSelectingPlayer = 2;
+        document.getElementById('p2-big-preview').innerHTML = `<span style="color: white; font-weight: bold;">P2 棋子</span>`;
         updateHint("請 玩家 2 重新選擇角色", "var(--p2-color)");
     }
     updateHighlight();
 }
 
-// ✅ 輔助更新文字用的函數
+// ✅ 輔助更新文字函數
 function updateHint(text, color) {
     const hint = document.getElementById('selection-hint');
     if(hint) {
@@ -592,11 +574,8 @@ function updateHint(text, color) {
         hint.style.color = color;
     }
 }
-    if (typeof updateHighlight === "function") {
-        updateHighlight();
-    }
 
-// 更新視覺反饋
+// ✅ 更新發光效果
 function updateHighlight() {
     const opts = document.querySelectorAll('.char-opt');
     opts.forEach(opt => {
