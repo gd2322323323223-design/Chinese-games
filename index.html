@@ -678,6 +678,41 @@ body:has(#start-screen[style*="display: flex"]) #game-container {
     0% { box-shadow: 0 0 5px var(--p2-color); }
     100% { box-shadow: 0 0 25px var(--p2-color), 0 0 10px var(--p2-color); }
 }
+/* --- 特殊格子佈局統一調整 --- */
+
+/* 1. 讓特殊格子的內容靠底部對齊 */
+.trap-cell, .boost-cell, .dino-cell {
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: flex-end !important; /* 強制內容沉到底部 */
+    align-items: center !important;
+    padding-bottom: 10px !important; /* 離底邊留一點距離，比較美觀 */
+}
+
+/* 2. 針對圖示微調 */
+.trap-cell .event-icon, 
+.boost-cell .event-icon, 
+.dino-cell .event-icon {
+    position: static !important; /* 移除原本可能的絕對定位 */
+    margin-bottom: 0 !important;
+    /* 稍微縮小一點點圖示，確保上方空間充足給棋子站立 */
+    transform-origin: bottom center; 
+}
+
+/* 3. 火箭格特別處理：因為火箭是斜的，我們讓它更貼底 */
+.boost-cell .event-icon {
+    margin-bottom: -5px !important;
+}
+
+/* 4. 恐龍格特別處理：讓恐龍稍微大一點但依然貼底 */
+.dino-cell .event-icon {
+    margin-bottom: -2px !important;
+}
+
+/* 5. 香蕉格特別處理 */
+.trap-cell .event-icon {
+    margin-bottom: 2px !important;
+}  
     </style>
     
 </head>
