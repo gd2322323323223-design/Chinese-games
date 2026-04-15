@@ -75,24 +75,25 @@ img {
 #game-container { position: relative; z-index: 10 !important; width: 95%; max-width: 1400px; margin: 20px auto; background: transparent !important;}
 
 #board { 
-    display: grid; 
-    grid-template-columns: repeat(10, 1fr); 
-    gap: 140px 15px; 
-    padding: 40px 40px 150px 40px; 
+    display: grid !important; 
+    grid-template-columns: repeat(10, 1fr) !important; 
+    gap: 140px 15px !important; 
+    padding: 40px 40px 150px 40px !important; 
     border-radius: 40px; 
 
-    /* ✨ 改用暖米色 (Ivory)，並提高透明度讓森林綠透進來 */
-    background: rgba(252, 251, 242, 0.4) !important; 
+    /* ✨ 關鍵修改：極淡的背景 + 強模糊 */
+    background: rgba(255, 252, 240, 0.15) !important; 
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
     
-    /* 增加磨砂感，讓背景森林與棋盤融合 */
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
+    /* 邊框維持深木頭色，增加層次感 */
+    border: 12px solid #5d4037;
+    outline: none; 
+    box-shadow: inset 0 0 50px rgba(0,0,0,0.1), 0 20px 60px rgba(0,0,0,0.4);
     
-    border: 12px solid #8d6e63;
-    outline: 6px solid #5d4037;
-    box-shadow: 
-        0 15px 0 #5d4037,           
-        0 30px 60px rgba(0,0,0,0.3); 
+    width: 95%;
+    max-width: 1400px;
+    margin: 20px auto;
 }
 
 /* --- 基礎結構 (保留你的 height, flex 等設定) --- */
