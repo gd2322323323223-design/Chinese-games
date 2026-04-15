@@ -1204,35 +1204,66 @@ async function moveSteps(pid, steps) {
 async function checkEndOrModal(pid) {
     const pos = players[pid].pos;
     if (pos === words.length - 1) {
-        playSound('win');
+        // 確保 playSound 有定義，或者改回 audio.win.play()
+        if (typeof audio !== 'undefined' && audio.win) audio.win.play();
         await fancyAlert(`🏆 玩家 ${pid + 1} 奪冠！`, "goal");
         location.reload();
     } else if (traps.includes(pos) || boosts.includes(pos) || dinosaurs.includes(pos) || pos === 0) {
         finishTurn();
     } else {
+        // 進入詞彙挑戰
         showModal();
     }
 }
 
 function showModal() {
     const currentWord = words[players[turn].pos];
-    if (!currentWord || currentWord === "起點") { finishTurn(); return; }
+    // 安全檢查：如果沒詞或是起點，直接跳過
+    if (!currentWord || currentWord === "起點") { 
+        finishTurn(); 
+        return; 
+    }
+
+    // 1. 填入文字內容
     document.getElementById('modal-text').innerText = currentWord;
-    document.getElementById('ai-sentence-text').innerText = customDictionary[currentWord] || "請造句。";
+    document.getElementById('ai-sentence-text').innerText = customDictionary[currentWord] || "請嘗試用這個詞語造句。";
+    
+    // 2. 顯示彈窗（此時絕對不呼叫 speak()）
     document.getElementById('modal').style.display = 'block';
+
+    // 3. 啟動計時器
     let timeLeft = 120;
+    const timerDisplay = document.getElementById('timer');
     clearInterval(timerInterval);
+    
     timerInterval = setInterval(() => {
         timeLeft--;
-        document.getElementById('timer').innerText = `⏳ 剩餘時間: ${timeLeft}s`;
-        if(timeLeft <= 0) closeModal(false);
+        if (timerDisplay) {
+            timerDisplay.innerText = `⏳ 剩餘時間: ${timeLeft}s`;
+        }
+        if (timeLeft <= 0) {
+            closeModal(false);
+        }
     }, 1000);
 }
 
+// 只有當玩家點擊「喇叭按鈕」時才會觸發此函式
 function speak() {
+    // 1. 先取消所有正在進行的語音（防止重疊）
     window.speechSynthesis.cancel();
-    const msg = new SpeechSynthesisUtterance(`${document.getElementById('modal-text').innerText}。${document.getElementById('ai-sentence-text').innerText}`);
-    msg.lang = 'zh-HK';
+
+    const word = document.getElementById('modal-text').innerText;
+    const sentence = document.getElementById('ai-sentence-text').innerText;
+
+    // 2. 建立語音對象
+    const msg = new SpeechSynthesisUtterance(`${word}。${sentence}`);
+    
+    // 3. 設定語言與參數
+    msg.lang = 'zh-HK'; // 粵語
+    msg.rate = 0.9;     // 稍微放慢一點點速度，讓小朋友聽得清楚
+    msg.pitch = 1.0;    // 音調正常
+
+    // 4. 開始播放
     window.speechSynthesis.speak(msg);
 }
 
