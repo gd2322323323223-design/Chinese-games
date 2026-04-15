@@ -434,39 +434,40 @@ body:has(#start-screen[style*="display: flex"]) #game-container {
   <div id="start-screen" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255, 255, 255, 0) !important; z-index: 1000; display: flex; flex-direction: column; align-items: center; justify-content: center;">
     <h1 style="font-size: 60px; color: #5d4037; font-weight: 900; margin-bottom: 40px; background: rgba(255, 255, 255, 0.8); padding: 10px 40px; border-radius: 50px; border: 4px solid #8d6e63; box-shadow: 0 4px 15px rgba(0,0,0,0.1); text-shadow: 2px 2px 0px rgba(255,255,255,0.8);">詞語大作戰</h1>
 
-    <div class="selection-container" style="display: flex; align-items: center; gap: 40px; width: 95%; max-width: 1400px; justify-content: center;">
-        
-        <div class="player-preview" style="flex: 1; display: flex; flex-direction: column; align-items: center;">
-            <h3 style="background: #ffffff; color: black; padding: 8px 25px; border-radius: 15px; font-size: 20px; margin-bottom: 15px; box-shadow: 0 4px 8px rgba(0,0,0,0.2); border: 2px solid white;">P1 玩家選擇了</h3>
-            <div id="p1-big-preview" class="preview-box" onclick="resetSelection(1)">
-                <span style="color: white; font-weight: bold;">P1 棋子</span>
-            </div>
-        </div>
-
-        <div id="character-pool-wrapper" style="text-align: center;">
-            <div id="character-pool" style="display: grid; grid-template-columns: repeat(4, 110px); gap: 20px; width: fit-content; background: rgba(255, 255, 255, 0.6); padding: 30px; border: 2px solid rgba(255, 255, 255, 0.8); border-radius: 40px; box-shadow: 0 10px 50px rgba(0,0,0,0.1); justify-items: center;">
-                <img src="images/dragon.png" class="char-opt" onclick="selectChar(this, 'images/dragon.png')">
-                <img src="images/fish.png" class="char-opt" onclick="selectChar(this, 'images/fish.png')">
-                <img src="images/snail.png" class="char-opt" onclick="selectChar(this, 'images/snail.png')">
-                <img src="images/octopus.png" class="char-opt" onclick="selectChar(this, 'images/octopus.png')">
-                <img src="images/cat.png" class="char-opt" onclick="selectChar(this, 'images/cat.png')">
-                <img src="images/dog.png" class="char-opt" onclick="selectChar(this, 'images/dog.png')">
-                <img src="images/bee.png" class="char-opt" onclick="selectChar(this, 'images/bee.png')">
-                <img src="images/fairy.png" class="char-opt" onclick="selectChar(this, 'images/fairy.png')">
-                <img src="images/turtle.png" class="char-opt" onclick="selectChar(this, 'images/turtle.png')">
-                <img src="images/knight.png" class="char-opt" onclick="selectChar(this, 'images/knight.png')">
-                <img src="images/star.png" class="char-opt" onclick="selectChar(this, 'images/star.png')">
-                <img src="images/panda.png" class="char-opt" onclick="selectChar(this, 'images/panda.png')">
-            </div>
-        </div>
-
-        <div class="player-preview" style="flex: 1; display: flex; flex-direction: column; align-items: center;">
-            <h3 style="background: #ffffff; color: black; padding: 8px 25px; border-radius: 15px; font-size: 20px; margin-bottom: 15px; box-shadow: 0 4px 8px rgba(0,0,0,0.2); border: 2px solid white;">P2 玩家選擇了</h3>
-            <div id="p2-big-preview" class="preview-box" onclick="resetSelection(2)" style="cursor: pointer; ...">
-                <span style="color: white; font-weight: bold;">P2 棋子</span>
-            </div>
+<div class="selection-container" style="display: flex; align-items: center; gap: 40px; width: 95%; max-width: 1400px; justify-content: center;">
+    
+    <div class="player-preview" style="flex: 1; display: flex; flex-direction: column; align-items: center;">
+        <h3 id="p1-hint" style="background: #3182ce; color: white; padding: 8px 25px; border-radius: 15px; font-size: 20px; margin-bottom: 15px; box-shadow: 0 4px 8px rgba(0,0,0,0.2); border: 2px solid white;">P1 玩家已選擇</h3>
+        <div id="p1-big-preview" class="preview-box" onclick="resetSelection(1)" style="cursor: pointer;">
+            <span style="color: white; font-weight: bold;">P1 棋子</span>
         </div>
     </div>
+
+    <div id="character-pool-wrapper" style="text-align: center;">
+        <div id="selection-hint" style="font-size: 24px; font-weight: bold; margin-bottom: 15px; color: #5d4037;">請 玩家 1 選擇一個角色</div>
+        <div id="character-pool">
+            <img src="images/dragon.png" class="char-opt" onclick="selectChar(this, 'images/dragon.png')">
+            <img src="images/fish.png" class="char-opt" onclick="selectChar(this, 'images/fish.png')">
+            <img src="images/snail.png" class="char-opt" onclick="selectChar(this, 'images/snail.png')">
+            <img src="images/octopus.png" class="char-opt" onclick="selectChar(this, 'images/octopus.png')">
+            <img src="images/cat.png" class="char-opt" onclick="selectChar(this, 'images/cat.png')">
+            <img src="images/dog.png" class="char-opt" onclick="selectChar(this, 'images/dog.png')">
+            <img src="images/bee.png" class="char-opt" onclick="selectChar(this, 'images/bee.png')">
+            <img src="images/fairy.png" class="char-opt" onclick="selectChar(this, 'images/fairy.png')">
+            <img src="images/turtle.png" class="char-opt" onclick="selectChar(this, 'images/turtle.png')">
+            <img src="images/knight.png" class="char-opt" onclick="selectChar(this, 'images/knight.png')">
+            <img src="images/star.png" class="char-opt" onclick="selectChar(this, 'images/star.png')">
+            <img src="images/panda.png" class="char-opt" onclick="selectChar(this, 'images/panda.png')">
+        </div>
+    </div>
+
+    <div class="player-preview" style="flex: 1; display: flex; flex-direction: column; align-items: center;">
+        <h3 id="p2-hint" style="background: #d53f8c; color: white; padding: 8px 25px; border-radius: 15px; font-size: 20px; margin-bottom: 15px; box-shadow: 0 4px 8px rgba(0,0,0,0.2); border: 2px solid white;">P2 玩家已選擇</h3>
+        <div id="p2-big-preview" class="preview-box" onclick="resetSelection(2)" style="cursor: pointer;">
+            <span style="color: white; font-weight: bold;">P2 棋子</span>
+        </div>
+    </div>
+</div>
 
 
     <button id="start-game-btn" onclick="startGame()" style="margin-top: 60px;">
@@ -522,14 +523,9 @@ const boosts = [8, 20, 32, 51, 68, 80, 90];
 const dinosaurs = [5, 12, 27, 43, 55, 70, 86, 103]; 
 
 // 修正後的選擇角色函式
+// ✅ 這是修正後的 selectChar，確保函數獨立且括號正確
 function selectChar(element, imgPath) {
-    if (imgPath === selectedP1 || imgPath === selectedP2) {
-        alert("這個角色已經被選走囉！請選其他的。");
-        return;
-    }
-
-   function selectChar(element, imgPath) {
-    // 1. 【新增判斷】如果點選的是已經選好的角色，就取消它 (觸發重選)
+    // 1. 如果點選的是已經選好的角色，就取消它 (觸發重設)
     if (currentSelectingPlayer === 1 && selectedP1 === imgPath) {
         resetSelection(1);
         return;
@@ -566,6 +562,7 @@ function selectChar(element, imgPath) {
     updateHighlight(); // 更新下方棋子池的發光外框
 }
 
+// ✅ 這是重設選擇的函數
 function resetSelection(playerNum) {
     if (playerNum === 1) {
         selectedP1 = "";
@@ -587,7 +584,7 @@ function resetSelection(playerNum) {
     updateHighlight();
 }
 
-// 輔助更新文字用的
+// ✅ 輔助更新文字用的函數
 function updateHint(text, color) {
     const hint = document.getElementById('selection-hint');
     if(hint) {
