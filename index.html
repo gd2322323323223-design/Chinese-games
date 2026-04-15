@@ -81,16 +81,18 @@ img {
     padding: 40px 40px 150px 40px; 
     border-radius: 40px; 
 
-    /* ✨ 這裡改為較紮實的白色背板，讓光束更有底色可以反射 */
-    background: rgba(255, 255, 255, 0.9) !important; 
-    backdrop-filter: blur(10px); 
+    /* ✨ 改用暖米色 (Ivory)，並提高透明度讓森林綠透進來 */
+    background: rgba(252, 251, 242, 0.4) !important; 
     
-    /* 保持你原本好看的邊框設定 */
+    /* 增加磨砂感，讓背景森林與棋盤融合 */
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    
     border: 12px solid #8d6e63;
     outline: 6px solid #5d4037;
     box-shadow: 
         0 15px 0 #5d4037,           
-        0 30px 60px rgba(0,0,0,0.4); 
+        0 30px 60px rgba(0,0,0,0.3); 
 }
 
 /* --- 基礎結構 (保留你的 height, flex 等設定) --- */
@@ -109,21 +111,25 @@ img {
 
 /* --- 文字格專屬樣式 (排除掉特殊格) --- */
 .cell:not(.trap-cell):not(.boost-cell):not(.dino-cell) {
-    /* ✨ 這裡換成你想要的顏色，例如淡淡的灰色或莫蘭迪色 */
-    background-color: #f8fafc !important; 
-    border: 2px solid #cbd5e1 !important;
-    box-shadow: 0 4px 0 #94a3b8 !important; /* 增加紮實的立體厚度感 */
-    color: #334155 !important;
+    /* ✨ 基礎狀態：帶綠調的米色 */
+    background: rgba(248, 249, 240, 0.9) !important; 
+    color: #4a5d23 !important; 
+    border: 2px solid #d4d9bc !important;
+    box-shadow: 0 4px 0 #b5bd98 !important; 
+    border-radius: 15px;
+    transition: all 0.2s ease; /* 讓動作更滑順 */
 }
 
 /* 鼠標移上去時的連動效果 */
 .cell:not(.trap-cell):not(.boost-cell):not(.dino-cell):hover {
     background-color: #ffffff !important;
-    transform: translateY(-3px);
-    box-shadow: 0 7px 0 #64748b !important;
+    transform: translateY(-5px); /* 稍微彈高一點點，更有回饋感 */
+    
+    /* ✨ 修正：將原本的藍灰色 #64748b 改為更深一點的泥土綠 */
+    /* 這樣 hover 時的顏色變化才會跟整體森林色系連貫 */
+    box-shadow: 0 8px 0 #9ba67e !important; 
 }
         
-
 /* --- 1. 香蕉格：修正空轉動態版 --- */
 
 .trap-cell {
@@ -711,7 +717,7 @@ body:has(#start-screen[style*="display: flex"]) #game-container {
     display: none !important;
 }
 
-/* 核心：柔邊光束本體 */
+/* 1. 核心樣式：控制光束的形狀、模糊度與混合模式 */
 .trap-cell .event-icon::before, 
 .boost-cell .event-icon::before, 
 .dino-cell .event-icon::before {
@@ -720,49 +726,38 @@ body:has(#start-screen[style*="display: flex"]) #game-container {
     bottom: 50%;
     left: 50%;
     transform: translateX(-50%);
-    width: 120px;   /* 稍微加寬，讓發散效果更自然 */
-    height: 160px;  /* 稍微加高 */
+    width: 120px;
+    height: 160px;
     
-    /* ✨ 關鍵 1：針對白底優化混合模式 */
-    /* multiply 會讓光束顏色與白底融合，顏色會變得很紮實、濃郁 */
-    mix-blend-mode: multiply; 
+    /* ✨ 針對森林/暖色調優化 */
+    mix-blend-mode: overlay; 
+    filter: blur(25px) !important;
+    opacity: 0.6 !important;
     
-    /* ✨ 關鍵 2：增加模糊度到 20px，徹底消除長方形感 */
-    filter: blur(20px) !important;
-    
-    opacity: 0.8 !important;
     z-index: -1;
     display: block !important;
     pointer-events: none;
     animation: soft-pulse 2s infinite ease-in-out;
 }
 
-/* --- 分別設定三種光束的顏色 (這部分也要更新成 radial-gradient) --- */
+/* 2. 顏色設定：將漸層與外發光整合，避免重複 */
 
+/* 香蕉陷阱 - 黃光 */
 .trap-cell .event-icon::before {
-    background: radial-gradient(ellipse at bottom, #fab005 0%, rgba(250, 176, 5, 0.4) 40%, transparent 75%) !important;
+    background: radial-gradient(ellipse at bottom, #fab005 0%, rgba(250, 176, 5, 0.3) 40%, transparent 70%) !important;
+    box-shadow: 0 0 30px rgba(250, 176, 5, 0.3);
 }
 
+/* 火箭加速 - 藍光 */
 .boost-cell .event-icon::before {
-    background: radial-gradient(ellipse at bottom, #339af0 0%, rgba(51, 154, 240, 0.4) 40%, transparent 75%) !important;
+    background: radial-gradient(ellipse at bottom, #339af0 0%, rgba(51, 154, 240, 0.3) 40%, transparent 70%) !important;
+    box-shadow: 0 0 30px rgba(51, 154, 240, 0.3);
 }
 
+/* 恐龍危機 - 綠光 */
 .dino-cell .event-icon::before {
-    background: radial-gradient(ellipse at bottom, #40c057 0%, rgba(64, 192, 87, 0.4) 40%, transparent 75%) !important;
-}
-
-/* --- 這裡維持各別顏色的設定 --- */
-.trap-cell .event-icon::before {
-    background: radial-gradient(ellipse at bottom, #fab005 0%, rgba(250, 176, 5, 0.3) 40%, rgba(250, 176, 5, 0) 70%) !important;
-    box-shadow: 0 0 30px rgba(250, 176, 5, 0.4);
-}
-.boost-cell .event-icon::before {
-    background: radial-gradient(ellipse at bottom, #339af0 0%, rgba(51, 154, 240, 0.3) 40%, rgba(51, 154, 240, 0) 70%) !important;
-    box-shadow: 0 0 30px rgba(51, 154, 240, 0.4);
-}
-.dino-cell .event-icon::before {
-    background: radial-gradient(ellipse at bottom, #40c057 0%, rgba(64, 192, 87, 0.3) 40%, rgba(64, 192, 87, 0) 70%) !important;
-    box-shadow: 0 0 30px rgba(64, 192, 87, 0.4);
+    background: radial-gradient(ellipse at bottom, #40c057 0%, rgba(64, 192, 87, 0.3) 40%, transparent 70%) !important;
+    box-shadow: 0 0 30px rgba(64, 192, 87, 0.3);
 }
 
 /* 呼吸動畫調整為柔和版 */
