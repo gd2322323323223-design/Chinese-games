@@ -82,8 +82,8 @@ img {
     border-radius: 40px; 
 
     /* ✨ 關鍵修改：極淡的背景 + 強模糊 */
-    background: rgba(255, 252, 240, 0.15) !important; 
-    backdrop-filter: blur(15px);
+    background: rgba(255, 252, 240, 0.4) !important; 
+    backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(15px);
     
     /* 邊框維持深木頭色，增加層次感 */
@@ -113,12 +113,13 @@ img {
 /* --- 文字格專屬樣式 (排除掉特殊格) --- */
 .cell:not(.trap-cell):not(.boost-cell):not(.dino-cell) {
     /* ✨ 基礎狀態：帶綠調的米色 */
-    background: rgba(248, 249, 240, 0.9) !important; 
+    background: rgba(248, 249, 240, 0.6) !important; 
     color: #4a5d23 !important; 
     border: 2px solid #d4d9bc !important;
     box-shadow: 0 4px 0 #b5bd98 !important; 
     border-radius: 15px;
     transition: all 0.2s ease; /* 讓動作更滑順 */
+    backdrop-filter: blur(5px); /* 增加玉石質感 */
 }
 
 /* 鼠標移上去時的連動效果 */
@@ -356,9 +357,9 @@ img {
     left: -10px; 
     right: -10px;
     height: var(--road-height);
-    background: #8d6e63; 
+    background: rgba(141, 110, 99, 0.4) !important; 
     background-image: radial-gradient(#a1887f 10%, transparent 20%);
-    border-bottom: 6px solid #795548; 
+    border-bottom: 3px solid rgba(121, 85, 72, 0.5) !important;
     z-index: 1;
     border-radius: 15px;
     background-size: 30px 30px;
