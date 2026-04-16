@@ -1097,32 +1097,32 @@ function playSound(name) {
 
 // 🔊 修改後的語音函式：支援「只讀詞語」或「讀全句」
 function speak(manualFlag = false, mode = 'full') {
+    // 1. 防禦機制：只有點擊按鈕才執行
     if (manualFlag !== true) return;
 
+    // 2. 停止當前所有正在播放的聲音
     window.speechSynthesis.cancel();
     
+    // 3. 獲取文字內容
     const word = document.getElementById('modal-text').innerText;
     const sentence = document.getElementById('ai-sentence-text').innerText;
     
     if (!word || word === "詞語") return;
 
+    // 4. 根據 mode 決定讀什麼
     let textToSpeak = "";
     if (mode === 'wordOnly') {
         textToSpeak = word; 
-    } else if (mode === 'sentenceOnly') { // 👈 新增：只讀句子模式
+    } else if (mode === 'sentenceOnly') {
         textToSpeak = sentence;
     } else {
         textToSpeak = `${word}。${sentence}`; 
     }
 
-    const utterance = new SpeechSynthesisUtterance(textToSpeak);
-    utterance.lang = 'zh-HK'; // 確保是廣東話
-    window.speechSynthesis.speak(utterance);
-}
-
+    // 5. 執行發音
     const msg = new SpeechSynthesisUtterance(textToSpeak);
-    msg.lang = 'zh-HK';
-    msg.rate = 0.9;
+    msg.lang = 'zh-HK'; // 廣東話
+    msg.rate = 0.9;     // 語速稍微放慢，聽得更清楚
     window.speechSynthesis.speak(msg);
 }
 
