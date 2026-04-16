@@ -1116,27 +1116,46 @@ function playSound(name) {
 
 // 1. 專門負責「讀出詞語」
 function speakWord() {
-    window.speechSynthesis.cancel();
+    // 1. 先停止背景音樂 (如果音樂變數存在)
+    if (typeof bgMusic !== 'undefined') bgMusic.pause(); 
+
+    // 2. 取消之前可能還在播放的語音
+    window.speechSynthesis.cancel(); 
+
     const text = document.getElementById('modal-text').innerText;
+    
+    // 3. 檢查文字是否有效
     if (text && text !== "詞語") {
         const msg = new SpeechSynthesisUtterance(text);
         msg.lang = 'zh-HK';
         msg.rate = 0.9;
+
+        // 4. 執行朗讀
         window.speechSynthesis.speak(msg);
-    }
-}
+    } // 👈 這是 if 的結尾
+} // 👈 這是 function 的結尾
 
 // 2. 專門負責「讀出句子」
 function speakSentence() {
-    window.speechSynthesis.cancel();
+    // 1. 先停止背景音樂 (確保發音清晰)
+    if (typeof bgMusic !== 'undefined') bgMusic.pause(); 
+
+    // 2. 取消之前可能還在播放的語音，避免重疊
+    window.speechSynthesis.cancel(); 
+
+    // 3. 獲取句子內容
     const text = document.getElementById('ai-sentence-text').innerText;
+    
+    // 4. 檢查是否有文字內容
     if (text) {
         const msg = new SpeechSynthesisUtterance(text);
-        msg.lang = 'zh-HK';
-        msg.rate = 0.9;
+        msg.lang = 'zh-HK'; // 廣東話
+        msg.rate = 0.9;     // 語速稍微放慢
+
+        // 5. 執行朗讀
         window.speechSynthesis.speak(msg);
-    }
-}
+    } // 👈 這是 if 的結尾
+} // 👈 這是 function 的結尾
 
 // --- 遊戲運作邏輯 ---
 async function roll() {
@@ -1332,20 +1351,40 @@ function showModal() {
 }
 
 function startRecognition() {
+    // 1. 優先停止背景音樂，避免雜音干擾錄音
+    if (typeof bgMusic !== 'undefined') bgMusic.pause();
+
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-    if (!SpeechRecognition) return;
+    if (!SpeechRecognition) {
+        alert("瀏覽器不支持語音識別");
+        return;
+    }
+
     const recognition = new SpeechRecognition();
     recognition.lang = 'zh-HK';
     const originalWord = document.getElementById('modal-text').innerText;
+
     recognition.start();
+
+    // 當識別到結果時
     recognition.onresult = (event) => {
         const result = event.results[0][0].transcript;
+        
+        // 檢查識別結果是否包含正確答案
         if (result.includes(originalWord)) {
             players[turn].score += 5;
             const scoreEl = document.getElementById('s' + (turn + 1));
             if (scoreEl) scoreEl.innerText = players[turn].score;
+            
+            // 答對了，關閉彈窗並自動恢復音樂（在 closeModal 裡處理）
             closeModal(true);
         }
+    };
+
+    // 如果學生取消識別或出錯，也可以考慮在這裡恢復音樂
+    recognition.onerror = () => {
+        console.log("語音識別出錯");
+        // if (typeof bgMusic !== 'undefined') bgMusic.play(); 
     };
 }
 
@@ -1367,6 +1406,10 @@ function closeModal(addScore = true) {
     // 🚪 關閉彈窗時也強制停止語音
     window.speechSynthesis.cancel();
     clearInterval(timerInterval);
+
+    // 恢復背景音樂播放
+    if (typeof bgMusic !== 'undefined') bgMusic.play();
+}
     
     // 隱藏遮罩與彈窗
     const overlay = document.getElementById('modal-overlay');
