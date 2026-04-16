@@ -1119,11 +1119,8 @@ function playSound(name) {
 function speak(manualFlag = false, mode = 'full') {
     // 1. 防禦機制：只有點擊按鈕才執行
     if (manualFlag !== true) return;
-
-    // 2. 停止當前所有正在播放的聲音
     window.speechSynthesis.cancel();
     
-    // 3. 獲取文字內容
     const word = document.getElementById('modal-text').innerText;
     const sentence = document.getElementById('ai-sentence-text').innerText;
     
@@ -1132,13 +1129,11 @@ function speak(manualFlag = false, mode = 'full') {
     let textToSpeak = "";
     
     if (mode === 'wordOnly') {
-        textToSpeak = word;        // 只讀：操場
+        textToSpeak = word;        
     } else if (mode === 'sentenceOnly') {
-        textToSpeak = sentence;    // 只讀：句子內容
-    } else {
-        textToSpeak = `${word}。${sentence}`; // 預設模式才全讀
-    }
-
+        textToSpeak = sentence;   
+    } 
+    
     const msg = new SpeechSynthesisUtterance(textToSpeak);
     msg.lang = 'zh-HK'; // 廣東話
     msg.rate = 0.9;
