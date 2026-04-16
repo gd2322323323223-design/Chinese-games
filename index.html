@@ -896,42 +896,40 @@ body:has(#start-screen[style*="display: flex"]) #game-container {
 
     <button id="start-game-btn" onclick="startGame()" style="margin-top: 60px;">
     開始大作戰
-    </button>
+   <div id="music-ctrl" onclick="toggleBGM()">🎵</div>
+
+<div id="game-container">
+    <div id="board"></div>
+    <div id="p1" class="player" onclick="handlePlayerClick(0)"></div>
+    <div id="p2" class="player" onclick="handlePlayerClick(1)"></div>
 </div>
 
-    <div id="music-ctrl" onclick="toggleBGM()" style="position:fixed; top:20px; right:20px; z-index:1000; cursor:pointer; font-size:30px; background:white; border-radius:50%; width:50px; height:50px; display:flex; align-items:center; justify-content:center; box-shadow:0 4px 10px rgba(0,0,0,0.2);">
-        🎵
+<div id="controls">
+    <div id="status">
+        <span id="player-turn-name">玩家 1</span>
+        <div id="dice-box">🎲</div>
+    </div>
+    <button id="btn-roll" onclick="roll()">擲骰子</button>
+</div>
+
+<div id="modal">
+    <div id="timer">⏳ 剩餘時間: 120s</div>
+    
+    <div id="modal-text" class="speak-trigger">詞語</div>
+    
+    <div id="ai-sentence-box">
+        <div class="ai-label">🤖 AI 老師造句：</div>
+        <div id="ai-sentence-text">這是一個例句。</div>
     </div>
     
-    <div id="game-container">
-        <div id="board"></div>
-        <div id="p1" class="player" onclick="handlePlayerClick(0)"></div>
-        <div id="p2" class="player" onclick="handlePlayerClick(1)"></div>
-    </div>
+    <p class="modal-hint">💡 點擊詞語可重複聽讀音</p>
     
- <div id="controls">
-        <div id="status" style="font-size: 20px; font-weight: bold; display: flex; align-items: center; gap: 15px;">
-            <span id="player-turn-name" style="color:var(--p1-color)">玩家 1</span>
-            <div id="dice-box" style="width: 60px; height: 60px; background: #f0f0f0; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 32px; border: 2px solid #cbd5e0; color: #2d3748;">🎲</div>
-        </div>
-
-        <button id="btn-roll" onclick="roll()">擲骰子</button>
+    <div class="modal-buttons">
+        <button class="speak-trigger">讀出句子 🔊</button>
+        <button onclick="startRecognition()" class="btn-ai">🎤 AI 老師聽讀音</button>
+        <button onclick="closeModal(true)" class="btn-confirm">✅ 我讀好了！</button>
     </div>
-
-    <div id="modal">
-        <div id="timer" style="font-size: 18px; color: #e67e22; font-weight: bold;">⏳ 剩餘時間: 120s</div>
-        <div id="modal-text" class="speak-trigger">詞語</div>
-        <div id="ai-sentence-box" style="margin: 15px 0; padding: 15px; background: #f7fafc; border-left: 5px solid #4299e1; border-radius: 10px; text-align: left;">
-            <div style="font-size: 14px; color: #4299e1; font-weight: bold; margin-bottom: 5px;">🤖 AI 老師造句：</div>
-            <div id="ai-sentence-text" style="font-size: 20px; color: #4a5568; line-height: 1.4;">這是一個例句。</div>
-        </div>
-        <p style="font-size: 14px; color: #a0aec0; margin-bottom: 20px;">💡 點擊詞語可重複聽讀音</p>
-        <div style="display: flex; gap: 15px; flex-direction: column;">
-            <button class="speak-trigger">讀出句子 🔊</button>
-            <button onclick="startRecognition()" style="padding: 12px; background: #5d4037; color: white; border: none; border-radius: 15px; font-size: 18px; cursor: pointer; font-weight: bold;">🎤 AI老師聽讀音</button>
-            <button onclick="closeModal(true)" style="padding: 12px; background: #48bb78; color: white; border: none; border-radius: 15px; font-size: 18px; cursor: pointer; font-weight: bold;">✅ 我讀好了！</button>
-        </div>
-    </div>
+</div>
     
 <script>
 let selectedP1 = "";
