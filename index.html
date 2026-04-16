@@ -860,6 +860,26 @@ body:has(#start-screen[style*="display: flex"]) #game-container {
     font-weight: 900;
 }
         
+/* 這個是新增的，用來告訴瀏覽器：裡面的按鈕要並排 */
+.btn-group {
+    display: flex;      /* 開啟並排模式 */
+    gap: 10px;          /* 設定左右按鈕的間距 */
+    width: 100%;        /* 讓這組按鈕佔滿寬度 */
+    margin-bottom: 10px;/* 跟下一個按鈕保持距離 */
+}
+
+/* 這個是新增的，用來統一設定這兩個藍色按鈕的顏色和形狀 */
+.blue-btn {
+    flex: 1;            /* 🚩 關鍵：這會讓兩個按鈕自動平分左右空間 */
+    background: #3182ce !important; /* 你指定的藍色 */
+    color: #ffffff !important;      /* 你指定的白色 */
+    border: none !important;
+    padding: 12px 5px !important;
+    border-radius: 50px !important;
+    font-weight: bold !important;
+    cursor: pointer;
+    box-shadow: 0 4px 0 #1e4e8c !important; /* 增加立體厚度感 */
+}
     </style>
     
 </head>
@@ -949,6 +969,10 @@ body:has(#start-screen[style*="display: flex"]) #game-container {
             <button onclick="startRecognition()" style="padding: 12px; background: #5d4037; color: white; border: none; border-radius: 15px; font-size: 18px; cursor: pointer; font-weight: bold;">🎤 AI老師聽讀音</button>
             <button onclick="closeModal(true)" style="padding: 12px; background: #48bb78; color: white; border: none; border-radius: 15px; font-size: 18px; cursor: pointer; font-weight: bold;">✅ 我讀好了！</button>
         </div>
+    <div class="btn-group">
+    <button onclick="speak(true, 'wordOnly')" class="blue-btn">讀出詞語 🔊</button>
+    <button onclick="speak(true, 'sentenceOnly')" class="blue-btn">讀出句子 🔊</button>
+</div>
     </div>
     
 <script>
@@ -1073,7 +1097,6 @@ function playSound(name) {
 
 // 🔊 修改後的語音函式：支援「只讀詞語」或「讀全句」
 function speak(manualFlag = false, mode = 'full') {
-    // 防禦機制
     if (manualFlag !== true) return;
 
     window.speechSynthesis.cancel();
@@ -1083,13 +1106,19 @@ function speak(manualFlag = false, mode = 'full') {
     
     if (!word || word === "詞語") return;
 
-    // 根據 mode 決定讀什麼
     let textToSpeak = "";
     if (mode === 'wordOnly') {
-        textToSpeak = word; // 只讀詞語
+        textToSpeak = word; 
+    } else if (mode === 'sentenceOnly') { // 👈 新增：只讀句子模式
+        textToSpeak = sentence;
     } else {
-        textToSpeak = `${word}。${sentence}`; // 讀詞語+句子
+        textToSpeak = `${word}。${sentence}`; 
     }
+
+    const utterance = new SpeechSynthesisUtterance(textToSpeak);
+    utterance.lang = 'zh-HK'; // 確保是廣東話
+    window.speechSynthesis.speak(utterance);
+}
 
     const msg = new SpeechSynthesisUtterance(textToSpeak);
     msg.lang = 'zh-HK';
