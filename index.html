@@ -114,17 +114,14 @@ img {
     box-sizing: border-box;
 }
 
-.cell:not(.trap-cell):not(.boost-cell):not(.dino-cell) {
-    /* ✨ 關鍵修改 1：全實色純白，與底板拉開層次 */
-    background: #ffffff !important; 
-    
-    /* 文字使用深軍綠色，對比清晰 */
-    color: #3d4a22 !important; 
-    
-    /* 邊框與立體陰影調紮實 */
-    border: 1px solid #e2e8f0 !important;
-    box-shadow: 0 4px 0 #cbd5e1 !important; /* 紮實的立體感 */
-    border-radius: 15px;
+/* 修改路徑格子的樣式 */
+.cell:not(.trap-cell):not(.boost-cell):not(.dino-cell):not(.goal-cell):not([data-word]) {
+    background: linear-gradient(145deg, #6d4c41, #4e342e) !important; /* 增加微弱漸層 */
+    border: 2px solid #3e2723 !important;
+    box-shadow: 
+        inset 2px 2px 5px rgba(255,255,255,0.1), /* 內高光 */
+        0 6px 0 #261b18 !important; /* 加深底部厚度感 */
+    border-radius: 8px !important;
 }
 
 /* 懸停效果：變亮並彈起 */
