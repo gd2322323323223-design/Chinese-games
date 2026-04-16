@@ -43,20 +43,18 @@ body {
     min-height: 100vh;
 }
         
-/* P1 選中效果：改用 outline 代替 border */
-.char-opt[style*="var(--p1-color)"] {
-    outline: 5px solid var(--p1-color); /* ✨ outline 不佔空間 */
-    outline-offset: -5px;              /* 讓框線往內縮 */
+/* 修改為匹配 class 名稱 */
+.char-opt.selected-p1 {
+    outline: 5px solid var(--p1-color);
+    outline-offset: -5px;
     box-shadow: 0 0 20px var(--p1-color) !important;
-    border: none !important;           /* 移除原本可能撐開空間的 border */
 }
 
-/* P2 選中效果 */
-.char-opt[style*="var(--p2-color)"] {
+.char-opt.selected-p2 {
     outline: 5px solid var(--p2-color);
     outline-offset: -5px;
     box-shadow: 0 0 20px var(--p2-color) !important;
-    border: none !important;
+    opacity: 0.6; /* 保持你原本的透明度設定 */
 }
 
 /* [狀態 B] 被選取後的動作：hover 時乖乖站好不要亂跳 */
@@ -1010,8 +1008,11 @@ async function checkEndOrModal(pid) {
 }
 
 function showModal() {
-    const currentWord = words[players[turn].pos];
-    if (!currentWord || currentWord === "起點") { 
+    const currentPos = players[turn].pos;
+    const currentWord = words[currentPos];
+
+    // 如果是特殊格或沒有詞語，直接跳過不開彈窗
+    if (!currentWord || currentWord === "" || currentWord === "起點" || currentWord.includes("🏆")) { 
         finishTurn(); 
         return; 
     }
