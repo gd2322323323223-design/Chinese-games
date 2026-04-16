@@ -591,22 +591,7 @@ body.game-active #controls {
 }
         
 /* --- 1. 先貼這段：定義基本的美化外觀 --- */
-display: grid;
-    /* 這裡使用 repeat(4, 1fr) 讓四列平均分配寬度 */
-    grid-template-columns: repeat(4, 1fr); 
-    gap: 15px;
-    width: 550px; /* 稍微縮小總寬度，使其與 P1/P2 框更協調 */
-    margin: 0 auto;
-    padding: 20px;
-    background: rgba(255, 255, 255, 0.4); 
-    backdrop-filter: blur(15px);
-    border-radius: 40px;
-    
-    /* 關鍵修正：確保內容居中 */
-    justify-content: center; 
-    align-content: center;
-    justify-items: center; 
-}
+
 
 .char-opt {
     width: 100px;
@@ -627,13 +612,37 @@ display: grid;
 
 /* --- 2. 再貼這段：針對手機螢幕做修正 --- */
 @media (max-width: 600px) {
+   /* ✅ 正確的電腦版設定：4 列排開，水平對齊 */
+#character-pool {
+    display: grid;
+    /* 110px * 4 = 440px，剛好放在中間 */
+    grid-template-columns: repeat(4, 110px); 
+    gap: 15px;
+    width: fit-content; 
+    margin: 0 auto;
+    padding: 20px;
+    background: rgba(255, 255, 255, 0.4); 
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    border-radius: 40px;
+    justify-content: center; 
+    align-content: center;
+    justify-items: center; 
+}
+
+/* ✅ 只有當螢幕很窄（手機）時，才切換成 2 列 */
+@media (max-width: 768px) {
     #character-pool {
-        /* 當螢幕很小時，自動把 4 欄擠成 2 欄 */
-        grid-template-columns: repeat(2, 110px) !important;
+        grid-template-columns: repeat(2, 110px); 
     }
+}
 }
         
 #start-game-btn {
+    osition: absolute;    /* 絕對定位，不參與上面三個框的排隊 */
+    bottom: 20px;          /* 距離底部 20px */
+    left: 50%;
+    transform: translateX(-50%); /* 水平置中關鍵 */
     margin-top: 0;
     padding: 18px 80px;
     font-size: 28px;
@@ -648,6 +657,7 @@ display: grid;
     text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
     letter-spacing: 2px;
     animation: pulse 2s infinite;
+    z-index: 1001;
 }
 
 #start-game-btn:active {
@@ -664,14 +674,21 @@ display: grid;
 /* 讓中間內容變成橫向排列 */
 .selection-container {
     display: flex;
-    align-items: flex-end; /* 關鍵：讓 P1、角色池、P2 的底部對齊 */
+    align-items: center;    /* 改回居中對齊，防止預覽框被強行拉長 */
     justify-content: center;
     gap: 40px;
     width: 100%;
-    position: relative;
-    padding-bottom: 120px; /* 為下方的按鈕留出空間 */
+    position: relative;     /* 為了讓按鈕絕對定位 */
+    padding-bottom: 150px;  /* 增加底部間距，給按鈕留位子 */
 }
 
+.player-preview {
+    flex: 0 0 280px; /* 固定寬度，不讓它被中間的角色池擠到變形 */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}       
+        
 /* 預覽框的基礎大小 */
 /* ✅ 這是修正後的新樣式（呈透明朦朧感） */
 .preview-box {
@@ -679,14 +696,12 @@ display: grid;
     height: 250px;
     background: rgba(255, 255, 255, 0.2) !important; 
     backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
     border: 3px dashed rgba(255, 255, 255, 0.5) !important;
     border-radius: 40px;
     display: flex;
     align-items: center;
     justify-content: center;
     box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-    transition: all 0.3s ease;
 }
         
 body:has(#start-screen[style*="display: flex"]) #game-container {
