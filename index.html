@@ -591,26 +591,28 @@ body.game-active #controls {
 }
         
 /* --- 1. 先貼這段：定義基本的美化外觀 --- */
-#character-pool {
-    display: grid;
-    grid-template-columns: repeat(4, 120px); /* 建議給固定寬度，背景才不會跑掉 */
+display: grid;
+    /* 這裡使用 repeat(4, 1fr) 讓四列平均分配寬度 */
+    grid-template-columns: repeat(4, 1fr); 
     gap: 15px;
-    width: 600px; /* 確保背景方格完美包裹 */
+    width: 550px; /* 稍微縮小總寬度，使其與 P1/P2 框更協調 */
     margin: 0 auto;
-    padding: 15px;
+    padding: 20px;
     background: rgba(255, 255, 255, 0.4); 
     backdrop-filter: blur(15px);
-    -webkit-backdrop-filter: blur(15px);
     border-radius: 40px;
-    border: 2px solid rgba(255, 255, 255, 0.6);
-    box-shadow: 0 20px 50px rgba(0,0,0,0.1);
-    justify-items: center;
+    
+    /* 關鍵修正：確保內容居中 */
+    justify-content: center; 
+    align-content: center;
+    justify-items: center; 
 }
 
 .char-opt {
     width: 100px;
     height: 100px;
     background: white;
+    object-fit: contain; /* 確保圖片在方塊內不變形 */
     border-radius: 25px;
     padding: 5px;
     box-sizing: border-box;
@@ -632,7 +634,7 @@ body.game-active #controls {
 }
         
 #start-game-btn {
-    margin-top: 45px;
+    margin-top: 0;
     padding: 18px 80px;
     font-size: 28px;
     font-weight: 900;
@@ -662,10 +664,12 @@ body.game-active #controls {
 /* 讓中間內容變成橫向排列 */
 .selection-container {
     display: flex;
-    align-items: center;
+    align-items: flex-end; /* 關鍵：讓 P1、角色池、P2 的底部對齊 */
     justify-content: center;
-    gap: 20px;
+    gap: 40px;
     width: 100%;
+    position: relative;
+    padding-bottom: 120px; /* 為下方的按鈕留出空間 */
 }
 
 /* 預覽框的基礎大小 */
