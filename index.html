@@ -72,7 +72,13 @@ img {
   object-fit: contain; /* 保持比例，完整顯示圖片 */
 }
         
-#game-container { position: relative; z-index: 10 !important; width: 95%; max-width: 1400px; margin: 20px auto; background: transparent !important;}
+#game-container {
+    position: relative;
+    z-index: 10;
+    display: block !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+}
 
 #board { 
     display: grid !important; 
@@ -707,10 +713,6 @@ body.game-active #controls {
     box-shadow: 0 10px 30px rgba(0,0,0,0.1);
 }
         
-body:has(#start-screen[style*="display: flex"]) #game-container {
-    opacity: 0; /* 或者用 visibility: hidden */
-}
-
 /* 呼吸燈動畫 */
 @keyframes breathing-p1 {
     0% { box-shadow: 0 0 5px var(--p1-color); }
