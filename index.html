@@ -979,6 +979,7 @@ body:has(#start-screen[style*="display: flex"]) #game-container {
 
  <div id="modal">
     <div id="timer" style="font-size: 18px; color: #e67e22; font-weight: bold;">⏳ 剩餘時間: 120s</div>
+    <div id="modal-text" class="speak-trigger">詞語</div>
     <div id="ai-sentence-box" style="margin: 15px 0; padding: 15px; background: #f7fafc; border-left: 5px solid #4299e1; border-radius: 10px; text-align: left;">
         <div id="ai-sentence-text" style="font-size: 20px; color: #4a5568; line-height: 1.4;">這是一個例句。</div>
     </div>
@@ -1116,46 +1117,27 @@ function playSound(name) {
 
 // 1. 專門負責「讀出詞語」
 function speakWord() {
-    // 1. 先停止背景音樂 (如果音樂變數存在)
-    if (typeof bgMusic !== 'undefined') bgMusic.pause(); 
-
-    // 2. 取消之前可能還在播放的語音
-    window.speechSynthesis.cancel(); 
-
+    window.speechSynthesis.cancel();
     const text = document.getElementById('modal-text').innerText;
-    
-    // 3. 檢查文字是否有效
     if (text && text !== "詞語") {
         const msg = new SpeechSynthesisUtterance(text);
         msg.lang = 'zh-HK';
         msg.rate = 0.9;
-
-        // 4. 執行朗讀
         window.speechSynthesis.speak(msg);
-    } // 👈 這是 if 的結尾
-} // 👈 這是 function 的結尾
+    }
+}
 
 // 2. 專門負責「讀出句子」
 function speakSentence() {
-    // 1. 先停止背景音樂 (確保發音清晰)
-    if (typeof bgMusic !== 'undefined') bgMusic.pause(); 
-
-    // 2. 取消之前可能還在播放的語音，避免重疊
-    window.speechSynthesis.cancel(); 
-
-    // 3. 獲取句子內容
+    window.speechSynthesis.cancel();
     const text = document.getElementById('ai-sentence-text').innerText;
-    
-    // 4. 檢查是否有文字內容
     if (text) {
         const msg = new SpeechSynthesisUtterance(text);
-        msg.lang = 'zh-HK'; // 廣東話
-        msg.rate = 0.9;     // 語速稍微放慢
-
-        // 5. 執行朗讀
+        msg.lang = 'zh-HK';
+        msg.rate = 0.9;
         window.speechSynthesis.speak(msg);
-    } // 👈 這是 if 的結尾
-} // 👈 這是 function 的結尾
+    }
+}
 
 // --- 遊戲運作邏輯 ---
 async function roll() {
@@ -1351,40 +1333,20 @@ function showModal() {
 }
 
 function startRecognition() {
-    // 1. 優先停止背景音樂，避免雜音干擾錄音
-    if (typeof bgMusic !== 'undefined') bgMusic.pause();
-
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-    if (!SpeechRecognition) {
-        alert("瀏覽器不支持語音識別");
-        return;
-    }
-
+    if (!SpeechRecognition) return;
     const recognition = new SpeechRecognition();
     recognition.lang = 'zh-HK';
     const originalWord = document.getElementById('modal-text').innerText;
-
     recognition.start();
-
-    // 當識別到結果時
     recognition.onresult = (event) => {
         const result = event.results[0][0].transcript;
-        
-        // 檢查識別結果是否包含正確答案
         if (result.includes(originalWord)) {
             players[turn].score += 5;
             const scoreEl = document.getElementById('s' + (turn + 1));
             if (scoreEl) scoreEl.innerText = players[turn].score;
-            
-            // 答對了，關閉彈窗並自動恢復音樂（在 closeModal 裡處理）
             closeModal(true);
         }
-    };
-
-    // 如果學生取消識別或出錯，也可以考慮在這裡恢復音樂
-    recognition.onerror = () => {
-        console.log("語音識別出錯");
-        // if (typeof bgMusic !== 'undefined') bgMusic.play(); 
     };
 }
 
@@ -1406,10 +1368,6 @@ function closeModal(addScore = true) {
     // 🚪 關閉彈窗時也強制停止語音
     window.speechSynthesis.cancel();
     clearInterval(timerInterval);
-
-    // 恢復背景音樂播放
-    if (typeof bgMusic !== 'undefined') bgMusic.play();
-}
     
     // 隱藏遮罩與彈窗
     const overlay = document.getElementById('modal-overlay');
@@ -1418,6 +1376,7 @@ function closeModal(addScore = true) {
     if (modal) modal.style.display = 'none';
     
     finishTurn();
+}
     
 function finishTurn() {
     turn = (turn === 0) ? 1 : 0;
