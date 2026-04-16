@@ -486,13 +486,13 @@ body.game-active #controls {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    width: 90%;
-    max-width: 500px;
+    width: 85%;
+    max-width: 450px;
     background: #ffffff;
     /* 移除綠色邊框改用深色，讓內容更顯眼 */
     border: 8px solid #2d3748; 
     border-radius: 40px;
-    padding: 40px 30px;
+    padding: 30px 20px;
     z-index: 2050;
     text-align: center;
     box-shadow: 0 30px 60px rgba(0,0,0,0.4);
@@ -580,7 +580,7 @@ speak-trigger, #modal button {
     margin: 25px 0;
     border-radius: 15px;
     font-size: 26px; /* 字體加大 */
-    color: #1a202c !important; /* 深黑色文字 */
+    color: #1a202c;
     line-height: 1.6;
     text-align: left;
     font-weight: bold;
@@ -918,7 +918,6 @@ body:has(#start-screen[style*="display: flex"]) #game-container {
         <div id="timer" style="font-size: 18px; color: #e67e22; font-weight: bold;">⏳ 剩餘時間: 120s</div>
         <div id="modal-text" class="speak-trigger">詞語</div>
         <div id="ai-sentence-box" style="margin: 15px 0; padding: 15px; background: #f7fafc; border-left: 5px solid #4299e1; border-radius: 10px; text-align: left;">
-            <div style="font-size: 14px; color: #4299e1; font-weight: bold; margin-bottom: 5px;">🤖 AI 老師造句：</div>
             <div id="ai-sentence-text" style="font-size: 20px; color: #4a5568; line-height: 1.4;">這是一個例句。</div>
         </div>
         <p style="font-size: 14px; color: #a0aec0; margin-bottom: 20px;">💡 點擊詞語可重複聽讀音</p>
