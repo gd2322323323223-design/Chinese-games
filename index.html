@@ -985,8 +985,8 @@ body:has(#start-screen[style*="display: flex"]) #game-container {
     </div>
      
     <div class="btn-group">
-        <button onclick="speak(true, 'wordOnly')" class="blue-btn">讀出詞語 🔊</button>
-        <button onclick="speak(true, 'sentenceOnly')" class="blue-btn">讀出句子 🔊</button>
+        <button onclick="speakWord()" class="blue-btn">讀出詞語 🔊</button>
+        <button onclick="speakSentence()" class="blue-btn">讀出句子 🔊</button>
     </div>
 
     <div style="display: flex; gap: 10px; flex-direction: column;">
@@ -1115,29 +1115,28 @@ function playSound(name) {
     if (audio[name]) { audio[name].currentTime = 0; audio[name].play().catch(e => {}); }
 }
 
-// 🔊 修改後的語音函式：支援「只讀詞語」或「讀全句」
-function speak(manualFlag = false, mode = 'full') {
-    // 1. 防禦機制：只有點擊按鈕才執行
-    if (manualFlag !== true) return;
+// 1. 專門負責「讀出詞語」
+function speakWord() {
     window.speechSynthesis.cancel();
-    
-    const word = document.getElementById('modal-text').innerText;
-    const sentence = document.getElementById('ai-sentence-text').innerText;
-    
-    if (!word || word === "詞語") return;
-    
-    let textToSpeak = "";
-    
-    if (mode === 'wordOnly') {
-        textToSpeak = word;        
-    } else if (mode === 'sentenceOnly') {
-        textToSpeak = sentence;   
-    } 
-    
-    const msg = new SpeechSynthesisUtterance(textToSpeak);
-    msg.lang = 'zh-HK'; // 廣東話
-    msg.rate = 0.9;
-    window.speechSynthesis.speak(msg);
+    const text = document.getElementById('modal-text').innerText;
+    if (text && text !== "詞語") {
+        const msg = new SpeechSynthesisUtterance(text);
+        msg.lang = 'zh-HK';
+        msg.rate = 0.9;
+        window.speechSynthesis.speak(msg);
+    }
+}
+
+// 2. 專門負責「讀出句子」
+function speakSentence() {
+    window.speechSynthesis.cancel();
+    const text = document.getElementById('ai-sentence-text').innerText;
+    if (text) {
+        const msg = new SpeechSynthesisUtterance(text);
+        msg.lang = 'zh-HK';
+        msg.rate = 0.9;
+        window.speechSynthesis.speak(msg);
+    }
 }
 
 // --- 遊戲運作邏輯 ---
