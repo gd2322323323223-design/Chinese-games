@@ -78,18 +78,12 @@ img {
     display: grid !important; 
     grid-template-columns: repeat(10, 1fr) !important; 
     gap: 140px 15px !important; 
-    padding: 40px 40px 150px 40px !important; 
-    border-radius: 40px; 
-
-    /* ✨ 關鍵修改 1：沙褐色 + 70% 透明度 (如同你原本馬路的設定) */
-    background: rgba(226, 210, 180, 0.7) !important; 
-    
-    /* 🔴 徹底拿掉模糊，讓森林的光影直接透出來 */
-    backdrop-filter: none !important; 
+    padding: 50px !important; 
+    border-radius: 30px; 
+    background: rgb(85, 61, 49, 0.7) !important; 
+    backdrop-filter: blur(8px);
     -webkit-backdrop-filter: none !important;
-    
-    /* ✨ 關鍵修改 2：邊框改為紮實的實色木頭褐色 */
-    border: 12px solid #8d6e63;
+    border: 12px solid #5d4037;
     outline: none; 
     
     /* 輕盈的投影，營造浮空感 */
@@ -115,16 +109,10 @@ img {
 }
 
 .cell:not(.trap-cell):not(.boost-cell):not(.dino-cell) {
-    /* ✨ 關鍵修改 1：全實色純白，與底板拉開層次 */
-    background: #ffffff !important; 
-    
-    /* 文字使用深軍綠色，對比清晰 */
-    color: #3d4a22 !important; 
-    
-    /* 邊框與立體陰影調紮實 */
-    border: 1px solid #e2e8f0 !important;
-    box-shadow: 0 4px 0 #cbd5e1 !important; /* 紮實的立體感 */
-    border-radius: 15px;
+background: #ffffff !important;
+    border: 2px solid #d1d5db !important;
+    box-shadow: 0 8px 15px rgba(0,0,0,0.15), 0 4px 0 #94a3b8 !important; /* 雙層投影 */
+    transform: translateY(-2px); /* 視覺上微浮 */
 }
 
 /* 懸停效果：變亮並彈起 */
@@ -271,10 +259,10 @@ img {
     border-radius: 20px; /* 保持圓角一致 */
     
     /* ✨ 核心修改 2：使用 border-image 製作黃黑警告斜紋邊框 */
-    border: 10px solid transparent !important; /* 設定邊框寬度 */
+    border: 3px solid #48bb78 !important; /* 設定邊框寬度 */
     border-image: repeating-linear-gradient(45deg, #f1c40f, #f1c40f 10px, #000 10px, #000 20px) 10 !important;
     
-    box-shadow: inset 0 0 25px rgba(0,0,0,0.7); /* 強化內陰影，增加幽暗感 */
+    box-shadow: 0 0 15px rgba(72, 187, 120, 0.5), 0 6px 0 #064e3b !important;
     transition: 0.3s;
 }
 
@@ -396,7 +384,11 @@ img {
     z-index: 2;
 }
 
-.cell-text { font-size: 30px; font-weight: 900; color: #1a202c; z-index: 3; margin: 0; line-height: 1.2; }
+.cell-text {
+    color: #1a202c !important;
+    text-shadow: 1px 1px 0px rgba(0,0,0,0.05); /* 極微細陰影增加清晰度 */
+    font-family: "Microsoft JhengHei", "Heiti TC", sans-serif;
+}
 .cell-index { position: absolute; top: 8px; left: 10px; font-size: 14px; color: #a0aec0; }
 
 .player { 
@@ -605,17 +597,17 @@ speak-trigger, #modal button {
     transition: 0.1s;
 }
 
-/* --- 3. 造句方框：簡化配色，背景調亮 --- */
+/* --- 3. 詞語造句文字：取消背景與邊框，保持清晰大字 --- */
 #ai-sentence-text {
-    background: transparent; /* 淺灰色背底，不搶戲 */
-    padding: 0px;
-    margin: 10px 0;
-    border-radius: 0px;
-    font-size: 26px; /* 字體加大 */
-    color: #1a202c;
-    line-height: 1.6;
-    text-align: center;
-    font-weight: bold;
+    background: transparent !important; /* 確保沒有背景方塊 */
+    border: none !important;            /* 確保沒有任何邊框 */
+    padding: 0 !important;              /* 移除內縮，讓文字置中 */
+    margin: 15px 0 !important;          /* 給上下留一點呼吸空間 */
+    font-size: 26px !important;         /* 保持大字體，閱讀不費力 */
+    color: #1a202c !important;          /* 使用深灰色/黑色，最高對比度 */
+    line-height: 1.6 !important;        /* 增加行高，避免文字太擠 */
+    text-align: center !important;      /* 保持置中對齊 */
+    font-weight: bold !important;       /* 加粗，讓字體更明顯 */
 }
         
 /* --- 1. 先貼這段：定義基本的美化外觀 --- */
