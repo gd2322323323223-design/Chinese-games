@@ -480,75 +480,77 @@ body.game-active #controls {
         #btn-roll:hover { background: #38a169; transform: scale(1.05); }
         #btn-roll:disabled { background: #cbd5e0; transform: scale(1); }
 
+/* --- 1. 彈窗本體：簡化邊框，強調對比 --- */
 #modal {
     display: none;
     position: fixed;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    width: 85%;
+    width: 90%;
     max-width: 500px;
-    
-    /* 羊皮紙感背景 */
-    background-color: #fcf3cf; 
-    background-image: radial-gradient(#f7dc6f 1px, transparent 1px);
-    background-size: 20px 20px;
-    
-    /* 厚木質邊框 */
-    border: 10px solid #8b4513; 
-    border-radius: 20px;
-    
-    padding: 30px;
+    background: #ffffff;
+    /* 移除綠色邊框改用深色，讓內容更顯眼 */
+    border: 8px solid #2d3748; 
+    border-radius: 40px;
+    padding: 40px 30px;
     z-index: 2050;
     text-align: center;
-    box-shadow: 0 20px 50px rgba(0,0,0,0.5), inset 0 0 100px rgba(139, 69, 19, 0.2);
-    animation: modalPop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    box-shadow: 0 30px 60px rgba(0,0,0,0.4);
 }
 
-       #modal-text {
-    font-size: 64px !important;
-    color: #2d5a27; /* 森林深綠 */
+    /* --- 2. 詞語大字：極高對比度 (深黑字) --- */
+#modal-text {
+    font-size: 100px !important; /* 再放大幅度 */
+    color: #000000 !important;   /* 強制純黑，絕對清晰 */
     font-weight: 900;
     margin: 20px 0;
-    text-shadow: 2px 2px 0px #fff, 4px 4px 0px rgba(0,0,0,0.1);
-    cursor: pointer;
-    transition: transform 0.2s;
+    letter-spacing: 6px;
+    /* 移除原本的陰影，避免視覺模糊 */
+    text-shadow: none !important; 
+    display: block;
 }
     #modal-text:hover { transform: scale(1.1); }
         
-    /* 按鈕美化 */
+/* --- 4. 按鈕簡化：不要太多漸層 --- */
 .speak-trigger, #modal button {
-    background: linear-gradient(to bottom, #48bb78, #2f855a);
-    color: white;
+    width: 100%;
+    background: #2d3748 !important; /* 改用深色塊 */
+    color: white !important;
     border: none;
-    padding: 12px 25px;
+    padding: 16px 0;
     border-radius: 50px;
-    font-size: 18px;
+    font-size: 22px;
     font-weight: bold;
     cursor: pointer;
-    box-shadow: 0 4px 0 #22543d;
-    transition: all 0.2s;
-    margin: 5px;
+    margin: 10px 0;
+    box-shadow: 0 4px 0 #000;
+    transition: transform 0.1s;
 }
-        .special-notice {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%) scale(0.5);
-            z-index: 2100;
-            padding: 40px 80px;
-            border-radius: 100px;
-            color: white;
-            font-size: 48px;
-            font-weight: 900;
-            text-align: center;
-            white-space: nowrap;
-            box-shadow: 0 0 50px rgba(0,0,0,0.3);
-            opacity: 0;
-            pointer-events: auto;
-            cursor: pointer;
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
+        
+#modal button:last-of-type {
+    background: #48bb78 !important; /* 只有確認按鈕保留綠色 */
+    box-shadow: 0 4px 0 #276749;
+}
+.special-notice {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0.5);
+    z-index: 2100;
+    padding: 40px 80px;
+    border-radius: 100px;
+    color: white;
+    font-size: 48px;
+    font-weight: 900;
+    text-align: center;
+    white-space: nowrap;
+    box-shadow: 0 0 50px rgba(0,0,0,0.3);
+    opacity: 0;
+    pointer-events: auto;
+    cursor: pointer;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
         .special-notice:hover {
             transform: translate(-50%, -50%) scale(1.05);
             filter: brightness(1.1);
@@ -577,17 +579,18 @@ body.game-active #controls {
     transition: 0.1s;
 }
 
-/* 造句方框 */
-#ai-sentence-box {
-    background: rgba(255, 255, 255, 0.6);
-    border-left: 5px solid #e67e22;
-    padding: 15px;
-    margin: 20px 0;
-    border-radius: 10px;
-    font-size: 20px;
+/* --- 3. 造句方框：簡化配色，背景調亮 --- */
+#ai-sentence-text {
+    background: #f1f5f9; /* 淺灰色背底，不搶戲 */
+    border-left: 10px solid #3182ce; /* 用單色藍條標示 */
+    padding: 25px;
+    margin: 25px 0;
+    border-radius: 15px;
+    font-size: 26px; /* 字體加大 */
+    color: #1a202c !important; /* 深黑色文字 */
     line-height: 1.6;
-    color: #4a5568;
     text-align: left;
+    font-weight: bold;
 }
         
 /* --- 1. 先貼這段：定義基本的美化外觀 --- */
@@ -837,14 +840,14 @@ body:has(#start-screen[style*="display: flex"]) #game-container {
     box-shadow: 0 1px 0 #1b5e20;
 }
  /* 5. 倒數計時小標籤 */
-    #timer {
-        background: #ef6c00;
-        color: white;
-        padding: 4px 12px;
-        border-radius: 15px;
-        font-size: 16px;
-        display: inline-block;
-    }
+ #timer {
+    background: #000000;
+    color: #fbbf24;
+    padding: 8px 20px;
+    border-radius: 25px;
+    font-size: 20px;
+    font-weight: 900;
+}
         
     </style>
     
