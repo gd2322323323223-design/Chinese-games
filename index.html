@@ -492,7 +492,7 @@ body.game-active #controls {
     border: none !important; 
     border-radius: 50px !important; 
     cursor: pointer !important; 
-    display: inline-block !important; /* 確保它是顯示的 */
+    display: none; 
     visibility: visible !important;
 }
         
@@ -1081,14 +1081,31 @@ function updateHighlight() {
 }
 
 function startGame() {
-    if (!selectedP1 || !selectedP2) { alert("兩位玩家都必須選擇角色喔！"); return; }
+    if (!selectedP1 || !selectedP2) { 
+        alert("兩位玩家都必須選擇角色喔！"); 
+        return; 
+    }
+    
+    // 設定角色圖片
     document.getElementById('p1').style.backgroundImage = `url('${selectedP1}')`;
     document.getElementById('p2').style.backgroundImage = `url('${selectedP2}')`;
+    
+    // 隱藏首頁
     document.getElementById('start-screen').style.display = 'none';
+    
+    // ✅ 顯示控制區 (使用 setProperty 來確保覆蓋 CSS 的 !important)
     const ctrl = document.getElementById('controls');
-    if (ctrl) ctrl.style.setProperty('display', 'flex', 'important');
+    if (ctrl) {
+        ctrl.style.setProperty('display', 'flex', 'important');
+    }
+    
+    // ✅ 顯示擲骰子按鈕
     const rollBtn = document.getElementById('btn-roll');
-    if (rollBtn) rollBtn.style.setProperty('display', 'inline-block', 'important');
+    if (rollBtn) {
+        rollBtn.style.setProperty('display', 'inline-block', 'important');
+    }
+    
+    // 播放音樂
     if (typeof audio !== 'undefined' && audio.bgm.paused) toggleBGM();
 }
 
