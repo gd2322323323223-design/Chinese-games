@@ -484,7 +484,7 @@ body.game-active #controls {
 .face-6 { transform: rotateX(-90deg) translateZ(30px); }
 
 #btn-roll {
-    position: static !important; /* 讓它回到控制列內，不要在畫面上亂飛 */
+    position: fixed; 
     padding: 15px 40px !important; 
     font-size: 22px !important; 
     background: #48bb78 !important; /* 變回綠色 */
@@ -1086,27 +1086,30 @@ function startGame() {
         return; 
     }
     
-    // 設定角色圖片
+    // 1. 設定角色
     document.getElementById('p1').style.backgroundImage = `url('${selectedP1}')`;
     document.getElementById('p2').style.backgroundImage = `url('${selectedP2}')`;
     
-    // 隱藏首頁
+    // 2. 切換頁面 (隱藏首頁，顯示遊戲頁)
     document.getElementById('start-screen').style.display = 'none';
     
-    // ✅ 顯示控制區 (使用 setProperty 來確保覆蓋 CSS 的 !important)
+    // 3. 顯示控制台與按鈕
+    // 我們使用 setProperty 來強制覆蓋 CSS 裡的 !important
     const ctrl = document.getElementById('controls');
     if (ctrl) {
         ctrl.style.setProperty('display', 'flex', 'important');
     }
     
-    // ✅ 顯示擲骰子按鈕
     const rollBtn = document.getElementById('btn-roll');
     if (rollBtn) {
+        // 這裡將 display 改回 inline-block 或 block
         rollBtn.style.setProperty('display', 'inline-block', 'important');
     }
     
-    // 播放音樂
+    // 4. 音樂與初始化
     if (typeof audio !== 'undefined' && audio.bgm.paused) toggleBGM();
+    
+    // 如果你有 initBoard() 也要記得呼叫
 }
 
 // --- 音效與語音邏輯 ---
