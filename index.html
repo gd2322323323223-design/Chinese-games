@@ -1259,8 +1259,10 @@ function init() {
         cell.id = 'c' + i;
 
         // 判斷是否為終點
-        const isGoal = (i === words.length - 1);
-        if (isGoal) cell.classList.add('goal-cell');
+        if (i === words.length - 1) {
+    cell.classList.add('goal-cell');
+    cell.innerHTML = `<div class="event-icon">🏆</div><div class="cell-text">終點</div>`;
+}
 
         let iconText = "";
         if(traps.includes(i)) { iconText = "🍌"; cell.classList.add('trap-cell'); }
