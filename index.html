@@ -323,39 +323,65 @@ img {
 }
 
 /* 4. 終點整合樣式 (發光 + 佈局) */
+/* 終點格子的核心樣式 */
 .cell.goal-cell {
     grid-column: span 2;
     grid-row: span 2;
     height: auto;
-    min-height: calc(var(--cell-size) * 2 + 130px); 
-    background: radial-gradient(circle, #ffffff 0%, #fff9db 100%) !important;
-    border: 6px solid #f56565 !important;
+    /* 調整高度確保 1 年級學生看得很清楚 */
+    min-height: calc(var(--cell-size) * 2 + 20px); 
+    background: linear-gradient(135deg, #ffd700, #ff8c00, #ffd700) !important; /* 三色漸層更像金屬 */
+    background-size: 200% 200% !important;
+    border: 6px solid #fff !important; /* 加粗邊框 */
     z-index: 5;
     display: flex !important;
     flex-direction: column !important;
     justify-content: center !important;
     align-items: center !important;
-    gap: 10px; 
-    box-shadow: 0 0 30px rgba(252, 196, 25, 0.4) !important;
-    animation: goal-shine 2s infinite alternate;
-}
-@keyframes goal-shine {
-    from { box-shadow: 0 0 20px rgba(252, 196, 25, 0.3); }
-    to { box-shadow: 0 0 40px rgba(252, 196, 25, 0.6); }
-}
-.goal-cell .cell-text {
-    font-size: 60px !important; 
-    font-weight: 900;
-}
-.goal-cell .event-icon {
-    font-size: 120px !important; 
-    position: static !important; 
-    order: 1 
-}
-.goal-cell::after, .goal-cell::before {
-    display: none !important; /* 終點不需要道路 */
+    gap: 5px; 
+    box-shadow: 0 0 30px rgba(255, 215, 0, 1); /* 加強發光 */
+    
+    /* 引入動畫：流光 + 縮放 */
+    animation: goal-shine 3s infinite ease-in-out, gold-move 3s infinite linear;
+    position: relative;
+    overflow: hidden;
 }
 
+/* 縮放與亮度動畫 */
+@keyframes goal-shine {
+    0% { transform: scale(1); filter: brightness(1); }
+    50% { transform: scale(1.03); filter: brightness(1.3); }
+    100% { transform: scale(1); filter: brightness(1); }
+}
+
+/* 背景流光效果動畫 */
+@keyframes gold-move {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+/* 終點大文字 */
+.goal-cell .cell-text {
+    font-size: 40px !important; /* 60px 可能會太擠，建議先試 40-50px */
+    font-weight: 900;
+    color: #8b4513 !important; /* 深棕色文字在金色背景上更清楚 */
+    text-shadow: 1px 1px 0px #fff;
+    order: 2;
+}
+
+/* 終點大獎盃 */
+.goal-cell .event-icon {
+    font-size: 80px !important; /* 配合格子大小微調 */
+    position: static !important; 
+    order: 1; /* 獎盃在上面 */
+    filter: drop-shadow(0 0 10px rgba(255,255,255,0.8));
+}
+
+/* 強制移除終點的路徑線段，保持乾淨 */
+.goal-cell::after, .goal-cell::before {
+    display: none !important;
+}
 /* 5. 道路與通用效果 */
 .cell:hover {
     transform: translateY(-5px);
@@ -1221,16 +1247,40 @@ function init() {
     if (!board) return;
     board.innerHTML = "";
     let displayIndex = 1; 
+    
     words.forEach((w, i) => {
         const cell = document.createElement('div');
-        cell.className = 'cell'; cell.id = 'c' + i;
-        if (i === words.length - 1) cell.classList.add('goal-cell');
+        cell.className = 'cell'; 
+        cell.id = 'c' + i;
+
+        // 判斷是否為終點
+        const isGoal = (i === words.length - 1);
+        if (isGoal) cell.classList.add('goal-cell');
+
         let iconText = "";
         if(traps.includes(i)) { iconText = "🍌"; cell.classList.add('trap-cell'); }
         else if(boosts.includes(i)) { iconText = "🚀"; cell.classList.add('boost-cell'); }
         else if(dinosaurs.includes(i)) { iconText = "🦖"; cell.classList.add('dino-cell'); }
-        let numberHtml = (!i || i === words.length-1 || iconText) ? "" : `<span class="cell-index">${displayIndex++}</span>`;
-        cell.innerHTML = `${numberHtml}${i === words.length - 1 ? `<div class="event-icon" style="font-size: 80px;">🏆</div><div class="cell-text">終點</div>` : (w !== "" ? `<div class="cell-text">${w}</div><span class="event-icon" style="position: absolute; bottom: 5px; right: 8px; font-size: 24px;">${iconText}</span>` : `<div class="event-icon" style="font-size: 50px;">${iconText}</div>`) }`;
+
+        // 終點不需要數字編號
+        let numberHtml = (!i || isGoal || iconText) ? "" : `<span class="cell-index">${displayIndex++}</span>`;
+
+        if (isGoal) {
+            // 🏆 終點的特殊 HTML 結構
+            // 注意：這裡的 class 名稱要跟你的 CSS 對接 (event-icon 和 cell-text)
+            cell.innerHTML = `
+                <div class="event-icon">🏆</div>
+                <div class="cell-text">終點</div>
+            `;
+        } else {
+            // 普通格子的 HTML 結構
+            cell.innerHTML = `
+                ${numberHtml}
+                ${w !== "" ? `<div class="cell-text">${w}</div>` : ""}
+                <span class="event-icon" style="${w !== "" ? 'position: absolute; bottom: 5px; right: 8px; font-size: 24px;' : 'font-size: 50px;'}">${iconText}</span>
+            `;
+        }
+
         board.appendChild(cell);
     });
     setTimeout(updateDisplay, 100);
