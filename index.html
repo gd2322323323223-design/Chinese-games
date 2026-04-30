@@ -1252,42 +1252,37 @@ function init() {
     if (!board) return;
     board.innerHTML = "";
     let displayIndex = 1; 
-    
+
     words.forEach((w, i) => {
         const cell = document.createElement('div');
         cell.className = 'cell'; 
         cell.id = 'c' + i;
 
-        // 判斷是否為終點
-        if (i === words.length - 1) {
-    cell.classList.add('goal-cell');
-    cell.innerHTML = `<div class="event-icon">🏆</div><div class="cell-text">終點</div>`;
-}
-
-        let iconText = "";
-        if(traps.includes(i)) { iconText = "🍌"; cell.classList.add('trap-cell'); }
-        else if(boosts.includes(i)) { iconText = "🚀"; cell.classList.add('boost-cell'); }
-        else if(dinosaurs.includes(i)) { iconText = "🦖"; cell.classList.add('dino-cell'); }
-
-        // 終點不需要數字編號
-        let numberHtml = (!i || isGoal || iconText) ? "" : `<span class="cell-index">${displayIndex++}</span>`;
+        // 🟢 重點：在這裡定義 isGoal
+        const isGoal = (i === words.length - 1);
 
         if (isGoal) {
-            // 🏆 終點的特殊 HTML 結構
-            // 注意：這裡的 class 名稱要跟你的 CSS 對接 (event-icon 和 cell-text)
+            // 🏆 終點格子邏輯
+            cell.classList.add('goal-cell');
             cell.innerHTML = `
                 <div class="event-icon">🏆</div>
                 <div class="cell-text">終點</div>
             `;
         } else {
-            // 普通格子的 HTML 結構
+            // 🍌🚀🦖 其他格子邏輯
+            let iconText = "";
+            if(traps.includes(i)) { iconText = "🍌"; cell.classList.add('trap-cell'); }
+            else if(boosts.includes(i)) { iconText = "🚀"; cell.classList.add('boost-cell'); }
+            else if(dinosaurs.includes(i)) { iconText = "🦖"; cell.classList.add('dino-cell'); }
+
+            let numberHtml = (!i || iconText) ? "" : `<span class="cell-index">${displayIndex++}</span>`;
+            
             cell.innerHTML = `
                 ${numberHtml}
                 ${w !== "" ? `<div class="cell-text">${w}</div>` : ""}
                 <span class="event-icon" style="${w !== "" ? 'position: absolute; bottom: 5px; right: 8px; font-size: 24px;' : 'font-size: 50px;'}">${iconText}</span>
             `;
         }
-
         board.appendChild(cell);
     });
     setTimeout(updateDisplay, 100);
