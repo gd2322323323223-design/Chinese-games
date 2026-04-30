@@ -322,7 +322,6 @@ img {
     100% { transform: translate(1px, -2px) rotate(-1deg); }
 }
 
-/* 終點格子的核心樣式 */
 /* 🏆 終點格子的特別樣式 */
 .cell.goal-cell {
     /* 1. 讓它變大 (佔兩格寬與高) */
@@ -392,6 +391,12 @@ img {
     transform: translateY(-5px);
     background-color: #fff !important;
     box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+}
+
+.cell.goal-cell:hover {
+    background: linear-gradient(135deg, #ffd700, #ffae00, #fff700) !important;
+    transform: scale(1.05) translateY(-5px) !important;
+    filter: brightness(1.2) !important;
 }
         
 .cell::after {
@@ -929,6 +934,24 @@ body:has(#start-screen[style*="display: flex"]) #game-container {
     font-weight: bold !important;
     cursor: pointer;
     box-shadow: 0 4px 0 #1e4e8c !important; /* 增加立體厚度感 */
+}
+        
+ /* 這裡用更強大的選擇器，確保蓋過原本的白色 */
+div.cell.goal-cell, 
+div#board div.cell.goal-cell {
+    background: linear-gradient(135deg, #ffd700, #ffae00, #fff700) !important;
+    background-color: #ffd700 !important; /* 保險起見，加一個純色背景 */
+    grid-column: span 2 !important;
+    grid-row: span 2 !important;
+    height: auto !important;
+    min-height: 200px !important; /* 直接給一個固定數值測試 */
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: center !important;
+    align-items: center !important;
+    z-index: 99 !important;
+    box-shadow: 0 0 30px rgba(255, 215, 0, 0.8) !important;
+    border: 5px solid white !important;
 }
     </style>
     
