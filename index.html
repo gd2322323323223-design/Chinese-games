@@ -322,66 +322,71 @@ img {
     100% { transform: translate(1px, -2px) rotate(-1deg); }
 }
 
-/* 4. 終點整合樣式 (發光 + 佈局) */
 /* 終點格子的核心樣式 */
+/* 🏆 終點格子的特別樣式 */
 .cell.goal-cell {
+    /* 1. 讓它變大 (佔兩格寬與高) */
     grid-column: span 2;
     grid-row: span 2;
     height: auto;
-    /* 調整高度確保 1 年級學生看得很清楚 */
     min-height: calc(var(--cell-size) * 2 + 20px); 
-    background: linear-gradient(135deg, #ffd700, #ff8c00, #ffd700) !important; /* 三色漸層更像金屬 */
+    
+    /* 2. 黃金流光背景 */
+    background: linear-gradient(135deg, #ffd700, #ffae00, #fff700) !important;
     background-size: 200% 200% !important;
-    border: 6px solid #fff !important; /* 加粗邊框 */
-    z-index: 5;
+    
+    /* 3. 邊框與發光 */
+    border: 5px solid #fff !important;
+    box-shadow: 0 0 30px rgba(255, 215, 0, 0.8), inset 0 0 20px rgba(255,255,255,0.5);
+    z-index: 10;
+    
+    /* 4. 佈局設定 */
     display: flex !important;
     flex-direction: column !important;
     justify-content: center !important;
     align-items: center !important;
-    gap: 5px; 
-    box-shadow: 0 0 30px rgba(255, 215, 0, 1); /* 加強發光 */
+    gap: 10px;
     
-    /* 引入動畫：流光 + 縮放 */
-    animation: goal-shine 3s infinite ease-in-out, gold-move 3s infinite linear;
+    /* 5. 呼吸動畫 */
+    animation: goal-shine 3s infinite ease-in-out, gold-flow 3s infinite linear;
     position: relative;
-    overflow: hidden;
 }
 
-/* 縮放與亮度動畫 */
-@keyframes goal-shine {
-    0% { transform: scale(1); filter: brightness(1); }
-    50% { transform: scale(1.03); filter: brightness(1.3); }
-    100% { transform: scale(1); filter: brightness(1); }
-}
-
-/* 背景流光效果動畫 */
-@keyframes gold-move {
+/* 讓金色背景動起來的動畫 */
+@keyframes gold-flow {
     0% { background-position: 0% 50%; }
     50% { background-position: 100% 50%; }
     100% { background-position: 0% 50%; }
 }
 
-/* 終點大文字 */
+/* 呼吸縮放動畫 */
+@keyframes goal-shine {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); filter: brightness(1.2); }
+    100% { transform: scale(1); }
+}
+
+/* 終點文字：加粗、變大 */
 .goal-cell .cell-text {
-    font-size: 40px !important; /* 60px 可能會太擠，建議先試 40-50px */
-    font-weight: 900;
-    color: #8b4513 !important; /* 深棕色文字在金色背景上更清楚 */
-    text-shadow: 1px 1px 0px #fff;
+    font-size: 48px !important;
+    font-weight: 900 !important;
+    color: #8b4513 !important; /* 深棕色在金色上更好看 */
+    text-shadow: 2px 2px 0px rgba(255,255,255,0.5);
     order: 2;
 }
 
-/* 終點大獎盃 */
+/* 終點圖標：大獎盃 */
 .goal-cell .event-icon {
-    font-size: 80px !important; /* 配合格子大小微調 */
-    position: static !important; 
-    order: 1; /* 獎盃在上面 */
+    font-size: 100px !important;
+    order: 1;
     filter: drop-shadow(0 0 10px rgba(255,255,255,0.8));
 }
 
-/* 強制移除終點的路徑線段，保持乾淨 */
+/* 移除終點格子的道路線條，保持乾淨 */
 .goal-cell::after, .goal-cell::before {
     display: none !important;
 }
+        
 /* 5. 道路與通用效果 */
 .cell:hover {
     transform: translateY(-5px);
