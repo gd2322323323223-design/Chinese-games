@@ -1050,7 +1050,7 @@ div#board div.cell.goal-cell {
 </div>
     
 <script>
-// --- 1. 基礎設定與狀態 ---
+// --- 1. 遊戲基礎設定與變數 ---
 let selectedP1 = "", selectedP2 = "", currentSelectingPlayer = 1;
 let pendingSteps = 0, turn = 0, dice = 0, moving = false;
 let waitingForClick = false, specialEventActive = false;
@@ -1060,6 +1060,7 @@ const traps = [1, 16, 39, 48, 61, 76, 96];
 const boosts = [8, 20, 32, 51, 68, 80, 90];
 const dinosaurs = [5, 12, 27, 43, 55, 70, 86, 103];
 
+// --- 2. 核心 8 大題庫 (保留你的數據) ---
 // --- 1. 供詞填充題庫 ---
 const fillTasks = [
     { type: "fill", question: "新年快到了，我和爸媽一起______房子。", options: ["換洗", "打掃", "乾淨"], answer: "打掃" },
@@ -1156,87 +1157,200 @@ const understandTasks = [
     { type: "understand", sentence: "「七時半，我來到了學校。十一時半，我在上中文課。一時半，我在上數學課。三時半，我回到了家裏。」", question: "我在甚麼時候上數學課？", options: ["十一時半", "一時半", "三時半"], answer: "一時半" }
 ];
 
-// 合併所有題目
 const allTasks = [...fillTasks, ...reorderTasks, ...matchTasks, ...radicalTasks, ...puncTasks, ...continueTasks, ...strokeTasks, ...understandTasks];
 
-// --- 3. 棋盤初始化 (去詞語化) ---
-let words = [];
-for (let i = 0; i < 110; i++) {
-    if (i === 0) words.push("起點");
-    else if (i === 109) words.push("終點 🏆");
-    else if (traps.includes(i) || boosts.includes(i) || dinosaurs.includes(i)) words.push("");
-    else words.push("語文挑戰"); 
+// --- 3. 角色選擇函數 (修復報錯) ---
+function selectChar(element, imgPath) {
+    if (currentSelectingPlayer === 1 && selectedP1 === imgPath) { resetSelection(1); return; }
+    if (currentSelectingPlayer === 2 && selectedP2 === imgPath) { resetSelection(2); return; }
+
+    if (imgPath === selectedP1 || imgPath === selectedP2) {
+        alert("這個角色已經被選走囉！"); return;
+    }
+
+    if (currentSelectingPlayer === 1) {
+        selectedP1 = imgPath;
+        const preview = document.getElementById('p1-big-preview');
+        if(preview) preview.innerHTML = `<img src="${imgPath}" style="width:85%;">`;
+        currentSelectingPlayer = 2;
+        updateHint("請 玩家 2 選擇一個角色", "var(--p2-color)");
+    } else {
+        selectedP2 = imgPath;
+        const preview = document.getElementById('p2-big-preview');
+        if(preview) preview.innerHTML = `<img src="${imgPath}" style="width:85%;">`;
+        updateHint("選擇完成！可以開始遊戲囉。", "#48bb78");
+    }
+    updateHighlight();
 }
 
-// --- 4. 遊戲流程控制 ---
+function resetSelection(pNum) {
+    if (pNum === 1) { selectedP1 = ""; currentSelectingPlayer = 1; document.getElementById('p1-big-preview').innerHTML = "P1"; }
+    else { selectedP2 = ""; currentSelectingPlayer = 2; document.getElementById('p2-big-preview').innerHTML = "P2"; }
+    updateHint(`請 玩家 ${pNum} 選擇角色`, pNum===1?"var(--p1-color)":"var(--p2-color)");
+    updateHighlight();
+}
+
+function updateHighlight() {
+    document.querySelectorAll('.char-opt').forEach(opt => {
+        const path = opt.getAttribute('src');
+        opt.classList.remove('selected-p1', 'selected-p2');
+        if (path === selectedP1) opt.classList.add('selected-p1');
+        if (path === selectedP2) opt.classList.add('selected-p2');
+    });
+}
+
+function updateHint(t, c) { const h = document.getElementById('selection-hint'); if(h){ h.innerText=t; h.style.color=c; } }
+
+// --- 4. 棋盤渲染與初始化 ---
+const words = ["起點"];
+for(let i=1; i<109; i++){
+    if(traps.includes(i) || boosts.includes(i) || dinosaurs.includes(i)) words.push("");
+    else words.push("語文挑戰");
+}
+words.push("終點 🏆");
+
+function init() {
+    const board = document.getElementById('board');
+    if (!board) return;
+    board.innerHTML = "";
+    let displayIdx = 1;
+    words.forEach((w, i) => {
+        const cell = document.createElement('div');
+        cell.className = 'cell'; cell.id = 'c' + i;
+        let icon = "";
+        if(traps.includes(i)){ icon="🍌"; cell.classList.add('trap-cell'); }
+        else if(boosts.includes(i)){ icon="🚀"; cell.classList.add('boost-cell'); }
+        else if(dinosaurs.includes(i)){ icon="🦖"; cell.classList.add('dino-cell'); }
+        
+        cell.innerHTML = `<span class="cell-index">${(!i || i==109 || icon)? "" : displayIdx++}</span>
+                          <div class="cell-text">${w}</div>
+                          <span class="event-icon">${icon}</span>`;
+        board.appendChild(cell);
+    });
+    updateDisplay();
+}
+
+// --- 5. 遊戲運作邏輯 ---
 function startGame() {
     if (!selectedP1 || !selectedP2) { alert("兩位玩家都必須選擇角色喔！"); return; }
     document.getElementById('p1').style.backgroundImage = `url('${selectedP1}')`;
     document.getElementById('p2').style.backgroundImage = `url('${selectedP2}')`;
     document.getElementById('start-screen').style.display = 'none';
-    const ctrl = document.getElementById('controls');
-    if (ctrl) ctrl.style.setProperty('display', 'flex', 'important');
-    if (typeof audio !== 'undefined' && audio.bgm.paused) toggleBGM();
+    document.getElementById('controls').style.setProperty('display', 'flex', 'important');
 }
 
+async function roll() {
+    if(moving || waitingForClick) return;
+    playSound('dice');
+    const num = Math.floor(Math.random() * 6) + 1;
+    const diceBox = document.getElementById('dice-box');
+    if(diceBox) diceBox.style.transform = `rotateX(${Math.random()*360+720}deg) rotateY(${Math.random()*360+720}deg)`;
+    await new Promise(r => setTimeout(r, 600));
+    dice = num;
+    waitingForClick = true;
+    document.getElementById('p' + (turn + 1)).classList.add('can-move');
+    document.getElementById('btn-roll').disabled = true;
+}
+
+async function handlePlayerClick(pid) {
+    if (!waitingForClick || pid !== turn || moving) return;
+    waitingForClick = false;
+    document.getElementById('p' + (turn + 1)).classList.remove('can-move');
+    
+    let steps = specialEventActive ? pendingSteps : dice;
+    specialEventActive = false;
+    
+    await moveSteps(pid, steps);
+    checkEndOrModal(pid);
+}
+
+async function moveSteps(pid, steps) {
+    moving = true;
+    const isForward = steps > 0;
+    for (let i = 0; i < Math.abs(steps); i++) {
+        if (isForward && players[pid].pos < words.length - 1) players[pid].pos++;
+        else if (!isForward && players[pid].pos > 0) players[pid].pos--;
+        updateDisplay();
+        await new Promise(r => setTimeout(r, 300));
+    }
+    moving = false;
+}
+
+function updateDisplay() {
+    players.forEach((p, i) => {
+        const cell = document.getElementById('c' + p.pos);
+        const pEl = document.getElementById('p' + (i + 1));
+        if (cell && pEl) {
+            pEl.style.left = (cell.offsetLeft + cell.offsetWidth / 2 - pEl.offsetWidth / 2) + 'px';
+            pEl.style.top = (cell.offsetTop + (i === 0 ? 5 : 35)) + 'px';
+        }
+    });
+}
+
+// --- 6. 挑戰與事件處理 ---
 async function checkEndOrModal(pid) {
     const pos = players[pid].pos;
     if (pos === words.length - 1) {
-        playSound('win');
-        await fancyAlert(`🏆 玩家 ${pid + 1} 奪冠！`, "goal");
-        location.reload();
-    } else if (traps.includes(pos) || boosts.includes(pos) || dinosaurs.includes(pos) || pos === 0) {
-        finishTurn();
+        playSound('win'); alert(`🏆 玩家 ${pid + 1} 奪冠！`); location.reload();
+    } else if (traps.includes(pos)) {
+        await fancyAlert("🍌 香蕉皮！後退 1 格"); prepareSpecial(pid, -1);
+    } else if (boosts.includes(pos)) {
+        await fancyAlert("🚀 火箭衝刺！前進 5 格"); prepareSpecial(pid, 5);
+    } else if (dinosaurs.includes(pos)) {
+        await fancyAlert("🦖 遇到恐龍！後退 3 格"); prepareSpecial(pid, -3);
+    } else if (pos > 0) {
+        openChallengeModal();
     } else {
-        openChallengeModal(); // 啟動語文挑戰
+        finishTurn();
     }
 }
 
-// --- 5. 語文挑戰邏輯 (自動識別 8 種題型) ---
+function prepareSpecial(pid, s) {
+    waitingForClick = true; specialEventActive = true; pendingSteps = s;
+    document.getElementById('p' + (pid + 1)).classList.add('can-move');
+}
+
 function openChallengeModal() {
     const task = allTasks[Math.floor(Math.random() * allTasks.length)];
     const container = document.getElementById('modal-content');
-    container.innerHTML = "";
-    
     let html = `<div class="challenge-box">`;
-    if (task.gif) html += `<img src="images/${task.gif}" style="width:200px; border-radius:10px; margin-bottom:10px;">`;
-    
-    if (task.type === "understand") {
-        html += `<div style="background:#f0f7ff; padding:10px; border-radius:8px; margin-bottom:10px; text-align:left;">${task.sentence}</div>`;
-    }
-    
-    html += `<p style="font-size:22px; font-weight:bold; margin-bottom:20px;">${task.question || "請選擇正確答案："}</p>`;
+    if (task.gif) html += `<img src="images/${task.gif}" style="width:180px; margin-bottom:10px;">`;
+    if (task.type === "understand") html += `<div style="background:#f0f7ff; padding:10px; border-radius:8px; margin-bottom:10px; text-align:left;">${task.sentence}</div>`;
+    html += `<p style="font-size:20px; font-weight:bold; margin-bottom:15px;">${task.question || "請選擇正確答案："}</p>`;
     html += `<div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">`;
-    
     task.options.forEach(opt => {
-        html += `<button class="opt-btn" onclick="handleAns('${opt}', '${task.answer}')">${opt}</button>`;
+        html += `<button class="opt-btn" style="padding:10px; cursor:pointer;" onclick="handleAns('${opt}', '${task.answer}')">${opt}</button>`;
     });
-    
     html += `</div></div>`;
     container.innerHTML = html;
     document.getElementById('modal-overlay').style.display = 'flex';
 }
 
 function handleAns(userSelect, correct) {
-    if (userSelect === correct) {
-        alert("✅ 答對了！");
-    } else {
-        alert("❌ 答錯了！正確答案是：" + correct);
-    }
+    if (userSelect === correct) alert("✅ 答對了！");
+    else alert("❌ 答錯了！正確答案是：" + correct);
     closeModal();
 }
 
-function closeModal() {
-    document.getElementById('modal-overlay').style.display = 'none';
-    finishTurn();
+function closeModal() { document.getElementById('modal-overlay').style.display = 'none'; finishTurn(); }
+
+function finishTurn() {
+    turn = (turn === 0) ? 1 : 0;
+    const tn = document.getElementById('player-turn-name');
+    if (tn) {
+        tn.innerText = "玩家 " + (turn + 1);
+        tn.style.color = (turn === 0) ? "var(--p1-color)" : "var(--p2-color)";
+    }
+    document.getElementById('btn-roll').disabled = false;
 }
 
-// --- 其餘輔助功能 (保留原本的 Dice, Move, SelectChar 邏輯，但刪除 Recognition 和 Word 點擊) ---
-// ... (保留你原本 script 中 selectChar, roll, init, updateDisplay, handlePlayerClick, move, moveSteps, finishTurn 的代碼)
+// 音效模擬 (防止報錯)
+const audio = { bgm: { paused: true, play:()=>{} }, dice: { play:()=>{} }, win: { play:()=>{} } };
+function playSound(n){}
+function toggleBGM(){}
+function fancyAlert(m){ return new Promise(r => { alert(m); r(); }); }
 
-window.onload = function() {
-    init();
-};
+window.onload = init;
 </script>
 </body>
 </html>
