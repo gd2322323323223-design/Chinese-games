@@ -483,6 +483,13 @@ body.game-active #controls {
             display: flex !important;
             z-index: 9999 !important; /* 同時解決你說的：進入遊戲後要浮在最前方 */
         }
+        
+#dice-container {
+    width: 80px;
+    height: 80px;
+    perspective: 400px; /* 增加 3D 感 */
+    margin-bottom: 10px;
+}
 
 #dice-box {
     width: 60px !important;
@@ -1240,15 +1247,46 @@ function startGame() {
 }
 
 async function roll() {
+    // 防止重複點擊
     if(moving || waitingForClick) return;
-    playSound('dice');
-    const num = Math.floor(Math.random() * 6) + 1;
+    
+    // 播放骰子音效（如果有的話）
+    if (typeof playSound === "function") playSound('dice');
+    
     const diceBox = document.getElementById('dice-box');
-    if(diceBox) diceBox.style.transform = `rotateX(${Math.random()*360+720}deg) rotateY(${Math.random()*360+720}deg)`;
+    if (!diceBox) return;
+
+    // 1. 產生 1-6 的隨機點數
+    const num = Math.floor(Math.random() * 6) + 1;
+    
+    // 2. 定義每個點數對應的 3D 旋轉角度
+    const rotations = {
+        1: 'rotateX(0deg) rotateY(0deg)',
+        2: 'rotateX(0deg) rotateY(180deg)',
+        3: 'rotateX(0deg) rotateY(-90deg)',
+        4: 'rotateX(0deg) rotateY(90deg)',
+        5: 'rotateX(-90deg) rotateY(0deg)',
+        6: 'rotateX(90deg) rotateY(0deg)'
+    };
+
+    // 3. 先隨機亂轉幾圈，增加真實感
+    diceBox.style.transition = 'transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
+    const randomExtra = `rotateX(${Math.random() * 360 + 720}deg) rotateY(${Math.random() * 360 + 720}deg)`;
+    diceBox.style.transform = randomExtra;
+
+    // 4. 等待一下，定格到正確的面
     await new Promise(r => setTimeout(r, 600));
-    dice = num;
+    diceBox.style.transform = rotations[num];
+
+    // 5. 將結果存入全局變數 dice 並準備移動
+    await new Promise(r => setTimeout(r, 400));
+    dice = num; 
+    
     waitingForClick = true;
-    document.getElementById('p' + (turn + 1)).classList.add('can-move');
+    const pEl = document.getElementById('p' + (turn + 1));
+    if (pEl) pEl.classList.add('can-move');
+    
+    // 禁用按鈕防止移動完畢前再次擲骰子
     document.getElementById('btn-roll').disabled = true;
 }
 
