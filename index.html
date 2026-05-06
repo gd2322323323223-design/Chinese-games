@@ -507,7 +507,7 @@ body.game-active #controls {
     justify-content: center;
     font-size: 32px;
     font-weight: bold;
-    color: 000000;
+    color: #000000;
     box-shadow: inset 0 0 10px rgba(0,0,0,0.1);
 }
 
@@ -569,7 +569,7 @@ body.game-active #controls {
 speak-trigger, #modal button {
     width: 100%;
     background: #3182ce !important; /* 改用深色塊 */
-    color: ffffff !important;
+    color: #ffffff !important;
     border: none;
     padding: 16px 0;
     border-radius: 50px;
@@ -679,12 +679,10 @@ speak-trigger, #modal button {
     box-shadow: 0 20px 40px rgba(0,0,0,0.15);
 }
 
-/* --- 2. 再貼這段：針對手機螢幕做修正 --- */
-@media (max-width: 600px) {
-   /* ✅ 正確的電腦版設定：4 列排開，水平對齊 */
+/* 1. 先寫基礎樣式（電腦版）：預設就是 4 列 */
 #character-pool {
     display: grid;
-    /* 110px * 4 = 440px，剛好放在中間 */
+    /* 110px * 4 = 440px，在寬螢幕下顯示 4 列 */
     grid-template-columns: repeat(4, 110px); 
     gap: 15px;
     width: fit-content; 
@@ -699,16 +697,16 @@ speak-trigger, #modal button {
     justify-items: center; 
 }
 
-/* ✅ 只有當螢幕很窄（手機）時，才切換成 2 列 */
+/* 2. 再寫媒體查詢：只有當螢幕窄到放不下 4 列時（例如手機 768px 以下），才切換成 2 列 */
 @media (max-width: 768px) {
     #character-pool {
+        /* 手機版改為 2 列，防止畫面超出邊界 */
         grid-template-columns: repeat(2, 110px); 
     }
 }
-}
         
 #start-game-btn {
-    osition: absolute;    /* 絕對定位，不參與上面三個框的排隊 */
+    position: absolute;    /* 絕對定位，不參與上面三個框的排隊 */
     bottom: 20px;          /* 距離底部 20px */
     left: 50%;
     transform: translateX(-50%); /* 水平置中關鍵 */
