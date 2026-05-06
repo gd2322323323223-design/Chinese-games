@@ -1408,8 +1408,8 @@ function fancyAlert(msg, type = 'event') {
 
 function closeModal(addScore = true) {
     // 🚪 關閉彈窗時也強制停止語音
-    window.speechSynthesis.cancel();
-    clearInterval(timerInterval);
+    if (window.speechSynthesis) window.speechSynthesis.cancel();
+    if (typeof timerInterval !== 'undefined') clearInterval(timerInterval);
     
     // 隱藏遮罩與彈窗
     const overlay = document.getElementById('modal-overlay');
@@ -1431,7 +1431,12 @@ function finishTurn() {
     if (rollBtn) rollBtn.disabled = false;
 }
 
-    });
+// ✅ 修正後的 window.onload 結構
+window.onload = function() {
+    // 只有當 init 函數存在時才執行
+    if (typeof init === "function") {
+        init();
+    }
 };
 </script>
 </body>
