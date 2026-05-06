@@ -565,21 +565,7 @@ body.game-active #controls {
 }
     #modal-text:hover { transform: scale(1.1); }
         
-    /* 按鈕美化 */
-speak-trigger, #modal button {
-    width: 100%;
-    background: #3182ce !important; /* 改用深色塊 */
-    color: #ffffff !important;
-    border: none;
-    padding: 16px 0;
-    border-radius: 50px;
-    font-size: 22px;
-    font-weight: bold;
-    cursor: pointer;
-    margin: 10px 0;
-    box-shadow: 0 4px 0 #000;
-    transition: transform 0.1s;
-}
+
         .special-notice {
             position: fixed;
             top: 50%;
@@ -961,7 +947,7 @@ div#board div.cell.goal-cell {
     
     <h1 style="font-size: 60px; color: #5d4037; font-weight: 900; margin-bottom: 40px; background: rgba(255, 255, 255, 0.8); padding: 10px 40px; border-radius: 50px; border: 4px solid #8d6e63; box-shadow: 0 4px 15px rgba(0,0,0,0.1); text-shadow: 2px 2px 0px rgba(255,255,255,0.8);">詞語大作戰</h1>
 
-    <div class="selection-container" style="display: flex; align-items: center; gap: 40px; width: 95%; max-width: 1400px; justify-content: center;">
+   <div class="selection-container" style="display: flex; align-items: flex-start; gap: 20px; width: 100%; max-width: 1200px; justify-content: center; flex-wrap: wrap;">
       
       <div class="player-preview" style="flex: 1; display: flex; flex-direction: column; align-items: center;">
           <h3 id="p1-hint" style="background: #3182ce; color: white; padding: 8px 25px; border-radius: 15px; font-size: 20px; margin-bottom: 15px; box-shadow: 0 4px 8px rgba(0,0,0,0.2); border: 2px solid white;">點擊下面更換角色</h3>
@@ -986,7 +972,6 @@ div#board div.cell.goal-cell {
               <img src="images/star.png" class="char-opt" onclick="selectChar(this, 'images/star.png')">
               <img src="images/panda.png" class="char-opt" onclick="selectChar(this, 'images/panda.png')">
           </div>
-         <button id="start-game-btn" onclick="startGame()" style="display: block; margin: 30px auto;">開始大作戰</button>
       </div>
 
       <div class="player-preview" style="flex: 1; display: flex; flex-direction: column; align-items: center;">
@@ -999,9 +984,7 @@ div#board div.cell.goal-cell {
     
     </div>
 
-    <button id="start-game-btn" onclick="startGame()" style="margin-top: 60px;">
-    開始大作戰
-    </button>
+    <button id="start-game-btn" onclick="startGame()">開始大作戰</button>
 </div>
 
     <div id="music-ctrl" onclick="toggleBGM()" style="position:fixed; top:20px; right:20px; z-index:1000; cursor:pointer; font-size:30px; background:white; border-radius:50%; width:50px; height:50px; display:flex; align-items:center; justify-content:center; box-shadow:0 4px 10px rgba(0,0,0,0.2);">
@@ -1029,21 +1012,14 @@ div#board div.cell.goal-cell {
         <button id="btn-roll" onclick="roll()">擲骰子</button>
     </div>
 
- <div id="modal">
-    <div id="timer" style="font-size: 18px; color: #e67e22; font-weight: bold;">⏳ 剩餘時間: 120s</div>
-    <div id="modal-text" class="speak-trigger">詞語</div>
-    <div id="ai-sentence-box" style="margin: 15px 0; padding: 15px; background: #f7fafc; border-left: 5px solid #4299e1; border-radius: 10px; text-align: left;">
-        <div id="ai-sentence-text" style="font-size: 20px; color: #4a5568; line-height: 1.4;">這是一個例句。</div>
-    </div>
-     
-    <div class="btn-group">
-        <button onclick="speakWord()" class="blue-btn">讀出詞語 🔊</button>
-        <button onclick="speakSentence()" class="blue-btn">讀出句子 🔊</button>
-    </div>
+<div id="modal">
+    <div id="timer">⏳ 語文挑戰中...</div>
+    
+    <div id="modal-content" style="margin: 20px 0; min-height: 100px;">
+          </div>
 
-    <div style="display: flex; gap: 10px; flex-direction: column;">
-        <button onclick="startRecognition()" style="padding: 12px; background: #5d4037; color: white; border: none; border-radius: 15px; font-size: 18px; cursor: pointer; font-weight: bold;">🎤 AI老師聽讀音</button>
-        <button onclick="closeModal(true)" style="padding: 12px; background: #48bb78; color: white; border: none; border-radius: 15px; font-size: 18px; cursor: pointer; font-weight: bold;">✅ 我讀好了！</button>
+    <div id="modal-actions" style="display: flex; gap: 10px; flex-direction: column;">
+        <button onclick="closeModal()" style="padding: 12px; background: #48bb78; color: white; border: none; border-radius: 15px; font-size: 18px; cursor: pointer; font-weight: bold;">繼續遊戲</button>
     </div>
 </div>
     
@@ -1182,30 +1158,6 @@ function toggleBGM() {
 
 function playSound(name) {
     if (audio[name]) { audio[name].currentTime = 0; audio[name].play().catch(e => {}); }
-}
-
-// 1. 專門負責「讀出詞語」
-function speakWord() {
-    window.speechSynthesis.cancel();
-    const text = document.getElementById('modal-text').innerText;
-    if (text && text !== "詞語") {
-        const msg = new SpeechSynthesisUtterance(text);
-        msg.lang = 'zh-HK';
-        msg.rate = 0.9;
-        window.speechSynthesis.speak(msg);
-    }
-}
-
-// 2. 專門負責「讀出句子」
-function speakSentence() {
-    window.speechSynthesis.cancel();
-    const text = document.getElementById('ai-sentence-text').innerText;
-    if (text) {
-        const msg = new SpeechSynthesisUtterance(text);
-        msg.lang = 'zh-HK';
-        msg.rate = 0.9;
-        window.speechSynthesis.speak(msg);
-    }
 }
 
 // --- 遊戲運作邏輯 ---
@@ -1479,21 +1431,6 @@ function finishTurn() {
     if (rollBtn) rollBtn.disabled = false;
 }
 
-// ✅ 核心修正：將所有「點擊監聽器」放在 window.onload 確保元素已載入
-window.onload = function() {
-    init();
-
-    document.addEventListener('click', function(e) {
-        const target = e.target;
-        
-        // 1. 如果點擊的是大字詞語 (ID 為 modal-text) -> 只讀詞語
-        if (target && target.id === 'modal-text') {
-            speak(true, 'wordOnly');
-        } 
-        // 2. 如果點擊的是「讀出句子」按鈕 -> 讀全句
-        else if (target && (target.classList.contains('speak-trigger') || target.innerText.includes('🔊'))) {
-            speak(true, 'full');
-        }
     });
 };
 </script>
