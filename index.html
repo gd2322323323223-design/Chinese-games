@@ -1521,6 +1521,9 @@ async function checkEndOrModal(pid) {
 }
 
 function showModal() {
+    // 每次打開挑戰都要重設機會
+    attempts = 3; 
+
     // 1. 隨機抽一題
     const task = allTasks[Math.floor(Math.random() * allTasks.length)];
     
@@ -1533,7 +1536,7 @@ function showModal() {
     content.innerHTML = "";
     actions.innerHTML = "";
 
-    // 3. 根據題型生成 HTML 內容
+   // 3. 根據題型生成 HTML 內容
     let html = `<div class="challenge-container">`;
     
     if (task.gif) { // 看圖配詞
@@ -1545,47 +1548,40 @@ function showModal() {
     
     html += `<p style="font-size:24px; font-weight:bold; margin-bottom:20px;">${task.question}</p>`;
     
-   if (task.type === "reorder") {
-        // --- 1. 重組句子：生成顯示區域與回饋區 ---
-        // 注意：這裡加入了 feedback-msg 讓學生看到機會提示
+    if (task.type === "reorder") {
+        // --- 重組句子題型 ---
         html += `<div id="reorder-zone"></div>`; 
         html += `<div id="feedback-msg" style="font-size: 22px; font-weight: bold; margin: 10px 0; min-height: 30px;"></div>`;
         html += `<div class="word-pool" style="background: rgba(0,0,0,0.03); padding: 10px; border-radius: 15px;">`;
         
         task.words.forEach(w => {
-            // 這裡呼叫我們新寫的 addToReorder
             html += `<button class="opt-btn" style="width:auto;" onclick="addToReorder(this)">${w}</button>`;
         });
         html += `</div></div>`;
         content.innerHTML = html;
 
-        // --- 2. 建立提交按鈕 ---
         const submitBtn = document.createElement('button');
         submitBtn.className = "opt-btn";
         submitBtn.style.background = "#3182ce";
-        submitBtn.style.color = "white"; // 確認按鈕要顯眼
+        submitBtn.style.color = "white";
         submitBtn.style.width = "100%";
         submitBtn.style.marginTop = "15px";
         submitBtn.innerText = "確認句子順序";
         
         submitBtn.onclick = () => {
-            // 抓取 reorder-zone 裡目前所有的文字
             const userSentence = Array.from(document.getElementById('reorder-zone').children)
                                      .map(node => node.innerText).join("");
-            
             if (userSentence === "") {
                 const feedback = document.getElementById('feedback-msg');
                 if (feedback) feedback.innerHTML = "⚠️ 請先點擊詞語來排列句子喔！";
                 return;
             }
-            // 執行檢查邏輯
             checkUserAnswer(userSentence, task.answer);
         };
         actions.appendChild(submitBtn);
 
     } else {
-        // --- 3. 其他題型 (填充、選擇、標點等) ---
-        // 同樣加入回饋文字區，讓學生看得到「還有幾次機會」
+        // --- 其他題型 (填充、選擇等) ---
         html += `<div id="feedback-msg" style="font-size: 22px; font-weight: bold; margin: 10px 0; min-height: 30px;"></div>`;
         html += `</div>`;
         content.innerHTML = html;
@@ -1599,29 +1595,6 @@ function showModal() {
                 actions.appendChild(btn);
             });
         }
-    }
-        // --- 在這裡貼上函數定義 ---
-function addToReorder(btn) {
-    const zone = document.getElementById('reorder-zone');
-    if (!zone) return;
-    
-    // 1. 標記下方的按鈕為「已使用」
-    btn.classList.add('used');
-    
-    // 2. 創建一個顯示在上方方格的新按鈕
-    const newBtn = document.createElement('button');
-    newBtn.className = "opt-btn"; 
-    newBtn.innerText = btn.innerText;
-    newBtn.style.margin = "4px";
-    
-    // 3. 增加「點擊上方即取消」的功能
-    newBtn.onclick = function() {
-        this.remove();
-        btn.classList.remove('used');
-    };
-    
-    zone.appendChild(newBtn);
-}
     }
 
     // 4. 顯示彈窗與遮罩
@@ -1640,122 +1613,25 @@ function addToReorder(btn) {
             closeModal(); 
         }
     }, 1000);
-
-// 注意：attempts 變數維持在全域
-let attempts = 3; 
-
-function checkUserAnswer(userSelect, correctAnswer) {
-    // 取得回饋文字區域，如果找不到則不執行（防止報錯）
-    const feedbackText = document.getElementById('feedback-msg'); 
-    const currentEvent = window.event; // 取得目前的點擊事件
-    const clickedBtn = currentEvent ? currentEvent.target : null;
-
-    if (userSelect === correctAnswer) {
-        // ✅ 答對了
-        if (typeof playSound === "function") playSound('win');
-        
-        if (feedbackText) {
-            feedbackText.innerHTML = "🌟 太棒了！你觀察得很仔細！";
-            feedbackText.style.color = "#48bb78";
-        }
-        
-        // 隱藏原本的選項，只顯示完成按鈕
-        const actions = document.getElementById('modal-actions');
-        if (actions) {
-            actions.innerHTML = `
-                <button onclick="closeModal()" class="finish-btn" style="
-                    padding: 15px 40px; 
-                    background: #48bb78; 
-                    color: white; 
-                    border: none; 
-                    border-radius: 15px; 
-                    font-size: 24px; 
-                    cursor: pointer; 
-                    font-weight: bold;
-                    width: 100%;
-                ">完成挑戰 🏆</button>
-            `;
-        }
-    } else {
-        // ❌ 答錯了
-        attempts--;
-        if (typeof playSound === "function") playSound('wrong'); 
-        
-        if (attempts > 0) {
-            if (feedbackText) {
-                feedbackText.innerHTML = `😮 差一點點！還有 ${attempts} 次機會，加油！`;
-                feedbackText.style.color = "#f56565";
-            }
-            // 讓點擊的按鈕觸發抖動 CSS 特效
-            if (clickedBtn) {
-                clickedBtn.classList.add('wrong-answer');
-                setTimeout(() => clickedBtn.classList.remove('wrong-answer'), 500);
-            }
-        } else {
-            if (feedbackText) {
-                feedbackText.innerHTML = "💔 沒關係，下次再挑戰！正確答案是「" + correctAnswer + "」";
-            }
-            // 機會用完，等待 2 秒讓學生看清楚答案後關閉
-            setTimeout(closeModal, 2000); 
-        }
-    }
-}
-
-// ⚠️ 重要：在你的 showModal 函數裡，請務必加上這行：
-// function showModal() {
-//    attempts = 3; // 每次打開挑戰都要重設機會
-
-// --- 3. 關閉彈窗並換人 ---
-function closeModal() {
-    // 停止所有活動
-    if (window.speechSynthesis) window.speechSynthesis.cancel();
-    clearInterval(timerInterval);
+} // <--- 這是 showModal 的結尾
     
-    // 隱藏 UI
-    const overlay = document.getElementById('modal-overlay');
-    const modal = document.getElementById('modal');
-    if (overlay) overlay.style.display = 'none';
-    if (modal) modal.style.display = 'none';
+    function addToReorder(btn) {
+    const zone = document.getElementById('reorder-zone');
+    if (!zone) return;
     
-    // 執行換人
-    finishTurn();
-}
-
-// --- 4. 切換回合 (核心邏輯) ---
-function finishTurn() {
-    turn = (turn === 0) ? 1 : 0;
-    const turnName = document.getElementById('player-turn-name');
-    if (turnName) {
-        turnName.innerText = "玩家 " + (turn + 1);
-        turnName.style.color = (turn === 0) ? "var(--p1-color)" : "var(--p2-color)";
-    }
-    // 重新啟用骰子按鈕
-    const rollBtn = document.getElementById('btn-roll');
-    if (rollBtn) rollBtn.disabled = false;
-}
-
-// --- 5. 事件提示 (香蕉皮、火箭等) ---
-function fancyAlert(msg, type = 'event') {
-    return new Promise(resolve => {
-        const notice = document.createElement('div');
-        notice.className = `special-notice notice-${type}`;
-        notice.innerHTML = `${msg}<br><span style="font-size:16px; opacity:0.8;">( 點擊關閉 )</span>`;
-        document.body.appendChild(notice);
-        setTimeout(() => notice.classList.add('show'), 10);
-        notice.onclick = () => {
-            notice.classList.remove('show');
-            setTimeout(() => { notice.remove(); resolve(); }, 400);
-        };
-    });
-}
+    btn.classList.add('used');
+    const newBtn = document.createElement('button');
+    newBtn.className = "opt-btn"; 
+    newBtn.innerText = btn.innerText;
+    newBtn.style.margin = "4px";
     
-// ✅ 修正後的 window.onload 結構
-window.onload = function() {
-    // 只有當 init 函數存在時才執行
-    if (typeof init === "function") {
-        init();
-    }
-};
+    newBtn.onclick = function() {
+        this.remove();
+        btn.classList.remove('used');
+    };
+    
+    zone.appendChild(newBtn);
+}
 </script>
 </body>
 </html>
