@@ -937,6 +937,36 @@ div#board div.cell.goal-cell {
     box-shadow: 0 0 30px rgba(255, 215, 0, 0.8) !important;
     border: 5px solid white !important;
 }
+     .opt-btn {
+            padding: 15px 30px;
+            margin: 10px;
+            font-size: 32px; 
+            font-weight: bold;
+            color: #5d4037; 
+            background: #fff9c4; 
+            border: 3px solid #ffccbc;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.2s;
+            min-width: 80px;
+        }
+
+        .opt-btn:hover {
+            background: #fff176;
+            transform: scale(1.05);
+        }
+
+        .wrong-answer {
+            animation: shake 0.5s;
+            background-color: #ffcdd2 !important;
+            border-color: #e53935 !important;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
     </style>
     
 </head>
@@ -1000,11 +1030,17 @@ div#board div.cell.goal-cell {
       <button id="btn-roll" onclick="roll()">擲骰子</button>
   </div>
 
-  <div id="modal" style="display:none;">
-    <div id="timer">⏳ 時間: 120s</div>
-    <div id="modal-content"></div>
-    <div id="modal-actions"></div>
-  </div>
+<div id="modal">
+    <div id="timer">⏳ 剩餘時間: 120s</div>
+    
+    <div id="modal-content">
+        </div>
+
+    <div id="feedback-msg" style="font-size: 22px; font-weight: bold; margin-bottom: 15px; min-height: 30px;"></div>
+
+    <div id="modal-actions">
+        </div>
+</div>
 </body>
     
 <script>
@@ -1514,26 +1550,69 @@ function showModal() {
     }, 1000);
 }
 
-// --- 2. 檢查答案 (由按鈕觸發) ---
+// 注意：attempts 變數維持在全域
+let attempts = 3; 
+
 function checkUserAnswer(userSelect, correctAnswer) {
+    // 取得回饋文字區域，如果找不到則不執行（防止報錯）
+    const feedbackText = document.getElementById('feedback-msg'); 
+    const currentEvent = window.event; // 取得目前的點擊事件
+    const clickedBtn = currentEvent ? currentEvent.target : null;
+
     if (userSelect === correctAnswer) {
-        alert("✅ 太棒了！答對了。");
-        // 如果要加分：players[turn].score += 10;
+        // ✅ 答對了
+        if (typeof playSound === "function") playSound('win');
+        
+        if (feedbackText) {
+            feedbackText.innerHTML = "🌟 太棒了！你觀察得很仔細！";
+            feedbackText.style.color = "#48bb78";
+        }
+        
+        // 隱藏原本的選項，只顯示完成按鈕
+        const actions = document.getElementById('modal-actions');
+        if (actions) {
+            actions.innerHTML = `
+                <button onclick="closeModal()" class="finish-btn" style="
+                    padding: 15px 40px; 
+                    background: #48bb78; 
+                    color: white; 
+                    border: none; 
+                    border-radius: 15px; 
+                    font-size: 24px; 
+                    cursor: pointer; 
+                    font-weight: bold;
+                    width: 100%;
+                ">完成挑戰 🏆</button>
+            `;
+        }
     } else {
-        alert("❌ 差一點點！正確答案是：" + correctAnswer);
+        // ❌ 答錯了
+        attempts--;
+        if (typeof playSound === "function") playSound('wrong'); 
+        
+        if (attempts > 0) {
+            if (feedbackText) {
+                feedbackText.innerHTML = `😮 差一點點！還有 ${attempts} 次機會，加油！`;
+                feedbackText.style.color = "#f56565";
+            }
+            // 讓點擊的按鈕觸發抖動 CSS 特效
+            if (clickedBtn) {
+                clickedBtn.classList.add('wrong-answer');
+                setTimeout(() => clickedBtn.classList.remove('wrong-answer'), 500);
+            }
+        } else {
+            if (feedbackText) {
+                feedbackText.innerHTML = "💔 沒關係，下次再挑戰！正確答案是「" + correctAnswer + "」";
+            }
+            // 機會用完，等待 2 秒讓學生看清楚答案後關閉
+            setTimeout(closeModal, 2000); 
+        }
     }
-    closeModal(); // 檢查完畢後關閉彈窗
 }
-    // 點擊詞語方塊將其加入上方空格
-function addToReorder(btn) {
-    const zone = document.getElementById('reorder-zone');
-    if (!zone) return;
-    
-    // 複製一個方塊放到上方區域
-    const newBtn = btn.cloneNode(true);
-    newBtn.onclick = function() { this.remove(); }; // 點擊上方的方塊可以移除
-    zone.appendChild(newBtn);
-}
+
+// ⚠️ 重要：在你的 showModal 函數裡，請務必加上這行：
+// function showModal() {
+//    attempts = 3; // 每次打開挑戰都要重設機會
 
 // --- 3. 關閉彈窗並換人 ---
 function closeModal() {
