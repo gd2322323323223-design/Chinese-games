@@ -937,30 +937,82 @@ div#board div.cell.goal-cell {
     box-shadow: 0 0 30px rgba(255, 215, 0, 0.8) !important;
     border: 5px solid white !important;
 }
-     .opt-btn {
-            padding: 15px 30px;
-            margin: 10px;
-            font-size: 32px; 
-            font-weight: bold;
-            color: #5d4037; 
-            background: #fff9c4; 
-            border: 3px solid #ffccbc;
-            border-radius: 15px;
-            cursor: pointer;
-            transition: all 0.2s;
-            min-width: 80px;
-        }
+    /* 修改選項按鈕，確保字體清晰 */
+/* --- 選項按鈕基礎樣式 --- */
+.opt-btn {
+    padding: 12px 25px;
+    margin: 8px;
+    font-size: 28px; /* 稍微調整大小，確保長句子詞語放得下 */
+    font-weight: bold;
+    color: #5d4037 !important; /* 強制深色字，解決看不清的問題 */
+    background: #fff9c4; 
+    border: 3px solid #ffe082;
+    border-radius: 15px;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: inline-block;
+    box-shadow: 0 4px 0 #ffccbc; /* 增加一點立體感 */
+}
 
-        .opt-btn:hover {
-            background: #fff176;
-            transform: scale(1.05);
-        }
+/* 滑鼠移上去或觸碰效果 */
+.opt-btn:hover {
+    background: #fff176;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 0 #ffccbc;
+}
 
-        .wrong-answer {
-            animation: shake 0.5s;
-            background-color: #ffcdd2 !important;
-            border-color: #e53935 !important;
-        }
+/* 🟢 重點：當單字被點擊並加入上方方格後，下方的原始按鈕變淡 */
+.opt-btn.used {
+    opacity: 0.3;
+    pointer-events: none; /* 鎖定按鈕，防止重複點擊 */
+    filter: grayscale(0.5);
+    box-shadow: none;
+    transform: none;
+}
+
+/* 🔴 答錯時的抖動特效 */
+.wrong-answer {
+    animation: shake 0.5s;
+    background-color: #ffcdd2 !important;
+    border-color: #e53935 !important;
+    color: #b71c1c !important;
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-5px); }
+    75% { transform: translateX(5px); }
+}
+
+/* 📦 上方重組句子放置區域的樣式優化 */
+#reorder-zone {
+    min-height: 90px;
+    border: 3px dashed #b0bec5;
+    background-color: #fcfcfc;
+    padding: 15px;
+    margin-bottom: 20px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
+    align-items: center;
+    border-radius: 20px;
+}
+
+/* 🏆 答對後出現的「完成」按鈕專屬樣式 */
+.finish-btn {
+    padding: 15px 40px;
+    background: #48bb78 !important;
+    color: white !important;
+    border: none;
+    border-radius: 50px;
+    font-size: 26px;
+    cursor: pointer;
+    font-weight: bold;
+    width: 100%;
+    margin-top: 10px;
+    box-shadow: 0 5px 0 #2f855a;
+}
 
         @keyframes shake {
             0%, 100% { transform: translateX(0); }
@@ -1493,34 +1545,51 @@ function showModal() {
     
     html += `<p style="font-size:24px; font-weight:bold; margin-bottom:20px;">${task.question}</p>`;
     
-    if (task.type === "reorder") {
-        // --- 重組句子題型 ---
-        html += `<div id="reorder-zone" style="min-height:50px; border:2px dashed #ccc; padding:10px; margin-bottom:10px; display:flex; flex-wrap:wrap; gap:5px; justify-content:center;"></div>`;
-        html += `<div class="word-pool">`;
+   if (task.type === "reorder") {
+        // --- 1. 重組句子：生成顯示區域與回饋區 ---
+        // 注意：這裡加入了 feedback-msg 讓學生看到機會提示
+        html += `<div id="reorder-zone"></div>`; 
+        html += `<div id="feedback-msg" style="font-size: 22px; font-weight: bold; margin: 10px 0; min-height: 30px;"></div>`;
+        html += `<div class="word-pool" style="background: rgba(0,0,0,0.03); padding: 10px; border-radius: 15px;">`;
+        
         task.words.forEach(w => {
-            html += `<button class="opt-btn" style="width:auto; margin:5px;" onclick="addToReorder(this)">${w}</button>`;
+            // 這裡呼叫我們新寫的 addToReorder
+            html += `<button class="opt-btn" style="width:auto;" onclick="addToReorder(this)">${w}</button>`;
         });
         html += `</div></div>`;
         content.innerHTML = html;
 
-        // 建立提交按鈕
+        // --- 2. 建立提交按鈕 ---
         const submitBtn = document.createElement('button');
         submitBtn.className = "opt-btn";
         submitBtn.style.background = "#3182ce";
+        submitBtn.style.color = "white"; // 確認按鈕要顯眼
+        submitBtn.style.width = "100%";
         submitBtn.style.marginTop = "15px";
         submitBtn.innerText = "確認句子順序";
+        
         submitBtn.onclick = () => {
+            // 抓取 reorder-zone 裡目前所有的文字
             const userSentence = Array.from(document.getElementById('reorder-zone').children)
-                                     .map(btn => btn.innerText).join("");
+                                     .map(node => node.innerText).join("");
+            
+            if (userSentence === "") {
+                const feedback = document.getElementById('feedback-msg');
+                if (feedback) feedback.innerHTML = "⚠️ 請先點擊詞語來排列句子喔！";
+                return;
+            }
+            // 執行檢查邏輯
             checkUserAnswer(userSentence, task.answer);
         };
         actions.appendChild(submitBtn);
+
     } else {
-        // --- 其他題型 (填充、選擇、標點、部件等) ---
+        // --- 3. 其他題型 (填充、選擇、標點等) ---
+        // 同樣加入回饋文字區，讓學生看得到「還有幾次機會」
+        html += `<div id="feedback-msg" style="font-size: 22px; font-weight: bold; margin: 10px 0; min-height: 30px;"></div>`;
         html += `</div>`;
         content.innerHTML = html;
 
-        // 只有在非重組題型下才生成選項按鈕
         if (task.options) {
             task.options.forEach(opt => {
                 const btn = document.createElement('button');
@@ -1530,6 +1599,29 @@ function showModal() {
                 actions.appendChild(btn);
             });
         }
+    }
+        // --- 在這裡貼上函數定義 ---
+function addToReorder(btn) {
+    const zone = document.getElementById('reorder-zone');
+    if (!zone) return;
+    
+    // 1. 標記下方的按鈕為「已使用」
+    btn.classList.add('used');
+    
+    // 2. 創建一個顯示在上方方格的新按鈕
+    const newBtn = document.createElement('button');
+    newBtn.className = "opt-btn"; 
+    newBtn.innerText = btn.innerText;
+    newBtn.style.margin = "4px";
+    
+    // 3. 增加「點擊上方即取消」的功能
+    newBtn.onclick = function() {
+        this.remove();
+        btn.classList.remove('used');
+    };
+    
+    zone.appendChild(newBtn);
+}
     }
 
     // 4. 顯示彈窗與遮罩
