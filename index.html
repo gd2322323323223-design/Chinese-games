@@ -1632,6 +1632,115 @@ function showModal() {
     
     zone.appendChild(newBtn);
 }
+    function addToReorder(btn) {
+    const zone = document.getElementById('reorder-zone');
+    if (!zone) return;
+    
+    // 標記下方按鈕已使用
+    btn.classList.add('used');
+    
+    const newBtn = document.createElement('button');
+    newBtn.className = "opt-btn"; 
+    newBtn.innerText = btn.innerText;
+    newBtn.style.margin = "4px";
+    
+    // 點擊上方即回收
+    newBtn.onclick = function() {
+        this.remove();
+        btn.classList.remove('used');
+    };
+    
+    zone.appendChild(newBtn);
+}
+    // ==========================================
+// 1. 檢查答案函數 (處理多次機會與鼓勵語)
+// ==========================================
+let attempts = 3; // 全域變數
+
+function checkUserAnswer(userSelect, correctAnswer) {
+    const feedbackText = document.getElementById('feedback-msg'); 
+    const currentEvent = window.event;
+    const clickedBtn = currentEvent ? currentEvent.target : null;
+
+    if (userSelect === correctAnswer) {
+        // ✅ 答對了
+        if (typeof playSound === "function") playSound('win');
+        if (feedbackText) {
+            feedbackText.innerHTML = "🌟 太棒了！你觀察得很仔細！";
+            feedbackText.style.color = "#48bb78";
+        }
+        // 隱藏原本的選項，只顯示綠色的「完成」按鈕
+        const actions = document.getElementById('modal-actions');
+        if (actions) {
+            actions.innerHTML = `<button onclick="closeModal()" class="finish-btn">完成挑戰 🏆</button>`;
+        }
+    } else {
+        // ❌ 答錯了
+        attempts--;
+        if (typeof playSound === "function") playSound('wrong'); 
+        
+        if (attempts > 0) {
+            if (feedbackText) {
+                feedbackText.innerHTML = `😮 差一點點！還有 ${attempts} 次機會，加油！`;
+                feedbackText.style.color = "#f56565";
+            }
+            // 答錯抖動特效 (需配合 CSS)
+            if (clickedBtn && clickedBtn.classList.contains('opt-btn')) {
+                clickedBtn.classList.add('wrong-answer');
+                setTimeout(() => clickedBtn.classList.remove('wrong-answer'), 500);
+            }
+        } else {
+            if (feedbackText) {
+                feedbackText.innerHTML = "💔 沒關係，下次再挑戰！正確答案是「" + correctAnswer + "」";
+                feedbackText.style.color = "#5d4037";
+            }
+            // 機會用完，等待 2 秒讓學生看清楚答案後自動關閉
+            setTimeout(closeModal, 2000); 
+        }
+    }
+}
+
+// ==========================================
+// 2. 重組句子專用：點擊詞語移動函數
+// ==========================================
+function addToReorder(btn) {
+    const zone = document.getElementById('reorder-zone');
+    if (!zone) return;
+    
+    // 標記下方按鈕為已使用（變淡）
+    btn.classList.add('used');
+    
+    // 創建一個顯示在上方方格的新按鈕
+    const newBtn = document.createElement('button');
+    newBtn.className = "opt-btn"; 
+    newBtn.innerText = btn.innerText;
+    newBtn.style.color = "#5d4037"; // 確保字體是深色
+    newBtn.style.margin = "4px";
+    
+    // 增加「點擊上方即回收」的功能
+    newBtn.onclick = function() {
+        this.remove();
+        btn.classList.remove('used');
+    };
+    
+    zone.appendChild(newBtn);
+}
+
+// ==========================================
+// 3. 關閉彈窗並執行換人
+// ==========================================
+function closeModal() {
+    if (window.speechSynthesis) window.speechSynthesis.cancel();
+    if (typeof timerInterval !== 'undefined') clearInterval(timerInterval);
+    
+    const overlay = document.getElementById('modal-overlay');
+    const modal = document.getElementById('modal');
+    if (overlay) overlay.style.display = 'none';
+    if (modal) modal.style.display = 'none';
+    
+    // 呼叫換人函數
+    if (typeof finishTurn === "function") finishTurn();
+}
 </script>
 </body>
 </html>
