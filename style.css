@@ -773,83 +773,80 @@ body.game-active #controls {
     box-shadow: inset 0 2px 5px rgba(0,0,0,0.1);
 }
 
-/* --- d. 選項容器：整體向上調整 --- */
+/* d. 選項按鈕容器 */
 #modal #modal-actions {
     display: flex !important;
     flex-direction: row !important;
     justify-content: center;
-    gap: 35px; 
+    gap: 30px; 
     width: 100%;
-    /* 將整個選項區塊向上提升 */
-    margin-top: -10px !important; 
-    padding-bottom: 20px !important;
+    margin-top: 20px !important; 
 }
 
-/* --- e. 選項按鈕本體 (.opt-btn) --- */
+/* e. 選項按鈕本體 (.opt-btn)：50px 巨無霸大字 */
 #modal .opt-btn {
     position: relative;
     flex: 1;
-    max-width: 280px;   
-    height: 115px;      /* 🚩 稍微加高，讓文字有下移的空間 */
+    max-width: 290px;
+    height: 100px;
     
     background: linear-gradient(180deg, #ffca28 0%, #ffb300 100%) !important;
     border: 4px solid #ff8f00 !important;
-    border-radius: 25px;
+    border-radius: 20px;
     
-    /* 文字設定 */
+    /* 🚩 重點：50px 幼線條大字 */
     color: #5d4037 !important;
-    font-size: 46px !important;   /* 🚩 再次加大到 46px */
-    font-weight: 500 !important;   
+    font-size: 50px !important;
+    font-weight: 500 !important;
     
     display: flex !important;
     align-items: center;
     justify-content: center;
+    padding: 0 10px !important; /* 左右留出一點點呼吸空間 */
     
-    /* 🚩 關鍵修改：增加 padding-top (25px)，把文字往下擠，避開上方的標籤 */
-    padding: 25px 15px 0 15px !important; 
-    
-    box-shadow: 0 8px 0 #e65100, 0 10px 20px rgba(0,0,0,0.2);
+    box-shadow: 0 7px 0 #e65100, 0 10px 20px rgba(0,0,0,0.15);
     cursor: pointer;
-    overflow: visible; 
+    overflow: visible;
+    transition: all 0.1s ease;
 }
 
-/* --- f. 字母標籤徽章 (標籤向上飛得更高) --- */
+/* f. 字母徽章：極致縮小，扣在左上角外部 */
 .opt-label {
     position: absolute;
-    /* 🚩 核心修改：從 -40px 提升到 -55px，確保絕對不碰到 46px 的大字 */
-    top: -55px !important;  
-    left: 50% !important;
-    transform: translateX(-50%) !important; 
+    top: -15px !important;
+    left: -15px !important;
     
-    width: 60px; /* 稍微加大徽章，讓它更醒目 */
-    height: 60px;
-    background: #5d4037; 
+    width: 38px; /* 🚩 縮小圓框 */
+    height: 38px;
+    background: #5d4037;
     color: #ffffff !important;
     border-radius: 50%;
+    
     display: flex;
     align-items: center;
     justify-content: center;
     
-    font-size: 30px !important;
+    font-size: 20px !important; /* 🚩 縮小字母 */
     font-weight: 900;
-    font-family: Arial, sans-serif;
-    border: 4px solid #ffffff; 
-    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-    z-index: 10;
+    border: 3px solid #ffffff;
+    box-shadow: 0 3px 6px rgba(0,0,0,0.3);
+    z-index: 5;
+    pointer-events: none;
 }
 
-/* --- g. 文字垂直微調 --- */
+/* g. 🚩 核心保留：文字垂直微調 */
 .opt-text {
     z-index: 1;
     white-space: nowrap;
-    /* 🚩 確保在大字體下，字體不會因為行高而往上飄 */
+    /* 🚩 鎖定行高為 1，確保 50px 的大字在 100px 高的按鈕裡絕對居中 */
     line-height: 1 !important; 
+    display: block;
 }
 
-/* 按鈕按下的效果 */
+/* 按鈕按下的動態效果 */
 #modal .opt-btn:active {
     transform: translateY(4px);
-    box-shadow: 0 4px 0 #e65100, 0 6px 12px rgba(0,0,0,0.2);
+    box-shadow: 0 3px 0 #e65100, 0 6px 12px rgba(0,0,0,0.2);
 }
 
 /* 5. 供詞填充 */
