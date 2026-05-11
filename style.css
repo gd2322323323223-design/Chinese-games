@@ -682,17 +682,48 @@ body.game-active #controls {
     75% { transform: translateX(5px); }
 }
 
-/* --- 1. 所有題型的題目文字大小 (控制 P 標籤) --- */
-#modal.type-fill p, 
-#modal.type-radical p, 
-#modal.type-punc p, 
-#modal.type-stroke p,
-#modal.type-match p {
-    font-size: 28px !important;  /* 這是題目文字的大小 */
-    width: auto !important;      /* 🚩 題目文字寬度要自動，不能固定 200px */
-    height: auto !important;     /* 🚩 題目文字高度要自動 */
-    margin: 10px 0 !important;
+/* --- 1. 所有題型的題目文字大小 (修正版) --- */
+#modal.type-fill p, #modal.type-fill .task-question,
+#modal.type-radical p, #modal.type-radical .task-question,
+#modal.type-punc p, #modal.type-punc .task-question,
+#modal.type-stroke p, #modal.type-stroke .task-question,
+#modal.type-match p, #modal.type-match .task-question {
+    font-size: 28px !important; 
+    width: auto !important;     
+    height: auto !important;    
+    margin: 5px 0 !important; /* 🚩 稍微縮小間距，適配 40vh */
     color: #1a365d !important;
+    font-weight: bold;
+}
+/* --- 題型標題自動化 --- */
+
+/* 在填充題上方加入標題 */
+#modal.type-fill .challenge-container::before {
+    content: "【 供詞填充 】";
+    display: block;
+    font-size: 18px;
+    color: #3182ce;
+    margin-bottom: 10px;
+    font-weight: bold;
+}
+
+/* 順便也可以幫其他題型也加上去，這樣你題庫就不用重複寫字了 */
+#modal.type-reorder .challenge-container::before {
+    content: "【 重組句子 】";
+    display: block;
+    font-size: 18px;
+    color: #3182ce;
+    margin-bottom: 10px;
+    font-weight: bold;
+}
+
+#modal.type-stroke .challenge-container::before {
+    content: "【 筆順辨認 】";
+    display: block;
+    font-size: 18px;
+    color: #3182ce;
+    margin-bottom: 10px;
+    font-weight: bold;
 }
 
 /* --- 2. 專門針對「筆順題」的長方形按鈕 (控制按鈕) --- */
