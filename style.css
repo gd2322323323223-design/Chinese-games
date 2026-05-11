@@ -913,9 +913,10 @@ div#board div.cell.goal-cell {
     box-shadow: 0 0 30px rgba(255, 215, 0, 0.8) !important;
     border: 5px solid #ffffff !important;
 }
-    /* 修改選項按鈕，確保字體清晰 */
+
 /* --- 選項按鈕基礎樣式 --- */
 .opt-btn {
+ position: relative;
  padding: 12px 20px;
     margin: 8px;
     font-size: 28px; /* 增大字體方便閱讀 */
@@ -938,6 +939,14 @@ div#board div.cell.goal-cell {
     cursor: pointer;
     transition: all 0.2s;
     display: inline-block;
+}
+.opt-label {
+    position: absolute;
+    bottom: 5px;
+    left: 8px;
+    font-size: 18px;
+    color: #5d4037;
+    font-weight: bold;
 }
 
 /* 滑鼠移上去或觸碰效果 */
@@ -974,13 +983,42 @@ div#board div.cell.goal-cell {
     75% { transform: translateX(5px); }
 }
 
-/* --- 1. 純文字類：填充、辨析、標點、筆順 (字數少，字體可以大一點) --- */
+/* --- 1. 所有題型的題目文字大小 (控制 P 標籤) --- */
 #modal.type-fill p, 
 #modal.type-radical p, 
 #modal.type-punc p, 
-#modal.type-stroke p {
-    font-size: 30px !important; 
-    margin: 15px 0 !important;
+#modal.type-stroke p,
+#modal.type-match p {
+    font-size: 28px !important;  /* 這是題目文字的大小 */
+    width: auto !important;      /* 🚩 題目文字寬度要自動，不能固定 200px */
+    height: auto !important;     /* 🚩 題目文字高度要自動 */
+    margin: 10px 0 !important;
+    color: #1a365d !important;
+}
+
+/* --- 2. 專門針對「筆順題」的長方形按鈕 (控制按鈕) --- */
+#modal.type-stroke .opt-btn {
+    width: 180px !important;    /* 🚩 設定長方形按鈕寬度 */
+    height: 100px !important;   /* 🚩 設定高度 */
+    position: relative;         /* 🚩 為了定位左下角的 A. B. C. */
+    font-size: 50px !important; /* 🚩 按鈕內的中文字加大 */
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+    background: #fff9c4 !important;
+    border: 3px solid #ffccbc !important;
+    margin: 10px !important;
+}
+
+/* --- 3. A. B. C. 標籤樣式 --- */
+.opt-label {
+    position: absolute;
+    bottom: 5px;                /* 靠下 */
+    left: 10px;                 /* 靠左 */
+    font-size: 20px;            /* 字母大小 */
+    color: #5d4037;
+    font-family: Arial, sans-serif;
+    font-weight: bold;
 }
 
 /* --- 2. 重組句子 (最危險題型：空間壓縮到極致) --- */
