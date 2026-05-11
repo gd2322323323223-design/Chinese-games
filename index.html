@@ -936,18 +936,28 @@ div#board div.cell.goal-cell {
     /* 修改選項按鈕，確保字體清晰 */
 /* --- 選項按鈕基礎樣式 --- */
 .opt-btn {
-    padding: 12px 25px;
+ padding: 12px 20px;
     margin: 8px;
-    font-size: 28px; /* 稍微調整大小，確保長句子詞語放得下 */
-    font-weight: bold;
-    color: #5d4037 !important; /* 強制深色字，解決看不清的問題 */
-    background: #fff9c4; 
-    border: 3px solid #ffe082;
+    font-size: 28px; /* 增大字體方便閱讀 */
+    font-weight: 900; /* 加粗字體 */
+    
+    /* 🔴 關鍵修正：深咖啡色字，絕對不要用白色 */
+    color: #5d4037 !important; 
+    
+    /* 🟡 背景改用溫暖的淡黃色，對比度最高 */
+    background: #fff9c4 !important; 
+    
+    /* 邊框改深一點點的黃色 */
+    border: 3px solid #ffccbc !important; 
     border-radius: 15px;
+    
+    /* 移除發光陰影，改用實色陰影，字體才會銳利 */
+    text-shadow: none !important;
+    box-shadow: 0 5px 0 #ffab91;
+    
     cursor: pointer;
     transition: all 0.2s;
     display: inline-block;
-    box-shadow: 0 4px 0 #ffccbc; /* 增加一點立體感 */
 }
 
 /* 滑鼠移上去或觸碰效果 */
@@ -959,11 +969,15 @@ div#board div.cell.goal-cell {
 
 /* 🟢 重點：當單字被點擊並加入上方方格後，下方的原始按鈕變淡 */
 .opt-btn.used {
-    opacity: 0.3;
-    pointer-events: none; /* 鎖定按鈕，防止重複點擊 */
-    filter: grayscale(0.5);
+    background: #f5f5f5 !important;
+    color: #bdbdbd !important;
+    border-color: #eeeeee !important;
     box-shadow: none;
-    transform: none;
+    opacity: 0.5;
+}
+     #modal p, #modal div {
+    color: #5d4037 !important; /* 全域深咖啡色 */
+    text-shadow: none !important;
 }
 
 /* 🔴 答錯時的抖動特效 */
@@ -986,7 +1000,7 @@ div#board div.cell.goal-cell {
     width: 95%;              /* 讓方框變寬 */
     max-width: 600px;
     min-height: 80px;        /* 降低高度，看起來更像一行 */
-    border: 3px dashed #8d6e63;
+    border: 3px dashed #bcaaa4 !important;
     background-color: #fdfaf5;
     padding: 15px;
     margin: 0 auto 20px auto;
