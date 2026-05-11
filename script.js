@@ -173,13 +173,52 @@ function updateHighlight() {
 }
 
 function startGame() {
-    if (!selectedP1 || !selectedP2) { alert("兩位玩家都必須選擇角色喔！"); return; }
-    document.getElementById('p1').style.backgroundImage = `url('${selectedP1}')`;
-    document.getElementById('p2').style.backgroundImage = `url('${selectedP2}')`;
+    // 1. 檢查是否選好角色
+    if (!selectedP1 || !selectedP2) { 
+        alert("兩位玩家都必須選擇角色喔！"); 
+        return; 
+    }
+    
+    // 2. 設定棋子圖片，並強制設定縮放比例（防止巨大化）
+    const p1 = document.getElementById('p1');
+    const p2 = document.getElementById('p2');
+    
+    p1.style.backgroundImage = `url('${selectedP1}')`;
+    p1.style.backgroundSize = "contain";      // 🚩 強制縮放，不讓它撐開
+    p1.style.backgroundRepeat = "no-repeat";
+    
+    p2.style.backgroundImage = `url('${selectedP2}')`;
+    p2.style.backgroundSize = "contain";      // 🚩 同上
+    p2.style.backgroundRepeat = "no-repeat";
+    
+    // 3. 畫面切換：隱藏首頁，顯示遊戲主體
     document.getElementById('start-screen').style.display = 'none';
-    document.getElementById('controls').style.setProperty('display', 'flex', 'important');
-    document.getElementById('btn-roll').style.setProperty('display', 'inline-block', 'important');
-    if (audio.bgm.paused) toggleBGM();
+    
+    const gameContainer = document.getElementById('game-container');
+    if (gameContainer) {
+        gameContainer.style.display = 'block'; // 🚩 確保遊戲容器出現
+        gameContainer.style.visibility = 'visible';
+    }
+    
+    // 4. 顯示控制列與按鈕
+    const ctrl = document.getElementById('controls');
+    if (ctrl) {
+        ctrl.style.setProperty('display', 'flex', 'important');
+    }
+    
+    const rollBtn = document.getElementById('btn-roll');
+    if (rollBtn) {
+        rollBtn.style.setProperty('display', 'inline-block', 'important');
+        rollBtn.disabled = false; // 確保按鈕可以按
+    }
+    
+    // 5. 播放音樂
+    if (typeof audio !== 'undefined' && audio.bgm.paused) {
+        toggleBGM();
+    }
+    
+    // 6. 重新校正棋子位置（搬家後位置可能偏移，跑一次更新）
+    setTimeout(updateDisplay, 100);
 }
 
 // --- 4. 音效邏輯 ---
@@ -207,6 +246,11 @@ function playSound(name) {
 
 // --- 5. 棋盤與移動邏輯 ---
 function init() {
+    // 🚩 核心修正：初始化時先讓遊戲容器隱藏，避免它蓋住首頁選角池
+    const gameContainer = document.getElementById('game-container');
+    if (gameContainer) {
+        gameContainer.style.display = 'none'; 
+    }
     const board = document.getElementById('board');
     if (!board) return;
     board.innerHTML = "";
