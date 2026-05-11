@@ -429,31 +429,31 @@ function showModal() {
         html += `<div id="feedback-msg" style="min-height:30px;"></div></div>`;
         content.innerHTML = html;
 
-      if (task.options) {
-        // 定義字母標籤
-        const labels = ["A", "B", "C"];
-        
-       task.options.forEach((opt, index) => {
-    // 1. 🚩 建立一個包裹容器，用來把 A. 和 按鈕垂直排在一起
-    const wrapper = document.createElement('div');
-    wrapper.className = "opt-wrapper"; 
+     if (task.options) {
+    const labels = ["A.", "B.", "C.", "D."];
+    const actions = document.getElementById('modal-actions');
+    
+    // 🚩 建議 1: 確保 actions 存在再執行，避免報錯
+    if (actions) {
+        actions.innerHTML = ""; 
 
-    // 2. 🚩 建立純文字的 A. B. C. 標籤
-    const label = document.createElement('div');
-    label.className = "opt-label-text";
-    label.innerText = labels[index]; 
-    wrapper.appendChild(label); // 放入容器
+        task.options.forEach((opt, index) => {
+            const wrapper = document.createElement('div');
+            wrapper.className = "opt-wrapper";
 
-    // 3. 🚩 建立按鈕本體 (裡面只有選項文字)
-    const btn = document.createElement('button');
-    btn.className = "opt-btn-pure"; // 使用新的純淨 Class 名稱
-    btn.innerText = opt; // 選項文字直接放入
-    btn.onclick = () => checkUserAnswer(opt, task.answer);
-    wrapper.appendChild(btn); // 放入容器
+            const label = document.createElement('div');
+            label.className = "opt-label-text";
+            label.innerText = labels[index] || ""; // 🚩 建議 2: 防止選項超過 4 個時報錯
+            wrapper.appendChild(label);
 
-    // 4. 🚩 最後將整個容器放入 actions 區塊
-    actions.appendChild(wrapper);
-});
+            const btn = document.createElement('button');
+            btn.className = "opt-btn-pure";
+            btn.innerText = opt;
+            btn.onclick = () => checkUserAnswer(opt, task.answer);
+            
+            wrapper.appendChild(btn);
+            actions.appendChild(wrapper);
+        });
     }
 }
 
