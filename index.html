@@ -531,82 +531,106 @@ body.game-active #controls {
         #btn-roll:hover { background: #38a169; transform: scale(1.05); }
         #btn-roll:disabled { background: #cbd5e0; transform: scale(1); }
 
+/* --- 修正後的彈窗與通知樣式 --- */
+
 #modal {
     display: none;
     position: fixed;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    width: 85%;
-    max-width: 450px;
+    
+    /* 🚩 依照需求放大：寬度佔 95%，高度佔 90% */
+    width: 95vw;          
+    height: 90vh;         
+    max-width: 1200px;    /* 避免在超寬螢幕上太難看 */
+    
     background: #ffffff;
-    /* 移除綠色邊框改用深色，讓內容更顯眼 */
-    border: 8px solid #3182ce; 
-    border-radius: 40px;
-    padding: 30px 20px;
+    /* 強化邊框與陰影 */
+    border: 12px solid #3182ce; 
+    border-radius: 50px;
+    padding: 40px;
     z-index: 2050;
     text-align: center;
-    box-shadow: 0 30px 60px rgba(0,0,0,0.4);
+    box-shadow: 0 30px 100px rgba(0,0,0,0.5);
+
+    /* 內部分佈優化 */
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    align-items: center;
 }
 
-   #modal-text {
-    font-size: 60px !important; /* 再放大幅度 */
-    color: #1a365d !important;   /* 強制純黑，絕對清晰 */
+#modal-text {
+    font-size: 80px !important; /* 配合大方框再放大 */
+    color: #1a365d !important;
     font-weight: 900;
     margin: 20px 0;
     letter-spacing: 6px;
-    /* 移除原本的陰影，避免視覺模糊 */
-    text-shadow: none !important; 
+    text-shadow: none !important;
     display: block;
+    transition: transform 0.2s;
 }
-    #modal-text:hover { transform: scale(1.1); }
-        
 
-        .special-notice {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%) scale(0.5);
-            z-index: 2100;
-            padding: 40px 80px;
-            border-radius: 100px;
-            color: #393939;
-            font-size: 48px;
-            font-weight: 900;
-            text-align: center;
-            #ffffff-space: nowrap;
-            box-shadow: 0 0 50px rgba(0,0,0,0.3);
-            opacity: 0;
-            pointer-events: auto;
-            cursor: pointer;
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
-        .special-notice:hover {
-            transform: translate(-50%, -50%) scale(1.05);
-            filter: brightness(1.1);
-        }
-        .special-notice.show {
-            opacity: 1;
-            transform: translate(-50%, -50%) scale(1);
-        }
-        .notice-event {
-            background: linear-gradient(45deg, #4299e1, #667eea);
-            border: 8px solid #ebf8ff;
-        }
-        .notice-goal {
-            background: linear-gradient(45deg, #ecc94b, #ed8936);
-            border: 8px solid #fffaf0;
-            font-size: 60px;
-            animation: gold-glow 1s infinite alternate;
-        }
-        @keyframes modalPop {
-    from { transform: translate(-50%, -50%) scale(0.5); opacity: 0; }
-    to { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+#modal-text:hover { 
+    transform: scale(1.05); 
 }
-        /* 棋子被點擊時的縮放效果 */
+
+.special-notice {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0.5);
+    z-index: 2100;
+    padding: 40px 80px;
+    border-radius: 100px;
+    
+    /* 🚩 修正：原代碼顏色設定與語法錯誤 */
+    color: #ffffff; /* 通常通知文字用白色配深色背景最清晰 */
+    font-size: 56px; /* 稍微加大 */
+    font-weight: 900;
+    text-align: center;
+    white-space: nowrap; /* 🚩 修正：原本誤寫為 #ffffff-space */
+    
+    box-shadow: 0 0 50px rgba(0,0,0,0.4);
+    opacity: 0;
+    pointer-events: auto;
+    cursor: pointer;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.special-notice:hover {
+    transform: translate(-50%, -50%) scale(1.05);
+    filter: brightness(1.1);
+}
+
+.special-notice.show {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+}
+
+.notice-event {
+    background: linear-gradient(45deg, #4299e1, #667eea);
+    border: 8px solid #ebf8ff;
+}
+
+.notice-goal {
+    background: linear-gradient(45deg, #ecc94b, #ed8936);
+    border: 8px solid #fffaf0;
+    font-size: 64px;
+    animation: gold-glow 1s infinite alternate;
+}
+
+/* 棋子被點擊時的縮放效果 */
 .player:active {
-    transform: scale(0.9) translateY(0);
+    transform: scale(0.8) translateY(0); /* 縮放感明顯一點 */
     transition: 0.1s;
+}
+
+/* 彈窗出現動畫 */
+@keyframes modalPop {
+    from { transform: translate(-50%, -50%) scale(0.8); opacity: 0; }
+    to { transform: translate(-50%, -50%) scale(1); opacity: 1; }
 }
 
 /* --- 3. 造句方框：簡化配色，背景調亮 --- */
