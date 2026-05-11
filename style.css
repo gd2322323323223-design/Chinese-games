@@ -733,11 +733,8 @@ body.game-active #controls {
 #modal.type-match .opt-btn { width: 140px !important; height: 70px !important; }
 
 /* ==========================================
- /* ==========================================
-/* ==========================================
    4. 續寫句子 (Continue) 特化樣式區
    ========================================== */
-
 /* a. 頂部時間標籤 */
 #modal #timer {
     font-size: 18px !important;
@@ -783,20 +780,21 @@ body.game-active #controls {
     justify-content: center;
     gap: 30px; 
     width: 100%;
-    margin-top: 45px !important; /* 🚩 加大這裡，給上方懸浮徽章留空間 */
+    /* 🚩 核心修改：使用負的 margin-top 將整個按鈕區塊向上提 */
+    margin-top: 10px !important; 
+    padding-bottom: 20px !important; /* 確保下方不空曠 */
 }
-
 /* e. 選項按鈕本體 (.opt-btn) */
 #modal .opt-btn {
     position: relative;
     flex: 1;
     max-width: 280px;   
-    height: 110px;      
+    height: 100px;      
     background: linear-gradient(180deg, #ffca28 0%, #ffb300 100%) !important;
     border: 4px solid #ff8f00 !important;
     border-radius: 25px;
     
-    /* 文字設定：44px 超大字體，幼細筆畫 */
+    /* 文字：極大且幼 */
     color: #5d4037 !important;
     font-size: 44px !important;   
     font-weight: 500 !important;   
@@ -804,20 +802,20 @@ body.game-active #controls {
     display: flex !important;
     align-items: center;
     justify-content: center;
-    padding: 10px 15px 0 15px !important; 
+    padding: 5px 15px 0 15px !important; 
     
     box-shadow: 0 8px 0 #e65100, 0 10px 20px rgba(0,0,0,0.2);
     cursor: pointer;
-    transition: all 0.1s ease;
-    overflow: visible; /* 徽章必備 */
+    overflow: visible; /* 🚩 必須為 visible 徽章才不會被切斷 */
 }
 
-/* f. 字母標籤徽章：統一為正上方置中 */
+/* f. 字母徽章：置中且「高度懸浮」 */
 .opt-label {
     position: absolute;
-    top: -30px;  /* 🚩 懸浮在頂部 */
-    left: 50%;
-    transform: translateX(-50%); /* 🚩 水平完美置中 */
+    /* 🚩 核心修改：從 -25px 提升到 -40px，徹底離開文字區 */
+    top: -40px !important;  
+    left: 50% !important;
+    transform: translateX(-50%) !important; /* 水平絕對置中 */
     
     width: 55px;
     height: 55px;
@@ -833,21 +831,26 @@ body.game-active #controls {
     font-family: Arial, sans-serif;
     border: 4px solid #ffffff; 
     box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-    z-index: 5;
-    pointer-events: none;
+    z-index: 10; /* 🚩 確保在最上層 */
 }
 
-/* g. 文字與動態效果 */
-.opt-text {
-    z-index: 1;
-    white-space: nowrap;
-    line-height: 1.2;
+/* g. 按鈕按下時的動態 (徽章同步下沉) */
+#modal .opt-btn:active {
+    transform: translateY(4px);
+    box-shadow: 0 4px 0 #e65100, 0 6px 12px rgba(0,0,0,0.2);
 }
 
 #modal .opt-btn:active {
     transform: translateY(4px);
     box-shadow: 0 4px 0 #e65100, 0 6px 12px rgba(0,0,0,0.2);
 }
+
+.opt-text {
+    z-index: 1;
+    white-space: nowrap;
+    line-height: 1;
+}
+
 /* 5. 供詞填充 */
 #modal.type-fill p { font-size: 28px !important; }
 #modal.type-fill .opt-btn { width: 150px !important; height: 80px !important; font-size: 28px !important; }
