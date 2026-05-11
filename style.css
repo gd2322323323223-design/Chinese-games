@@ -55,10 +55,18 @@ body {
     transform: scale(1.05) translateY(0) !important; 
 }
 
-img {
-  width: 100%;     /* 佔滿容器寬度 */
-  height: 100%;    /* 佔滿容器高度 */
-  object-fit: contain; /* 保持比例，完整顯示圖片 */
+/* 只讓預覽框裡面的圖片縮放 */
+.preview-box img {
+    width: 85%;
+    height: 85%;
+    object-fit: contain;
+}
+
+/* 確保角色池的小棋子大小正常 */
+.char-opt {
+    width: 80px;
+    height: 80px;
+    object-fit: contain;
 }
         
 #game-container { position: relative; z-index: 10 !important; width: 95%; max-width: 1400px; margin: 20px auto; background: transparent !important;}
