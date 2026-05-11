@@ -506,49 +506,106 @@ function finishTurn() {
 
 window.onload = init;
 
-// 🧪 測試專用
-// 🧪 修正後的測試專用函數
+// --- 1. 測試專用函數 ---
 function testModal(targetType) {
-    // 1. 從總題庫中找出符合該類型的所有題目
     const filteredTasks = allTasks.filter(t => t.type === targetType);
-    
     if (filteredTasks.length > 0) {
-        // 2. 隨機從過濾出的題目中挑選一題
         const task = filteredTasks[Math.floor(Math.random() * filteredTasks.length)];
-        
-        // 3. 🚩 關鍵：直接呼叫一個專門顯示特定題目的函數，跳過原本 showModal 的隨機抽取邏輯
         displaySpecificTask(task);
     } else {
-        alert("找不到題型為 '" + targetType + "' 的題目，請檢查題庫定義！");
+        alert("找不到題型為 '" + targetType + "' 的題目！");
     }
 }
 
-// 🚩 新增：專門用來顯示「指定題目」的函數
+// --- 2. 顯示特定題目的核心函數 ---
 function displaySpecificTask(task) {
-    attempts = 3; // 重設機會
+    attempts = 3; 
 
     const modal = document.getElementById('modal');
     modal.className = ""; 
     modal.classList.add('type-' + task.type); 
-    modal.style.display = 'flex';
     
     const content = document.getElementById('modal-content');
     const actions = document.getElementById('modal-actions');
-    
-    // 確保容器存在
     if (!content || !actions) return;
 
     content.innerHTML = ""; 
     actions.innerHTML = "";
 
-    // 呼叫原本 showModal 裡面的渲染邏輯
-    // 注意：這裡直接套用你 script.js 裡現有的生成 HTML 邏輯
-    renderTaskContent(task, content, actions);
+    // 🚩 渲染題目內容
+    let html = `<div class="challenge-container">`;
+    if (task.gif) html += `<img src="images/${task.gif}" class="task-image">`;
+    if (task.sentence) html += `<div class="task-sentence-box">${task.sentence}</div>`;
+    html += `<p class="task-question">${task.question}</p>`;
+    html += `<div id="feedback-msg" style="min-height:30px;"></div>`;
+    html += `</div>`; 
+    content.innerHTML = html;
 
-    // 顯示彈窗
+    // 🚩 渲染選項按鈕 (整合 ABC 標籤)
+    if (task.type === "reorder") {
+        // 重組句子特別處理
+        const zone = document.createElement('div');
+        zone.id = "reorder-zone";
+        content.querySelector('.challenge-container').appendChild(zone);
+
+        const pool = document.createElement('div');
+        pool.className = "word-pool";
+        task.words.forEach(w => {
+            const btn = document.createElement('button');
+            btn.className = "opt-btn";
+            btn.innerText = w;
+            btn.onclick = () => addToReorder(btn);
+            pool.appendChild(btn);
+        });
+        content.querySelector('.challenge-container').appendChild(pool);
+
+        const submitBtn = document.createElement('button');
+        submitBtn.className = "submit-btn";
+        submitBtn.innerText = "提 交";
+        submitBtn.onclick = () => {
+            const userSentence = Array.from(document.getElementById('reorder-zone').children).map(n => n.innerText).join("");
+            checkUserAnswer(userSentence, task.answer);
+        };
+        actions.appendChild(submitBtn);
+
+    } else {
+        // 其他題型 (包含續寫句子) 使用 ABC 標籤
+        const labels = ["A", "B", "C", "D"];
+        task.options.forEach((opt, index) => {
+            const btn = document.createElement('button');
+            btn.className = "opt-btn";
+            // 🚩 這裡對應你漂亮的 CSS 字母徽章結構
+            btn.innerHTML = `<span class="opt-label">${labels[index]}</span><span class="opt-text">${opt}</span>`;
+            btn.onclick = () => checkUserAnswer(opt, task.answer);
+            actions.appendChild(btn);
+        });
+    }
+
+    // 顯示
     document.getElementById('modal-overlay').style.display = 'block';
-    document.getElementById('modal').style.display = 'block';
+    document.getElementById('modal').style.display = 'flex';
 
-    // 啟動計時器
+    // 🚩 啟動計時器 (如果沒有這個函數，我直接寫在下面)
     startModalTimer();
+}
+
+// --- 3. 計時器函數 (防報錯補全) ---
+function startModalTimer() {
+    let timeLeft = 120;
+    const timerDisplay = document.getElementById('timer');
+    if (typeof timerInterval !== 'undefined') clearInterval(timerInterval);
+    timerInterval = setInterval(() => {
+        timeLeft--;
+        if (timerDisplay) timerDisplay.innerText = `⏳ 剩餘時間: ${timeLeft}s`;
+        if (timeLeft <= 0) {
+            clearInterval(timerInterval);
+            closeModal();
+        }
+    }, 1000);
+}
+
+// --- 4. 修改原本的隨機抽題函數 (讓它也共用這個顯示 logic) ---
+function showModal() {
+    const task = allTasks[Math.floor(Math.random() * allTasks.length)];
+    if (task) displaySpecificTask(task);
 }
