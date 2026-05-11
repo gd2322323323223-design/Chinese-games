@@ -5,12 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>詞語大作戰</title>
  <style>
-        :root { 
-            --p1-color: #3182ce; 
-            --p2-color: #d53f8c; 
-            --cell-size: 90px; 
-            --road-height: 90px;
-        }
+      :root { 
+    --p1-color: #3182ce; 
+    --p2-color: #d53f8c; 
+    --cell-size: 90px; 
+    --road-height: 90px;
+}
     
 /* --- 第一部分：專門控制背景圖和模糊效果 --- */
 body::before {
@@ -20,28 +20,24 @@ body::before {
     left: 0;
     width: 100%;
     height: 100%;
-    background-image: url('images/board-bg-frontpage.png') !important;
+    background: url('images/board-bg-frontpage.png') no-repeat center center;
     background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-    z-index: 5;
-    
-    /* 這裡控制模糊，只會影響這張圖，不會影響你的棋盤文字 */
-    filter: none !important; 
-    -webkit-filter: none !important;
-    z-index: 1;       /* 確保它在最底層 */
+    z-index: -1; /* 🔴 強制放在最底層，防止蓋住按鈕 */
+    filter: none;
 }
 
 /* --- 第二部分：你原本的 body 樣式（微調） --- */
 body {
     font-family: "Microsoft JhengHei", sans-serif;
     margin: 0;
-    background-color: transparent !important;  
-    background: transparent !important;  
+    background-color: #f0f0f0; /* 給一個基礎底色 */
     position: relative;
-    overflow-y: scroll;
-    padding-bottom: 200px;
+    overflow-x: hidden;
     min-height: 100vh;
+}
+     #start-screen {
+    z-index: 1000;
+    background: rgba(255, 255, 255, 0.1); /* 讓它帶一點點半透明感，透出底層森林 */
 }
         
 /* P1 選中效果：改用 outline 代替 border */
@@ -872,7 +868,7 @@ body:has(#start-screen[style*="display: flex"]) #game-container {
 .boost-cell .event-icon::before {
     background: radial-gradient(ellipse at bottom, #339af0 0%, rgba(51, 154, 240, 0.3) 40%, transparent 70%) !important;
     box-shadow: 0 0 30px rgba(51, 154, 240, 0.3);
-}
+} 
 
 /* 恐龍危機 - 綠光 */
 .dino-cell .event-icon::before {
