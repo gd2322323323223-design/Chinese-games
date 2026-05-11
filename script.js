@@ -429,18 +429,23 @@ function showModal() {
         html += `<div id="feedback-msg" style="min-height:30px;"></div></div>`;
         content.innerHTML = html;
 
-        if (task.options) {
-            const labels = ["A.", "B.", "C.", "D."];
-            task.options.forEach((opt, index) => {
-                const btn = document.createElement('button');
-                btn.className = "opt-btn";
-                if (task.type === "stroke") btn.innerHTML = `<span class="opt-label">${labels[index]}</span>${opt}`;
-                else btn.innerText = opt;
-                btn.onclick = () => checkUserAnswer(opt, task.answer);
-                actions.appendChild(btn);
-            });
-        }
+      if (task.options) {
+        // 定義字母標籤
+        const labels = ["A", "B", "C"];
+        
+        task.options.forEach((opt, index) => {
+            const btn = document.createElement('button');
+            btn.className = "opt-btn";
+            
+            // 🚩 核心：將按鈕內容改為：(字母標籤) + (選項文字)
+            // 這樣在 CSS 裡就可以分開定位
+            btn.innerHTML = `<span class="opt-label">${labels[index]}</span><span class="opt-text">${opt}</span>`;
+            
+            btn.onclick = () => checkUserAnswer(opt, task.answer);
+            actions.appendChild(btn);
+        });
     }
+}
 
     document.getElementById('modal-overlay').style.display = 'block';
     document.getElementById('modal').style.display = 'block';
