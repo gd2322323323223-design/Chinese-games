@@ -791,23 +791,26 @@ body.game-active #controls {
     position: relative;
     flex: 1;
     max-width: 250px;
-    height: 90px; /* 稍微加高一點點，適配更大的字體 */
+    height: 100px; /* 稍微加高一點點，適配更大的字體 */
     
     background: linear-gradient(180deg, #ffca28 0%, #ffb300 100%) !important;
     border: 3px solid #ff8f00 !important;
     border-radius: 20px;
     
-    /* 🚩 修改重點：字體放大且筆畫變幼 */
+    /* 文字設定：放大尺寸，保持細筆畫 */
     color: #5d4037 !important;
-    font-size: 32px !important;   /* 🚩 放大到 32px 讓字體清晰 */
-    font-weight: 600 !important;   /* 🚩 將 900 改為 600，讓筆畫「幼」一點，清晰不重疊 */
-    
-    box-shadow: 0 6px 0 #e65100, 0 8px 15px rgba(0,0,0,0.2);
+    font-size: 38px !important;   /* 🚩 再次放大，讓字體充滿方格 */
+    font-weight: 500 !important;   /* 🚩 保持幼細筆畫 (500 是中等偏細) */
     
     display: flex !important;
     align-items: center;
     justify-content: center;
-    padding: 0 10px 0 35px !important; 
+    padding: 0 10px 0 40px !important; 
+    
+    box-shadow: 0 6px 0 #e65100, 0 8px 15px rgba(0,0,0,0.2);
+    cursor: pointer;
+    transition: all 0.1s ease;
+    overflow: visible;
     
     text-shadow: none !important;
     cursor: pointer;
@@ -824,10 +827,10 @@ body.game-active #controls {
 /* g. 字母標籤徽章 (保持原樣) */
 .opt-label {
     position: absolute;
-    top: -18px;  
-    left: -18px;  
-    width: 52px;
-    height: 52px;
+    top: -22px;  
+    left: -22px;  
+    width: 55px;
+    height: 55px;
     background: #5d4037; 
     color: #ffffff !important;
     border-radius: 50%;
