@@ -759,70 +759,65 @@ body.game-active #controls {
 
 /* c. 問題方框：藍色圓角區 */
 #modal.type-continue p, 
+/* --- 終極比例修正：確保不切底、字體細、位置準 --- */
+
+/* 1. 調整題目方框，縮小高度騰出空間 */
 #modal.type-continue .task-question {
-    font-size: 28px !important;
-    color: #1a365d !important;
-    font-weight: bold;
-    background: #a5d8ff !important;
-    border: 3px solid #1971c2 !important;
-    border-radius: 20px;
-    padding: 20px 40px;
-    width: 90% !important;
-    max-width: 800px;
-    margin: 0 auto 35px auto !important; 
-    box-shadow: inset 0 2px 5px rgba(0,0,0,0.1);
+    font-size: 24px !important; /* 稍微縮小題目字體 */
+    padding: 15px 30px !important;
+    margin: 0 auto 20px auto !important; /* 減少下方留白 */
+    width: 80% !important;
 }
 
-/* d. 選項按鈕容器 */
-/* 🚩 終極強制修正：確保大字、細線、位置正確 */
+/* 2. 選項容器：強制上移，避免切到底部 */
 #modal #modal-actions {
     display: flex !important;
     flex-direction: row !important;
     justify-content: center !important;
-    align-items: flex-end !important;
-    gap: 30px !important;
-    margin-top: 10px !important; /* 向上提拉 */
-    padding: 0 20px 40px 20px !important;
+    align-items: flex-start !important; /* 改為靠上對齊 */
+    gap: 20px !important;
+    margin-top: 5px !important;
+    padding-bottom: 0 !important;
+    height: auto !important;
 }
 
-/* 2. 標籤容器：讓 A. B. C. 在按鈕上面 */
+/* 3. 包裹容器 */
 .opt-wrapper {
     display: flex !important;
     flex-direction: column !important;
     align-items: center !important;
-    flex: 1 !important;
+    width: 180px !important; /* 固定寬度防止撐開 */
 }
 
-/* 3. A. B. C. 文字：純文字，絕不重疊 */
+/* 4. A. B. C. 文字：縮小一點，騰出垂直空間 */
 .opt-label-text {
-    font-size: 32px !important;
+    font-size: 28px !important;
     color: #5d4037 !important;
-    margin-bottom: 10px !important;
     font-weight: bold !important;
-    position: static !important; /* 強制取消所有浮動定位 */
-    transform: none !important;
+    margin-bottom: 5px !important;
 }
 
-/* 4. 按鈕本體：超級大字 + 極幼筆畫 */
+/* 5. 按鈕本體：鎖定高度，字體極大且極細 */
 .opt-btn-pure {
     width: 100% !important;
-    height: 100px !important; 
-    background: #ffb300 !important; /* 鮮艷金色 */
-    border: 3px solid #333 !important;
-    border-radius: 15px !important;
+    height: 80px !important; /* 🚩 縮短高度防止切底 */
+    background: #ffb300 !important;
+    border: 2px solid #333 !important;
+    border-radius: 12px !important;
     
-    /* 🚩 核心：極大字體，極細筆畫 */
-    font-size: 55px !important; 
-    font-weight: 100 !important; /* 100 是最細的筆畫，保證清晰 */
+    /* 🚩 核心：50px 大字 + 極細筆畫 */
+    font-size: 48px !important; 
+    font-weight: 200 !important; /* 🚩 關鍵：極細權重 */
     color: #000 !important;
     
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
-    box-shadow: 0 6px 0 #bf360c !important;
-    cursor: pointer !important;
-    line-height: 1 !important;
-    padding: 0 !important;
+    box-shadow: 0 4px 0 #bf360c !important;
+    
+    /* 防止系統字體加粗 */
+    -webkit-font-smoothing: antialiased;
+    font-family: "Microsoft JhengHei", sans-serif !important;
 }
 
 /* 按下效果 */
