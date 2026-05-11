@@ -777,76 +777,70 @@ body.game-active #controls {
 #modal #modal-actions {
     display: flex !important;
     flex-direction: row !important;
-    justify-content: center;
-    gap: 30px; 
-    width: 100%;
-    margin-top: 20px !important; 
+    justify-content: center !important;
+    align-items: flex-end; /* 讓不同高度的按鈕底部對齊 */
+    gap: 40px; /* 按鈕之間的間距 */
+    width: 100% !important;
+    margin-top: 20px !important;
+    padding-bottom: 20px !important;
 }
 
-/* e. 選項按鈕本體 (.opt-btn)：50px 巨無霸大字 */
-#modal .opt-btn {
+/* e. 🚩 新增：按鈕包裹容器 (處理垂直排列) */
+.opt-wrapper {
+    display: flex;
+    flex-direction: column; /* 🚩 關鍵：讓 A. 在上，按鈕在下 */
+    align-items: center; /* 水平居中 */
+    flex: 1; /* 平均分佈寬度 */
+    max-width: 300px; /* 限制最大寬度 */
+}
+
+/* f. 🚩 新增：按鈕上方的 A. B. C. 純文字標籤 */
+.opt-label-text {
+    font-size: 32px !important; /* 🚩 您要的大標籤字體 */
+    color: #5d4037 !important; /* 深咖啡色 */
+    font-family: "Microsoft JhengHei", sans-serif; /* 統一字體 */
+    font-weight: bold;
+    margin-bottom: 10px !important; /* 與按鈕本體的間距 */
+    text-align: center;
+}
+
+/* g. 🚩 新增：純淨版選項按鈕 (.opt-btn-pure) */
+.opt-btn-pure {
     position: relative;
-    flex: 1;
-    max-width: 290px;
-    height: 100px;
+    width: 100%; /* 撐滿包裹容器 */
+    height: 90px; /* 統一高度 */
     
-    background: linear-gradient(180deg, #ffca28 0%, #ffb300 100%) !important;
-    border: 4px solid #ff8f00 !important;
-    border-radius: 20px;
+    /* 🚩 橘黃色/金色 大富翁風格 */
+    background: #ffb300 !important; /* 純色金色 */
+    border: 3px solid #e65100 !important; /* 橘色邊框 */
+    border-radius: 15px; /* 簡單圓角 */
     
-    /* 🚩 重點：50px 幼線條大字 */
-    color: #5d4037 !important;
-    font-size: 50px !important;
-    font-weight: 500 !important;
+    /* 文字設定：🚩 重點 - 50px 超級大字，幼線條清晰 */
+    color: #5d4037 !important; /* 深咖啡字 */
+    font-size: 50px !important; /* 🚩 您要的極大字體 */
+    font-weight: bold !important; /* 普通粗體，保持筆畫清晰 */
+    font-family: "Microsoft JhengHei", sans-serif;
     
+    /* 佈局設定：內容居中 */
     display: flex !important;
     align-items: center;
     justify-content: center;
-    padding: 0 10px !important; /* 左右留出一點點呼吸空間 */
+    padding: 0 10px !important; 
     
-    box-shadow: 0 7px 0 #e65100, 0 10px 20px rgba(0,0,0,0.15);
+    /* 簡單的立體陰影 */
+    box-shadow: 0 6px 0 #bf360c, 0 8px 15px rgba(0,0,0,0.2);
+    
+    /* 其他設定 */
+    text-shadow: none !important;
     cursor: pointer;
-    overflow: visible;
     transition: all 0.1s ease;
-}
-
-/* f. 字母徽章：極致縮小，扣在左上角外部 */
-.opt-label {
-    position: absolute;
-    top: -15px !important;
-    left: -15px !important;
-    
-    width: 38px; /* 🚩 縮小圓框 */
-    height: 38px;
-    background: #5d4037;
-    color: #ffffff !important;
-    border-radius: 50%;
-    
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    
-    font-size: 20px !important; /* 🚩 縮小字母 */
-    font-weight: 900;
-    border: 3px solid #ffffff;
-    box-shadow: 0 3px 6px rgba(0,0,0,0.3);
-    z-index: 5;
-    pointer-events: none;
-}
-
-/* g. 🚩 核心保留：文字垂直微調 */
-.opt-text {
-    z-index: 1;
-    white-space: nowrap;
-    /* 🚩 鎖定行高為 1，確保 50px 的大字在 100px 高的按鈕裡絕對居中 */
-    line-height: 1 !important; 
-    display: block;
+    border-style: solid; /* 確保邊框顯示 */
 }
 
 /* 按鈕按下的動態效果 */
-#modal .opt-btn:active {
+.opt-btn-pure:active {
     transform: translateY(4px);
-    box-shadow: 0 3px 0 #e65100, 0 6px 12px rgba(0,0,0,0.2);
+    box-shadow: 0 2px 0 #bf360c, 0 4px 10px rgba(0,0,0,0.2);
 }
 
 /* 5. 供詞填充 */
