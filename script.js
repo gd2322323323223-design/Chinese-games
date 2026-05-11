@@ -391,25 +391,23 @@ function displaySpecificTask(task) {
     actions.innerHTML = ""; 
 
     task.options.forEach((opt, index) => {
-        // 建立一個垂直的容器
-        const wrapper = document.createElement('div');
-        wrapper.className = "opt-wrapper";
+    const wrapper = document.createElement('div');
+    wrapper.className = "opt-wrapper";
 
-        // 建立上面的 A. B. C.
-        const label = document.createElement('div');
-        label.className = "opt-label-text";
-        label.innerText = labels[index];
-        wrapper.appendChild(label);
+    const label = document.createElement('div');
+    label.className = "opt-label-text";
+    label.innerText = labels[index]; 
+    wrapper.appendChild(label);
 
-        // 建立下面的金大按鈕
-        const btn = document.createElement('button');
-        btn.className = "opt-btn-pure";
-        btn.innerText = opt;
-        btn.onclick = () => checkUserAnswer(opt, task.answer);
-        
-        wrapper.appendChild(btn);
-        actions.appendChild(wrapper);
-    });
+    const btn = document.createElement('button');
+    btn.className = "opt-btn-pure";
+    // 🚩 使用 innerText 確保不會被之前的 HTML 標籤干擾
+    btn.innerText = opt; 
+    btn.onclick = () => checkUserAnswer(opt, task.answer);
+    
+    wrapper.appendChild(btn);
+    actions.appendChild(wrapper);
+});
 }
 
     // C. 顯示與計時
