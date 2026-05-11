@@ -433,17 +433,27 @@ function showModal() {
         // 定義字母標籤
         const labels = ["A", "B", "C"];
         
-        task.options.forEach((opt, index) => {
-            const btn = document.createElement('button');
-            btn.className = "opt-btn";
-            
-            // 🚩 核心：將按鈕內容改為：(字母標籤) + (選項文字)
-            // 這樣在 CSS 裡就可以分開定位
-            btn.innerHTML = `<span class="opt-label">${labels[index]}</span><span class="opt-text">${opt}</span>`;
-            
-            btn.onclick = () => checkUserAnswer(opt, task.answer);
-            actions.appendChild(btn);
-        });
+       task.options.forEach((opt, index) => {
+    // 1. 🚩 建立一個包裹容器，用來把 A. 和 按鈕垂直排在一起
+    const wrapper = document.createElement('div');
+    wrapper.className = "opt-wrapper"; 
+
+    // 2. 🚩 建立純文字的 A. B. C. 標籤
+    const label = document.createElement('div');
+    label.className = "opt-label-text";
+    label.innerText = labels[index]; 
+    wrapper.appendChild(label); // 放入容器
+
+    // 3. 🚩 建立按鈕本體 (裡面只有選項文字)
+    const btn = document.createElement('button');
+    btn.className = "opt-btn-pure"; // 使用新的純淨 Class 名稱
+    btn.innerText = opt; // 選項文字直接放入
+    btn.onclick = () => checkUserAnswer(opt, task.answer);
+    wrapper.appendChild(btn); // 放入容器
+
+    // 4. 🚩 最後將整個容器放入 actions 區塊
+    actions.appendChild(wrapper);
+});
     }
 }
 
