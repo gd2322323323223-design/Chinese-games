@@ -533,6 +533,7 @@ body.game-active #controls {
 
 /* --- 修正後的彈窗與通知樣式 --- */
 
+/* --- 針對 60vw / 40vh 比例優化的彈窗樣式 --- */
 #modal {
     display: none;
     position: fixed;
@@ -540,41 +541,37 @@ body.game-active #controls {
     left: 50%;
     transform: translate(-50%, -50%);
     
-    /* 🚩 依照需求放大：寬度佔 95%，高度佔 90% */
-    width: 50vw;          
-    height: 35vh;         
-    max-width: 1200px;    /* 避免在超寬螢幕上太難看 */
+    width: 60vw;          
+    height: 40vh;         
+    max-width: 800px;     
+    min-height: 380px;    /* 🚩 確保至少有 380px 高度，否則內容會疊在一起 */
     
     background: #ffffff;
-    /* 強化邊框與陰影 */
-    border: 12px solid #3182ce; 
-    border-radius: 50px;
-    padding: 40px;
+    border: 8px solid #3182ce; 
+    border-radius: 30px;      
+    padding: 15px 20px;       /* 減少內邊距以爭取高度 */
     z-index: 2050;
     text-align: center;
-    box-shadow: 0 30px 100px rgba(0,0,0,0.5);
+    box-shadow: 0 20px 60px rgba(0,0,0,0.4);
 
-    /* 內部分佈優化 */
     display: flex;
     flex-direction: column;
-    justify-content: space-around;
+    justify-content: space-between; /* 讓內容在扁平框內頂底分布 */
     align-items: center;
 }
 
 #modal-text {
-    font-size: 80px !important; /* 配合大方框再放大 */
+    font-size: 32px !important; /* 🚩 從 80px 縮小，適配 40vh 高度 */
     color: #1a365d !important;
     font-weight: 900;
-    margin: 20px 0;
-    letter-spacing: 6px;
+    margin: 5px 0;             /* 壓縮間距 */
+    letter-spacing: 2px;       /* 縮小間距 */
     text-shadow: none !important;
     display: block;
     transition: transform 0.2s;
 }
 
-#modal-text:hover { 
-    transform: scale(1.05); 
-}
+#modal-text:hover { transform: scale(1.05); }
 
 .special-notice {
     position: fixed;
@@ -582,16 +579,13 @@ body.game-active #controls {
     left: 50%;
     transform: translate(-50%, -50%) scale(0.5);
     z-index: 2100;
-    padding: 40px 80px;
+    padding: 20px 50px;        /* 縮小 Padding */
     border-radius: 100px;
-    
-    /* 🚩 修正：原代碼顏色設定與語法錯誤 */
-    color: #ffffff; /* 通常通知文字用白色配深色背景最清晰 */
-    font-size: 56px; /* 稍微加大 */
+    color: #ffffff; 
+    font-size: 36px;           /* 從 56px 縮小 */
     font-weight: 900;
     text-align: center;
-    white-space: nowrap; /* 🚩 修正：原本誤寫為 #ffffff-space */
-    
+    white-space: nowrap; 
     box-shadow: 0 0 50px rgba(0,0,0,0.4);
     opacity: 0;
     pointer-events: auto;
@@ -599,110 +593,78 @@ body.game-active #controls {
     transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
-.special-notice:hover {
-    transform: translate(-50%, -50%) scale(1.05);
-    filter: brightness(1.1);
+.special-notice:hover { transform: translate(-50%, -50%) scale(1.05); filter: brightness(1.1); }
+.special-notice.show { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+
+.notice-event { background: linear-gradient(45deg, #4299e1, #667eea); border: 6px solid #ebf8ff; }
+.notice-goal { 
+    background: linear-gradient(45deg, #ecc94b, #ed8936); 
+    border: 6px solid #fffaf0; 
+    font-size: 42px;           /* 從 64px 縮小 */
+    animation: gold-glow 1s infinite alternate; 
 }
 
-.special-notice.show {
-    opacity: 1;
-    transform: translate(-50%, -50%) scale(1);
-}
-
-.notice-event {
-    background: linear-gradient(45deg, #4299e1, #667eea);
-    border: 8px solid #ebf8ff;
-}
-
-.notice-goal {
-    background: linear-gradient(45deg, #ecc94b, #ed8936);
-    border: 8px solid #fffaf0;
-    font-size: 64px;
-    animation: gold-glow 1s infinite alternate;
-}
-
-/* 棋子被點擊時的縮放效果 */
-.player:active {
-    transform: scale(0.8) translateY(0); /* 縮放感明顯一點 */
-    transition: 0.1s;
-}
-
-/* 彈窗出現動畫 */
 @keyframes modalPop {
     from { transform: translate(-50%, -50%) scale(0.8); opacity: 0; }
     to { transform: translate(-50%, -50%) scale(1); opacity: 1; }
 }
 
-/* --- 3. 造句方框：簡化配色，背景調亮 --- */
+/* 棋子縮放 */
+.player:active { transform: scale(0.8) translateY(0); transition: 0.1s; }
+
+/* --- 3. 造句方框優化 --- */
 #ai-sentence-text {
-    background: transparent; /* 淺灰色背底，不搶戲 */
+    background: transparent;
     padding: 0px;
-    margin: 10px 0;
+    margin: 5px 0;             /* 壓縮間距 */
     border-radius: 0px;
-    font-size: 26px; /* 字體加大 */
+    font-size: 22px;           /* 從 26px 縮小 */
     color: #1a365d;
-    line-height: 1.6;
+    line-height: 1.4;
     text-align: center;
     font-weight: bold;
 }
 
-/* 新增：讓詞語和句子按鈕並排的容器 */
-.btn-group {
-    display: flex;
-    gap: 10px;
-    width: 100%;
-    margin: 10px 0; /* 放在文字下方的第一欄 */
-}
+.btn-group { display: flex; gap: 10px; width: 100%; margin: 5px 0; }
+.btn-group button { flex: 1; margin: 0 !important; }
 
-/* 確保並排時的按鈕平分寬度 */
-.btn-group button {
-    flex: 1; 
-    margin: 0 !important; /* 移除原本的上下 margin 避免高低不平 */
-}
-
-/* 修正你代碼中的顏色錯誤 (ffffff 少了 #) */
-#modal button {
+/* 修正按鈕顏色：只有完成/提交按鈕用白字，選項按鈕建議維持深色 */
+#modal button:not(.opt-btn) { 
     color: #ffffff !important; 
+    padding: 10px 30px;
+    font-size: 24px;
 }
-        
-/* --- 1. 先貼這段：定義基本的美化外觀 --- */
 
-
+/* --- 1. 美化外觀尺寸微調 --- */
 .char-opt {
-    width: 100px;
-    height: 100px;
+    width: 80px;               /* 從 100px 稍微縮小，節省垂直空間 */
+    height: 80px;
     background: #ffffff;
-    object-fit: contain; /* 確保圖片在方塊內不變形 */
-    border-radius: 25px;
+    object-fit: contain;
+    border-radius: 20px;
     padding: 5px;
     box-sizing: border-box;
     transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     box-shadow: 0 8px 15px rgba(0,0,0,0.05);
 }
 
-.char-opt:hover {
-    transform: translateY(-15px) rotate(5deg) scale(1.15);
-    box-shadow: 0 20px 40px rgba(0,0,0,0.15);
-}
+.char-opt:hover { transform: translateY(-10px) rotate(5deg) scale(1.1); box-shadow: 0 15px 30px rgba(0,0,0,0.15); }
 
-/* 1. 先寫基礎樣式（電腦版）：預設就是 4 列 */
 #character-pool {
     display: grid;
-    /* 110px * 4 = 440px，在寬螢幕下顯示 4 列 */
-    grid-template-columns: repeat(4, 110px); 
-    gap: 15px;
+    grid-template-columns: repeat(4, 90px); /* 縮小列寬 */
+    gap: 10px;                 /* 縮小間距 */
     width: fit-content; 
     margin: 0 auto;
-    padding: 20px;
+    padding: 15px;
     background: rgba(255, 255, 255, 0.4); 
     backdrop-filter: blur(15px);
     -webkit-backdrop-filter: blur(15px);
-    border-radius: 40px;
+    border-radius: 30px;
     justify-content: center; 
     align-content: center;
     justify-items: center; 
 }
-
 /* 2. 再寫媒體查詢：只有當螢幕窄到放不下 4 列時（例如手機 768px 以下），才切換成 2 列 */
 @media (max-width: 768px) {
     #character-pool {
