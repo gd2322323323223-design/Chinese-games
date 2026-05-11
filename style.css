@@ -774,63 +774,59 @@ body.game-active #controls {
 }
 
 /* d. 選項按鈕容器 */
+/* 🚩 終極強制修正：確保大字、細線、位置正確 */
 #modal #modal-actions {
     display: flex !important;
     flex-direction: row !important;
     justify-content: center !important;
     align-items: flex-end !important;
-    gap: 30px !important; 
-    width: 100% !important;
-    /* 將原本的 40px 改為 10px，整體向上移動 */
-    margin-top: 10px !important; 
-    padding-bottom: 5px !important;
+    gap: 30px !important;
+    margin-top: 10px !important; /* 向上提拉 */
+    padding: 0 20px 40px 20px !important;
 }
 
-/* e. 按鈕包裹容器 */
+/* 2. 標籤容器：讓 A. B. C. 在按鈕上面 */
 .opt-wrapper {
     display: flex !important;
     flex-direction: column !important;
     align-items: center !important;
     flex: 1 !important;
-    max-width: 320px !important;
 }
 
-/* f. 按鈕上方的 A. B. C. (縮小一點，避免太佔位) */
+/* 3. A. B. C. 文字：純文字，絕不重疊 */
 .opt-label-text {
     font-size: 32px !important;
     color: #5d4037 !important;
+    margin-bottom: 10px !important;
     font-weight: bold !important;
-    margin-bottom: 8px !important; 
+    position: static !important; /* 強制取消所有浮動定位 */
+    transform: none !important;
 }
 
-/* g. 🚩 純淨版選項按鈕：極大字、極幼筆畫 */
+/* 4. 按鈕本體：超級大字 + 極幼筆畫 */
 .opt-btn-pure {
     width: 100% !important;
-    height: 105px !important; /* 稍微縮減高度，幫助上移 */
-    background: #ffb300 !important;
-    border: 3px solid #333333 !important;
+    height: 100px !important; 
+    background: #ffb300 !important; /* 鮮艷金色 */
+    border: 3px solid #333 !important;
     border-radius: 15px !important;
     
-    /* 🚩 字體優化：極幼、極大 */
-    color: #000000 !important;
-    font-size: 65px !important;     /* 🚩 再放大一點 */
-    font-weight: 100 !important;     /* 🚩 強制極細筆畫，絕不糊掉 */
-    font-family: "Heiti TC", "Microsoft JhengHei", sans-serif !important;
+    /* 🚩 核心：極大字體，極細筆畫 */
+    font-size: 55px !important; 
+    font-weight: 100 !important; /* 100 是最細的筆畫，保證清晰 */
+    color: #000 !important;
     
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
-    
-    box-shadow: 0 8px 0 #bf360c !important;
+    box-shadow: 0 6px 0 #bf360c !important;
     cursor: pointer !important;
-    transition: transform 0.1s !important;
+    line-height: 1 !important;
+    padding: 0 !important;
 }
 
-/* 按鈕按下的效果 */
-.opt-btn-pure:active {
-    transform: translateY(4px) !important;
-    box-shadow: 0 4px 0 #bf360c !important;
-}
+/* 按下效果 */
+.opt-btn-pure:active { transform: translateY(4px) !important; box-shadow: 0 2px 0 #bf360c !important; }
 
 /* 5. 供詞填充 */
 #modal.type-fill p { font-size: 28px !important; }
