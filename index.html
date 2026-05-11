@@ -981,40 +981,62 @@ div#board div.cell.goal-cell {
 }
 
 /* 📦 上方重組句子放置區域的樣式優化 */
+/* 1. 核心：橫向重組區域 (作答框) */
 #reorder-zone {
-    min-height: 90px;
-    border: 3px dashed #b0bec5;
-    background-color: #fcfcfc;
+    width: 95%;              /* 讓方框變寬 */
+    max-width: 600px;
+    min-height: 80px;        /* 降低高度，看起來更像一行 */
+    border: 3px dashed #8d6e63;
+    background-color: #fdfaf5;
     padding: 15px;
-    margin-bottom: 20px;
+    margin: 0 auto 20px auto;
+    border-radius: 15px;
+    
+    /* 讓裡面的單字橫向排列 */
     display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    justify-content: center;
+    flex-direction: row;     /* 橫向 */
+    flex-wrap: wrap;        /* 萬一太長自動換行，但優先橫排 */
+    justify-content: flex-start; /* 從左邊開始排，像寫字一樣 */
     align-items: center;
-    border-radius: 20px;
+    gap: 8px;               /* 單字之間的間距 */
 }
 
-/* 🏆 答對後出現的「完成」按鈕專屬樣式 */
-.finish-btn {
-    padding: 15px 40px;
-    background: #48bb78 !important;
-    color: white !important;
-    border: none;
-    border-radius: 50px;
-    font-size: 26px;
-    cursor: pointer;
+/* 2. 移除白色文字：統一按鈕樣式 */
+.opt-btn {
+    padding: 10px 20px;
+    font-size: 24px;         /* 稍微縮小字體以適應橫排 */
     font-weight: bold;
+    color: #5d4037 !important; /* ❌ 絕對不要白色！改用深咖啡色 */
+    background: #fff9c4; 
+    border: 3px solid #ffe082;
+    border-radius: 12px;
+    cursor: pointer;
+    box-shadow: 0 4px 0 #ffccbc;
+    text-shadow: none !important; /* ❌ 移除會造成視覺模糊的陰影 */
+    transition: all 0.2s;
+}
+
+/* 上方重組區內的按鈕樣式（讓它們看起來更像句子的一部分） */
+#reorder-zone .opt-btn {
+    padding: 5px 10px;       /* 在方框內縮小一點點 */
+    margin: 2px;
+    background: #ffffff;     /* 方框內按鈕用白底黑字，對比更清晰 */
+    border-color: #d7ccc8;
+    box-shadow: 0 2px 0 #bcaaa4;
+}
+
+/* 3. 完成按鈕（也要避開白色字，建議用深綠或深咖啡） */
+.finish-btn {
+    background: #48bb78 !important;
+    color: #ffffff !important; /* 這裡是唯一的例外，深背景配純白字才清楚 */
+    padding: 15px;
+    border-radius: 50px;
+    font-size: 28px;
     width: 100%;
-    margin-top: 10px;
+    border: none;
+    font-weight: bold;
     box-shadow: 0 5px 0 #2f855a;
 }
-
-        @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            25% { transform: translateX(-5px); }
-            75% { transform: translateX(5px); }
-        }
     </style>
     
 </head>
