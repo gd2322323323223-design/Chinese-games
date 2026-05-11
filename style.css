@@ -778,58 +778,58 @@ body.game-active #controls {
     display: flex !important;
     flex-direction: row !important;
     justify-content: center !important;
-    gap: 40px; 
+    align-items: flex-end !important;
+    gap: 30px !important; 
     width: 100% !important;
-    margin-top: 40px !important; /* 🚩 增加上方空間，讓 A. B. C. 有地方站 */
+    /* 將原本的 40px 改為 10px，整體向上移動 */
+    margin-top: 10px !important; 
+    padding-bottom: 5px !important;
 }
 
-/* e. 🚩 新增：按鈕包裹容器 (處理垂直排列) */
+/* e. 按鈕包裹容器 */
 .opt-wrapper {
-    display: flex;
-    flex-direction: column; 
-    align-items: center;
-    flex: 1;
-    max-width: 320px;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    flex: 1 !important;
+    max-width: 320px !important;
 }
 
-/* f. 🚩 新增：按鈕上方的 A. B. C. 純文字標籤 */
+/* f. 按鈕上方的 A. B. C. (縮小一點，避免太佔位) */
 .opt-label-text {
-    font-size: 38px !important; /* 🚩 標籤也要夠大夠清楚 */
+    font-size: 32px !important;
     color: #5d4037 !important;
-    font-weight: bold;
-    margin-bottom: 15px !important; 
-    font-family: "Microsoft JhengHei", sans-serif;
+    font-weight: bold !important;
+    margin-bottom: 8px !important; 
 }
 
-/* g. 🚩 新增：純淨版選項按鈕 (.opt-btn-pure) */
+/* g. 🚩 純淨版選項按鈕：極大字、極幼筆畫 */
 .opt-btn-pure {
-    width: 100%;
-    height: 110px;      /* 🚩 增加高度，給大字呼吸空間 */
-    background: #ffb300 !important; /* 🚩 使用明亮的純金色 */
-    border: 3px solid #333333 !important; /* 🚩 使用深色細邊框，對比更強 */
-    border-radius: 15px;
+    width: 100% !important;
+    height: 105px !important; /* 稍微縮減高度，幫助上移 */
+    background: #ffb300 !important;
+    border: 3px solid #333333 !important;
+    border-radius: 15px !important;
     
-    /* 文字核心設定 */
-    color: #000000 !important; /* 🚩 改用純黑字，對比度最高 */
-    font-size: 60px !important; /* 🚩 挑戰 60px 巨型字體 */
-    font-weight: 400 !important; /* 🚩 關鍵：使用 400 (正常)，在大字下筆畫會最幼細清晰 */
-    font-family: "Microsoft JhengHei", "Heiti TC", sans-serif;
+    /* 🚩 字體優化：極幼、極大 */
+    color: #000000 !important;
+    font-size: 65px !important;     /* 🚩 再放大一點 */
+    font-weight: 100 !important;     /* 🚩 強制極細筆畫，絕不糊掉 */
+    font-family: "Heiti TC", "Microsoft JhengHei", sans-serif !important;
     
     display: flex !important;
-    align-items: center;
-    justify-content: center;
+    align-items: center !important;
+    justify-content: center !important;
     
-    /* 移除多餘裝飾 */
-    box-shadow: 0 8px 0 #bf360c; /* 只保留底部厚度感 */
-    text-shadow: none !important;
-    cursor: pointer;
-    transition: transform 0.1s;
+    box-shadow: 0 8px 0 #bf360c !important;
+    cursor: pointer !important;
+    transition: transform 0.1s !important;
 }
 
-/* 按鈕按下的動態效果 */
+/* 按鈕按下的效果 */
 .opt-btn-pure:active {
-    transform: translateY(4px);
-    box-shadow: 0 4px 0 #bf360c;
+    transform: translateY(4px) !important;
+    box-shadow: 0 4px 0 #bf360c !important;
 }
 
 /* 5. 供詞填充 */
