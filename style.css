@@ -1,5 +1,4 @@
- <style>
-      :root { 
+    :root { 
     --p1-color: #3182ce; 
     --p2-color: #d53f8c; 
     --cell-size: 90px; 
@@ -528,435 +527,76 @@ body.game-active #controls {
 /* --- 修正後的彈窗與通知樣式 --- */
 
 /* --- 針對 60vw / 40vh 比例優化的彈窗樣式 --- */
+/* --- 1. 彈窗基礎結構修正 (適配 60vw / 40vh) --- */
 #modal {
     display: none;
     position: fixed;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    
     width: 60vw;          
     height: 40vh;         
     max-width: 800px;     
-    min-height: 380px;    /* 🚩 確保至少有 380px 高度，否則內容會疊在一起 */
-    
+    min-height: 380px;    /* 確保有足夠空間顯示提交按鈕 */
     background: #ffffff;
     border: 8px solid #3182ce; 
     border-radius: 30px;      
-    padding: 15px 20px;       /* 減少內邊距以爭取高度 */
+    padding: 15px 20px;
     z-index: 2050;
     text-align: center;
     box-shadow: 0 20px 60px rgba(0,0,0,0.4);
-
     display: flex;
     flex-direction: column;
-    justify-content: space-between; /* 讓內容在扁平框內頂底分布 */
+    justify-content: space-between; 
     align-items: center;
+    overflow: hidden;    /* 防止內容爆框 */
 }
 
-#modal-text {
-    font-size: 32px !important; /* 🚩 從 80px 縮小，適配 40vh 高度 */
+/* --- 2. 題目文字與內容樣式 (解決白色字與溢出) --- */
+#modal p, .challenge-container p, .task-question {
+    font-size: 26px !important; 
     color: #1a365d !important;
     font-weight: 900;
-    margin: 5px 0;             /* 壓縮間距 */
-    letter-spacing: 2px;       /* 縮小間距 */
+    margin: 5px 0 !important;
+    line-height: 1.2;
     text-shadow: none !important;
-    display: block;
-    transition: transform 0.2s;
 }
 
-#modal-text:hover { transform: scale(1.05); }
-
-.special-notice {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%) scale(0.5);
-    z-index: 2100;
-    padding: 20px 50px;        /* 縮小 Padding */
-    border-radius: 100px;
-    color: #ffffff; 
-    font-size: 36px;           /* 從 56px 縮小 */
-    font-weight: 900;
-    text-align: center;
-    white-space: nowrap; 
-    box-shadow: 0 0 50px rgba(0,0,0,0.4);
-    opacity: 0;
-    pointer-events: auto;
-    cursor: pointer;
-    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+/* 閱讀理解/句子方框 */
+.task-sentence-box, #modal.type-understand div {
+    background: #f0f7ff;
+    padding: 10px;
+    border-radius: 12px;
+    font-size: 20px !important;
+    max-height: 70px;
+    overflow-y: auto;
+    text-align: left;
+    margin-bottom: 5px;
 }
 
-.special-notice:hover { transform: translate(-50%, -50%) scale(1.05); filter: brightness(1.1); }
-.special-notice.show { opacity: 1; transform: translate(-50%, -50%) scale(1); }
-
-.notice-event { background: linear-gradient(45deg, #4299e1, #667eea); border: 6px solid #ebf8ff; }
-.notice-goal { 
-    background: linear-gradient(45deg, #ecc94b, #ed8936); 
-    border: 6px solid #fffaf0; 
-    font-size: 42px;           /* 從 64px 縮小 */
-    animation: gold-glow 1s infinite alternate; 
-}
-
-@keyframes modalPop {
-    from { transform: translate(-50%, -50%) scale(0.8); opacity: 0; }
-    to { transform: translate(-50%, -50%) scale(1); opacity: 1; }
-}
-
-/* 棋子縮放 */
-.player:active { transform: scale(0.8) translateY(0); transition: 0.1s; }
-
-/* --- 3. 造句方框優化 --- */
-#ai-sentence-text {
-    background: transparent;
-    padding: 0px;
-    margin: 5px 0;             /* 壓縮間距 */
-    border-radius: 0px;
-    font-size: 22px;           /* 從 26px 縮小 */
-    color: #1a365d;
-    line-height: 1.4;
-    text-align: center;
-    font-weight: bold;
-}
-
-.btn-group { display: flex; gap: 10px; width: 100%; margin: 5px 0; }
-.btn-group button { flex: 1; margin: 0 !important; }
-
-/* 修正按鈕顏色：只有完成/提交按鈕用白字，選項按鈕建議維持深色 */
-#modal button:not(.opt-btn) { 
-    color: #ffffff !important; 
-    padding: 10px 30px;
-    font-size: 24px;
-}
-
-/* --- 1. 美化外觀尺寸微調 --- */
-.char-opt {
-    width: 80px;               /* 從 100px 稍微縮小，節省垂直空間 */
-    height: 80px;
-    background: #ffffff;
-    object-fit: contain;
-    border-radius: 20px;
-    padding: 5px;
-    box-sizing: border-box;
-    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    box-shadow: 0 8px 15px rgba(0,0,0,0.05);
-}
-
-.char-opt:hover { transform: translateY(-10px) rotate(5deg) scale(1.1); box-shadow: 0 15px 30px rgba(0,0,0,0.15); }
-
-#character-pool {
-    display: grid;
-    grid-template-columns: repeat(4, 90px); /* 縮小列寬 */
-    gap: 10px;                 /* 縮小間距 */
-    width: fit-content; 
-    margin: 0 auto;
-    padding: 15px;
-    background: rgba(255, 255, 255, 0.4); 
-    backdrop-filter: blur(15px);
-    -webkit-backdrop-filter: blur(15px);
-    border-radius: 30px;
-    justify-content: center; 
-    align-content: center;
-    justify-items: center; 
-}
-/* 2. 再寫媒體查詢：只有當螢幕窄到放不下 4 列時（例如手機 768px 以下），才切換成 2 列 */
-@media (max-width: 768px) {
-    #character-pool {
-        /* 手機版改為 2 列，防止畫面超出邊界 */
-        grid-template-columns: repeat(2, 110px); 
-    }
-}
-        
-#start-game-btn {
-    position: absolute;    /* 絕對定位，不參與上面三個框的排隊 */
-    bottom: 20px;          /* 距離底部 20px */
-    left: 50%;
-    transform: translateX(-50%); /* 水平置中關鍵 */
-    margin-top: 0;
-    padding: 18px 80px;
-    font-size: 28px;
-    font-weight: 900;
-    color: #ffffff;
-    border: none;
-    border-radius: 50px;
-    cursor: pointer;
-    background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
-    box-shadow: 0 8px 0 #2f855a, 0 15px 20px rgba(0,0,0,0.3);
-    transition: all 0.1s ease;
-    text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
-    letter-spacing: 2px;
-    animation: pulse 2s infinite;
-    z-index: 1001;
-}
-
-#start-game-btn:active {
-    transform: translateY(4px);
-    box-shadow: 0 4px 0 #2f855a, 0 8px 10px rgba(0,0,0,0.2);
-}
-
-@keyframes pulse {
-    0% { transform: scale(1); }
-    50% { transform: scale(1.05); }
-    100% { transform: scale(1); }
-}
-        
-/* 讓中間內容變成橫向排列 */
-.selection-container {
-    display: flex;
-    align-items: center;    /* 改回居中對齊，防止預覽框被強行拉長 */
-    justify-content: center;
-    gap: 40px;
-    width: 100%;
-    position: relative;     /* 為了讓按鈕絕對定位 */
-    padding-bottom: 150px;  /* 增加底部間距，給按鈕留位子 */
-}
-
-.player-preview {
-    flex: 0 0 280px; /* 固定寬度，不讓它被中間的角色池擠到變形 */
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}       
-        
-/* 預覽框的基礎大小 */
-/* ✅ 這是修正後的新樣式（呈透明朦朧感） */
-.preview-box {
-    width: 250px; 
-    height: 250px;
-    background: rgba(255, 255, 255, 0.2) !important; 
-    backdrop-filter: blur(10px);
-    border: 3px dashed rgba(255, 255, 255, 0.5) !important;
-    border-radius: 40px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-}
-        
-body:has(#start-screen[style*="display: flex"]) #game-container {
-    opacity: 0; /* 或者用 visibility: hidden */
-}
-
-/* 呼吸燈動畫 */
-@keyframes breathing-p1 {
-    0% { box-shadow: 0 0 5px var(--p1-color); }
-    100% { box-shadow: 0 0 25px var(--p1-color), 0 0 10px var(--p1-color); }
-}
-@keyframes breathing-p2 {
-    0% { box-shadow: 0 0 5px var(--p2-color); }
-    100% { box-shadow: 0 0 25px var(--p2-color), 0 0 10px var(--p2-color); }
-}
-
-/* 棋子懸停時的跳動旋轉 */
-.char-opt:hover {
-    transform: translateY(-15px) rotate(8deg) scale(1.2) !important;
-    filter: brightness(1.1);
-    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    z-index: 10;
-}
-
-/* 選定後的「砰」動畫 */
-@keyframes pop-in {
-    0% { transform: scale(0); opacity: 0; }
-    80% { transform: scale(1.2); }
-    100% { transform: scale(1); opacity: 1; }
-}
-.pop-effect {
-    animation: pop-in 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-}
-/* --- 角色選中後的發光與呼吸動畫 --- */
-
-/* 當玩家 1 選中時 */
-.char-opt.selected-p1 {
-    outline: 5px solid var(--p1-color) !important;
-    outline-offset: -5px;
-    animation: breathing-p1 0.8s infinite alternate !important;
-    z-index: 5;
-    transform: scale(1.1); /* 選中時稍微放大 */
-}
-
-/* 當玩家 2 選中時 */
-.char-opt.selected-p2 {
-    outline: 5px solid var(--p2-color) !important;
-    outline-offset: -5px;
-    animation: breathing-p2 0.8s infinite alternate !important;
-    z-index: 5;
-    transform: scale(1.1);
-}
-
-/* 定義呼吸燈動畫劇本 */
-@keyframes breathing-p1 {
-    0% { box-shadow: 0 0 5px var(--p1-color); }
-    100% { box-shadow: 0 0 25px var(--p1-color), 0 0 10px var(--p1-color); }
-}
-
-@keyframes breathing-p2 {
-    0% { box-shadow: 0 0 5px var(--p2-color); }
-    100% { box-shadow: 0 0 25px var(--p2-color), 0 0 10px var(--p2-color); }
-}
-
-/* --- 建議 D：柔邊版能量光束 (消除長方形感) --- */
-
-.trap-cell, .boost-cell, .dino-cell {
-    transform: translateY(110px) !important;
-    z-index: 100 !important; 
-    position: relative;
-    overflow: visible !important;
-}
-
-/* 確保馬路偽元素關閉 */
-.trap-cell::before, .trap-cell::after,
-.boost-cell::before, .boost-cell::after,
-.dino-cell::before, .dino-cell::after {
-    display: none !important;
-}
-
-/* 1. 核心樣式：控制光束的形狀、模糊度與混合模式 */
-.trap-cell .event-icon::before, 
-.boost-cell .event-icon::before, 
-.dino-cell .event-icon::before {
-    content: "" !important;
-    position: absolute;
-    bottom: 50%;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 120px;
-    height: 160px;
-    
-    /* ✨ 針對森林/暖色調優化 */
-    mix-blend-mode: overlay; 
-    filter: blur(25px) !important;
-    opacity: 0.6 !important;
-    mix-blend-mode: screen;  /* 讓彩色光束在深色底板上「濾光」噴發，亮度翻倍 */
-    opacity: 0.9 !important; /* 確保光束夠紮實 */
-    
-    z-index: -1;
-    display: block !important;
-    pointer-events: none;
-    animation: soft-pulse 2s infinite ease-in-out;
-}
-
-/* 2. 顏色設定：將漸層與外發光整合，避免重複 */
-
-/* 香蕉陷阱 - 黃光 */
-.trap-cell .event-icon::before {
-    background: radial-gradient(ellipse at bottom, #fab005 0%, rgba(250, 176, 5, 0.3) 40%, transparent 70%) !important;
-    box-shadow: 0 0 30px rgba(250, 176, 5, 0.3);
-}
-
-/* 火箭加速 - 藍光 */
-.boost-cell .event-icon::before {
-    background: radial-gradient(ellipse at bottom, #339af0 0%, rgba(51, 154, 240, 0.3) 40%, transparent 70%) !important;
-    box-shadow: 0 0 30px rgba(51, 154, 240, 0.3);
-} 
-
-/* 恐龍危機 - 綠光 */
-.dino-cell .event-icon::before {
-    background: radial-gradient(ellipse at bottom, #40c057 0%, rgba(64, 192, 87, 0.3) 40%, transparent 70%) !important;
-    box-shadow: 0 0 30px rgba(64, 192, 87, 0.3);
-}
-
-/* 呼吸動畫調整為柔和版 */
-@keyframes soft-pulse {
-    0%, 100% { opacity: 0.6; transform: translateX(-50%) scaleY(1); }
-    50% { opacity: 0.9; transform: translateX(-50%) scaleY(1.1); }
-}
-    .speak-trigger:active, #modal button:active {
-    transform: translateY(3px);
-    box-shadow: 0 1px 0 #1b5e20;
-}
-/* 倒數標籤：黑色背景亮色字 */
-#timer {
-    background: #ffffff;
-    color: #fbbf24;
-    padding: 8px 20px;
-    border-radius: 25px;
-    font-size: 20px;
-    font-weight: 900;
-}
-        
-/* 這個是新增的，用來告訴瀏覽器：裡面的按鈕要並排 */
-.btn-group {
-    display: flex;      /* 開啟並排模式 */
-    gap: 10px;          /* 設定左右按鈕的間距 */
-    width: 100%;        /* 讓這組按鈕佔滿寬度 */
-    margin-bottom: 10px;/* 跟下一個按鈕保持距離 */
-}
-
-/* 這個是新增的，用來統一設定這兩個藍色按鈕的顏色和形狀 */
-.blue-btn {
-    flex: 1;            /* 🚩 關鍵：這會讓兩個按鈕自動平分左右空間 */
-    background: #3182ce !important; /* 你指定的藍色 */
-    color: #393939 !important;      /* 你指定的白色 */
-    border: none !important;
-    padding: 12px 5px !important;
-    border-radius: 50px !important;
-    font-weight: bold !important;
-    cursor: pointer;
-    box-shadow: 0 4px 0 #1e4e8c !important; /* 增加立體厚度感 */
-}
-        
- /* 這裡用更強大的選擇器，確保蓋過原本的白色 */
-div.cell.goal-cell, 
-div#board div.cell.goal-cell {
-    background: linear-gradient(135deg, #ffd700, #ffae00, #fff700) !important;
-    background-color: #ffd700 !important; /* 保險起見，加一個純色背景 */
-    grid-column: span 2 !important;
-    grid-row: span 2 !important;
-    height: auto !important;
-    min-height: 200px !important; /* 直接給一個固定數值測試 */
-    display: flex !important;
-    flex-direction: column !important;
-    justify-content: center !important;
-    align-items: center !important;
-    z-index: 99 !important;
-    box-shadow: 0 0 30px rgba(255, 215, 0, 0.8) !important;
-    border: 5px solid #ffffff !important;
-}
-
-/* --- 選項按鈕基礎樣式 --- */
+/* --- 3. 選項按鈕 (.opt-btn) 基礎樣式 --- */
 .opt-btn {
- position: relative;
- padding: 12px 20px;
-    margin: 8px;
-    font-size: 28px; /* 增大字體方便閱讀 */
-    font-weight: 900; /* 加粗字體 */
-    
-    /* 🔴 關鍵修正：深咖啡色字，絕對不要用白色 */
+    position: relative;
+    padding: 10px 20px;
+    margin: 5px;
+    font-size: 24px;
+    font-weight: 900;
     color: #5d4037 !important; 
-    
-    /* 🟡 背景改用溫暖的淡黃色，對比度最高 */
     background: #fff9c4 !important; 
-    
-    /* 邊框改深一點點的黃色 */
     border: 3px solid #ffccbc !important; 
     border-radius: 15px;
-    
-    /* 移除發光陰影，改用實色陰影，字體才會銳利 */
     text-shadow: none !important;
-    box-shadow: 0 5px 0 #ffab91;
-    
+    box-shadow: 0 4px 0 #ffab91;
     cursor: pointer;
     transition: all 0.2s;
     display: inline-block;
 }
-.opt-label {
-    position: absolute;
-    bottom: 5px;
-    left: 8px;
-    font-size: 18px;
-    color: #5d4037;
-    font-weight: bold;
-}
 
-/* 滑鼠移上去或觸碰效果 */
 .opt-btn:hover {
-    background: #fff176;
+    background: #fff176 !important;
     transform: translateY(-2px);
-    box-shadow: 0 6px 0 #ffccbc;
 }
 
-/* 🟢 重點：當單字被點擊並加入上方方格後，下方的原始按鈕變淡 */
 .opt-btn.used {
     background: #f5f5f5 !important;
     color: #bdbdbd !important;
@@ -964,19 +604,70 @@ div#board div.cell.goal-cell {
     box-shadow: none;
     opacity: 0.5;
 }
-     #modal p, #modal div {
-    color: #5d4037 !important; /* 全域深咖啡色 */
-    text-shadow: none !important;
+
+/* --- 4. 筆順題專用 (長方形 + 左下角標籤) --- */
+#modal.type-stroke .opt-btn {
+    width: 180px !important;    
+    height: 100px !important;   
+    font-size: 50px !important; /* 中文字超大 */
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
 }
 
-/* 🔴 答錯時的抖動特效 */
+.opt-label {
+    position: absolute;
+    bottom: 5px;
+    left: 10px;
+    font-size: 18px;
+    color: #5d4037;
+    font-family: Arial, sans-serif;
+    font-weight: bold;
+}
+
+/* --- 5. 重組句子專用 (空間壓縮) --- */
+#modal.type-reorder #reorder-zone {
+    width: 90%;
+    height: 60px !important;
+    min-height: 60px !important;
+    background: #ffffff;
+    border: 3px solid #3182ce;
+    border-radius: 15px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 5px;
+    margin: 5px auto;
+}
+
+#modal.type-reorder .opt-btn {
+    font-size: 18px !important;
+    padding: 6px 12px !important;
+}
+
+/* --- 6. 提交與完成挑戰按鈕 ( actions 區塊 ) --- */
+#modal-actions button, .submit-btn, .finish-btn {
+    width: 80%;
+    max-width: 400px;
+    padding: 10px 0;
+    font-size: 24px;
+    font-weight: bold;
+    border-radius: 50px;
+    border: none;
+    cursor: pointer;
+    /* 這裡使用綠色漸層區分「完成」與「選擇」 */
+    background: linear-gradient(135deg, #48bb78 0%, #38a169 100%) !important;
+    color: white !important;
+    box-shadow: 0 5px 0 #2f855a;
+    margin-top: 5px;
+}
+
+/* 答錯抖動 */
 .wrong-answer {
     animation: shake 0.5s;
     background-color: #ffcdd2 !important;
     border-color: #e53935 !important;
-    color: #b71c1c !important;
 }
-
 @keyframes shake {
     0%, 100% { transform: translateX(0); }
     25% { transform: translateX(-5px); }
@@ -1063,4 +754,4 @@ div#board div.cell.goal-cell {
     overflow-y: auto;      /* 萬一太長可以捲動 */
     text-align: left;
 }
-    </style>
+
