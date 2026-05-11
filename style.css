@@ -769,59 +769,68 @@ body.game-active #controls {
     width: 80% !important;
 }
 
-/* 2. 選項容器：強制上移，避免切到底部 */
+/* ==========================================
+   🚩 最終豎排方案：極大大字 + 垂直佈局
+   ========================================== */
+
+/* 1. 選項容器：改為垂直列印 */
 #modal #modal-actions {
     display: flex !important;
-    flex-direction: row !important;
-    justify-content: center !important;
-    align-items: flex-start !important; /* 改為靠上對齊 */
-    gap: 20px !important;
-    margin-top: 5px !important;
-    padding-bottom: 0 !important;
-    height: auto !important;
-}
-
-/* 3. 包裹容器 */
-.opt-wrapper {
-    display: flex !important;
-    flex-direction: column !important;
+    flex-direction: column !important; /* 🚩 核心：改為豎排 */
     align-items: center !important;
-    width: 180px !important; /* 固定寬度防止撐開 */
+    gap: 15px !important; /* 每一行之間的距離 */
+    width: 100% !important;
+    margin-top: 10px !important;
+    padding-bottom: 20px !important;
 }
 
-/* 4. A. B. C. 文字：縮小一點，騰出垂直空間 */
-.opt-label-text {
-    font-size: 28px !important;
+/* 2. 每一行的包裹容器 */
+.opt-row-vertical {
+    display: flex !important;
+    flex-direction: row !important; /* A. 與 按鈕 橫向排列 */
+    align-items: center !important;
+    width: 90% !important; /* 寬度佔滿彈窗 */
+    max-width: 600px;
+}
+
+/* 3. 標籤 A. B. C. (站在按鈕左邊) */
+.opt-label-pure {
+    font-size: 38px !important;
     color: #5d4037 !important;
     font-weight: bold !important;
-    margin-bottom: 5px !important;
+    margin-right: 20px !important; /* 與按鈕保持距離 */
+    min-width: 50px;
+    text-align: right;
 }
 
-/* 5. 按鈕本體：鎖定高度，字體極大且極細 */
-.opt-btn-pure {
-    width: 100% !important;
-    height: 80px !important; /* 🚩 縮短高度防止切底 */
-    background: #ffb300 !important;
-    border: 2px solid #333 !important;
-    border-radius: 12px !important;
+/* 4. 豎排專用大按鈕 */
+.opt-btn-pure-vertical {
+    flex: 1 !important; /* 讓按鈕自動撐滿剩餘空間 */
+    height: 85px !important; 
+    background: #ffb300 !important; /* 金色 */
+    border: 3px solid #333 !important;
+    border-radius: 15px !important;
     
-    /* 🚩 核心：50px 大字 + 極細筆畫 */
-    font-size: 48px !important; 
-    font-weight: 200 !important; /* 🚩 關鍵：極細權重 */
+    /* 🚩 核心：超級大字 + 極幼細筆畫 */
+    font-size: 52px !important; 
+    font-weight: 200 !important; /* 強制使用幼細筆畫，不再糊掉 */
     color: #000 !important;
     
     display: flex !important;
     align-items: center !important;
-    justify-content: center !important;
-    box-shadow: 0 4px 0 #bf360c !important;
+    justify-content: flex-start !important; /* 文字靠左對齊，符合閱讀習慣 */
+    padding-left: 30px !important;
     
-    /* 防止系統字體加粗 */
-    -webkit-font-smoothing: antialiased;
-    font-family: "Microsoft JhengHei", sans-serif !important;
+    box-shadow: 0 6px 0 #bf360c !important;
+    cursor: pointer !important;
+    line-height: 1 !important;
 }
 
 /* 按下效果 */
-.opt-btn-pure:active { transform: translateY(4px) !important; box-shadow: 0 2px 0 #bf360c !important; }
+.opt-btn-pure-vertical:active {
+    transform: translateY(4px) !important;
+    box-shadow: 0 2px 0 #bf360c !important;
+}
 
 /* 5. 供詞填充 */
 #modal.type-fill p { font-size: 28px !important; }
