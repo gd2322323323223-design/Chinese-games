@@ -583,93 +583,119 @@ body.game-active #controls {
 }
 
 /* --- 3. 選項按鈕 (.opt-btn) 基礎樣式 --- */
+/* --- 1. 選項按鈕 (.opt-btn) 基礎樣式：統一設計 --- */
 .opt-btn {
     position: relative;
-    padding: 10px 20px;
-    margin: 5px;
-    font-size: 24px;
-    font-weight: 900;
-    color: #5d4037 !important; 
-    background: #fff9c4 !important; 
-    border: 3px solid #ffccbc !important; 
-    border-radius: 15px;
-    text-shadow: none !important;
-    box-shadow: 0 4px 0 #ffab91;
-    cursor: pointer;
-    transition: all 0.2s;
-    display: inline-block;
-}
-
-.opt-btn:hover {
-    background: #fff176 !important;
-    transform: translateY(-2px);
-}
-
-.opt-btn.used {
-    background: #f5f5f5 !important;
-    color: #bdbdbd !important;
-    border-color: #eeeeee !important;
-    box-shadow: none;
-    opacity: 0.5;
-}
-
-/* --- 4. 筆順題專用 (長方形 + 左下角標籤) --- */
-#modal.type-stroke .opt-btn {
-    width: 180px !important;    
-    height: 100px !important;   
-    font-size: 50px !important; /* 中文字超大 */
-    display: inline-flex !important;
+    display: inline-flex;
     align-items: center;
     justify-content: center;
+    
+    /* 統一尺寸與間距 */
+    min-width: 140px;  /* 🚩 確保橫向排列時有足夠寬度 */
+    height: 80px;      /* 🚩 統一高度，不再是細長條 */
+    margin: 8px;
+    padding: 10px 25px;
+    
+    /* 顏色與文字：徹底告別白色，改用深咖啡色提升對比 */
+    background: #ffffff !important;
+    color: #5d4037 !important; 
+    font-size: 32px !important; /* 🚩 統一放大字體 */
+    font-weight: 900 !important;
+    
+    /* 邊框與陰影：統一咖啡色系 */
+    border: 3px solid #8d6e63 !important; 
+    border-radius: 20px;
+    box-shadow: 0 5px 0 #8d6e63;
+    
+    text-shadow: none !important;
+    cursor: pointer;
+    transition: all 0.2s;
+    overflow: visible; /* 確保標籤不被裁切 */
 }
 
+/* 懸停效果 */
+.opt-btn:hover {
+    background: #fdf2e9 !important; /* 淡淡的米色，不干擾視線 */
+    transform: translateY(-2px);
+    box-shadow: 0 7px 0 #8d6e63;
+}
+
+/* 2. 修正 ABC 標籤樣式 (opt-label) */
 .opt-label {
     position: absolute;
-    bottom: 5px;
-    left: 10px;
-    font-size: 18px;
-    color: #5d4037;
-    font-family: Arial, sans-serif;
+    top: -5px;     /* 🚩 稍微往上移出邊界一點點或貼齊頂部，更明顯 */
+    left: 5px;
+    font-size: 20px !important;
+    color: #8d6e63 !important; /* 跟邊框同色 */
+    font-family: "Arial", sans-serif;
     font-weight: bold;
+    background: white; /* 給標籤一點背景，防止跟邊框重疊看不清 */
+    padding: 0 5px;
+    border-radius: 5px;
 }
 
-/* --- 5. 重組句子專用 (空間壓縮) --- */
+/* 3. 筆順題專用特化 (中文字要最大) */
+#modal.type-stroke .opt-btn {
+    font-size: 55px !important; 
+}
+
+/* 4. 重組句子專用 (保持小巧以適配長句子) */
+#modal.type-reorder .opt-btn {
+    min-width: 60px;
+    height: 50px !important;
+    font-size: 22px !important;
+    padding: 5px 15px;
+    margin: 4px;
+}
+
 #modal.type-reorder #reorder-zone {
-    width: 90%;
-    height: 60px !important;
-    min-height: 60px !important;
-    background: #ffffff;
-    border: 3px solid #3182ce;
+    width: 95%;
+    min-height: 70px;
+    background: #fdf2e9;
+    border: 2px dashed #8d6e63;
     border-radius: 15px;
     display: flex;
     justify-content: center;
     align-items: center;
-    padding: 5px;
-    margin: 5px auto;
+    flex-wrap: wrap;
+    margin-bottom: 15px;
 }
 
-#modal.type-reorder .opt-btn {
-    font-size: 18px !important;
-    padding: 6px 12px !important;
+/* 5. 續寫句子與閱讀理解 (文字較多時自動降字體) */
+#modal.type-continue .opt-btn,
+#modal.type-understand .opt-btn {
+    font-size: 24px !important;
+    height: auto;
+    min-height: 60px;
 }
 
-/* --- 6. 提交與完成挑戰按鈕 ( actions 區塊 ) --- */
-#modal-actions button, .submit-btn, .finish-btn {
-    width: 80%;
-    max-width: 400px;
-    padding: 10px 0;
-    font-size: 24px;
+/* 6. 提交與完成按鈕 (保持原有的綠色區隔) */
+#modal-actions .submit-btn, 
+#modal-actions .finish-btn {
+    width: 90%;
+    max-width: 450px;
+    padding: 12px 0;
+    font-size: 28px;
     font-weight: bold;
     border-radius: 50px;
     border: none;
     cursor: pointer;
-    /* 這裡使用綠色漸層區分「完成」與「選擇」 */
     background: linear-gradient(135deg, #48bb78 0%, #38a169 100%) !important;
     color: white !important;
-    box-shadow: 0 5px 0 #2f855a;
-    margin-top: 5px;
+    box-shadow: 0 6px 0 #2f855a;
+    margin-top: 10px;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
 }
 
+/* 7. 已使用的單字變淡 (重組句子用) */
+.opt-btn.used {
+    background: #eeeeee !important;
+    color: #bdbdbd !important;
+    border-color: #d1d1d1 !important;
+    box-shadow: none;
+    opacity: 0.5;
+    pointer-events: none;
+}
 /* 答錯抖動 */
 .wrong-answer {
     animation: shake 0.5s;
