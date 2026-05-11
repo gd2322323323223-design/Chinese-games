@@ -384,27 +384,33 @@ function displaySpecificTask(task) {
         };
         actions.appendChild(submitBtn);
 
-    } else if (task.options) {
-        // 選項題型：統一使用 A.B.C. 在上，按鈕在下的結構
-        const labels = ["A.", "B.", "C.", "D."];
-        task.options.forEach((opt, index) => {
-            const wrapper = document.createElement('div');
-            wrapper.className = "opt-wrapper";
+    // ... 在 displaySpecificTask 函數內處理選項的部分 ...
+} else if (task.options) {
+    const labels = ["A.", "B.", "C.", "D."];
+    const actions = document.getElementById('modal-actions');
+    actions.innerHTML = ""; 
 
-            const label = document.createElement('div');
-            label.className = "opt-label-text";
-            label.innerText = labels[index] || "";
-            wrapper.appendChild(label);
+    task.options.forEach((opt, index) => {
+        // 建立一個垂直的容器
+        const wrapper = document.createElement('div');
+        wrapper.className = "opt-wrapper";
 
-            const btn = document.createElement('button');
-            btn.className = "opt-btn-pure"; 
-            btn.innerText = opt;
-            btn.onclick = () => checkUserAnswer(opt, task.answer);
-            
-            wrapper.appendChild(btn);
-            actions.appendChild(wrapper);
-        });
-    }
+        // 建立上面的 A. B. C.
+        const label = document.createElement('div');
+        label.className = "opt-label-text";
+        label.innerText = labels[index];
+        wrapper.appendChild(label);
+
+        // 建立下面的金大按鈕
+        const btn = document.createElement('button');
+        btn.className = "opt-btn-pure";
+        btn.innerText = opt;
+        btn.onclick = () => checkUserAnswer(opt, task.answer);
+        
+        wrapper.appendChild(btn);
+        actions.appendChild(wrapper);
+    });
+}
 
     // C. 顯示與計時
     document.getElementById('modal-overlay').style.display = 'block';
