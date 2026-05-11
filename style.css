@@ -721,36 +721,6 @@ body.game-active #controls {
     color: #1a365d !important;
     font-weight: bold;
 }
-/* --- 題型標題自動化 --- */
-
-/* 在填充題上方加入標題 */
-#modal.type-fill .challenge-container::before {
-    content: "【 供詞填充 】";
-    display: block;
-    font-size: 18px;
-    color: #3182ce;
-    margin-bottom: 10px;
-    font-weight: bold;
-}
-
-/* 順便也可以幫其他題型也加上去，這樣你題庫就不用重複寫字了 */
-#modal.type-reorder .challenge-container::before {
-    content: "【 重組句子 】";
-    display: block;
-    font-size: 18px;
-    color: #3182ce;
-    margin-bottom: 10px;
-    font-weight: bold;
-}
-
-#modal.type-stroke .challenge-container::before {
-    content: "【 筆順辨認 】";
-    display: block;
-    font-size: 18px;
-    color: #3182ce;
-    margin-bottom: 10px;
-    font-weight: bold;
-}
 
 /* --- 2. 專門針對「筆順題」的長方形按鈕 (控制按鈕) --- */
 #modal.type-stroke .opt-btn {
@@ -764,17 +734,6 @@ body.game-active #controls {
     background: #fff9c4 !important;
     border: 3px solid #ffccbc !important;
     margin: 10px !important;
-}
-
-/* --- 3. A. B. C. 標籤樣式 --- */
-.opt-label {
-    position: absolute;
-    bottom: 5px;                /* 靠下 */
-    left: 10px;                 /* 靠左 */
-    font-size: 20px;            /* 字母大小 */
-    color: #5d4037;
-    font-family: Arial, sans-serif;
-    font-weight: bold;
 }
 
 /* --- 2. 重組句子 (最危險題型：空間壓縮到極致) --- */
@@ -820,3 +779,75 @@ body.game-active #controls {
     text-align: left;
 }
 
+/* 加入標題 */
+#modal.type-fill .challenge-container::before {
+    content: "【 供詞填充 】";
+    display: block;
+    font-size: 18px;
+    color: #3182ce;
+    margin-bottom: 10px;
+    font-weight: bold;
+}
+
+#modal.type-reorder .challenge-container::before {
+    content: "【 重組句子 】";
+    display: block;
+    font-size: 18px;
+    color: #3182ce;
+    margin-bottom: 10px;
+    font-weight: bold;
+}
+
+#modal.type-stroke .challenge-container::before {
+    content: "【 筆順辨認 】";
+    display: block;
+    font-size: 18px;
+    color: #3182ce;
+    margin-bottom: 10px;
+    font-weight: bold;
+}
+
+#modal.type-punc .challenge-container::before {
+    content: "【 標點符號 】";
+    display: block;
+    font-size: 18px;
+    color: #3182ce;
+    margin-bottom: 10px;
+    font-weight: bold;
+}
+
+#modal.type-match .challenge-container::before {
+    content: "【 看圖配詞 】";
+    display: block;
+    font-size: 18px;
+    color: #3182ce;
+    margin-bottom: 10px;
+    font-weight: bold;
+}
+
+#modal.type-radical .challenge-container::before {
+    content: "【 部件辨識 】";
+    display: block;
+    font-size: 18px;
+    color: #3182ce;
+    margin-bottom: 10px;
+    font-weight: bold;
+}
+
+#modal.type-continue .challenge-container::before {
+    content: "【 閱讀理解 】";
+    display: block;
+    font-size: 18px;
+    color: #3182ce;
+    margin-bottom: 10px;
+    font-weight: bold;
+}
+
+#modal.type-continue .challenge-container::before {
+    content: "【 續寫句子 】";
+    display: block;
+    font-size: 18px;
+    color: #3182ce;
+    margin-bottom: 10px;
+    font-weight: bold;
+}
