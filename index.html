@@ -1606,25 +1606,8 @@ function showModal() {
             closeModal(); 
         }
     }, 1000);
-} // <--- 這是 showModal 的結尾
-    
-    function addToReorder(btn) {
-    const zone = document.getElementById('reorder-zone');
-    if (!zone) return;
-    
-    btn.classList.add('used');
-    const newBtn = document.createElement('button');
-    newBtn.className = "opt-btn"; 
-    newBtn.innerText = btn.innerText;
-    newBtn.style.margin = "4px";
-    
-    newBtn.onclick = function() {
-        this.remove();
-        btn.classList.remove('used');
-    };
-    
-    zone.appendChild(newBtn);
-}
+} 
+
     function addToReorder(btn) {
     const zone = document.getElementById('reorder-zone');
     if (!zone) return;
@@ -1734,6 +1717,25 @@ function closeModal() {
     // 呼叫換人函數
     if (typeof finishTurn === "function") finishTurn();
 }
+    // 切換回合的函數 (獨立存放，不要包在別人裡面)
+function finishTurn() {
+    // 1. 切換玩家 (0 變 1, 1 變 0)
+    turn = (turn === 0) ? 1 : 0;
+    
+    // 2. 更新畫面下方的玩家名稱顯示
+    const tn = document.getElementById('player-turn-name');
+    if (tn) {
+        tn.innerText = "玩家 " + (turn + 1);
+        tn.style.color = (turn === 0) ? "var(--p1-color)" : "var(--p2-color)";
+    }
+    
+    // 3. 重新啟用擲骰子按鈕
+    const rollBtn = document.getElementById('btn-roll');
+    if (rollBtn) rollBtn.disabled = false;
+}
+
+// 最後確保有這一行來啟動棋盤
+window.onload = init;
 </script>
 </body>
 </html>
