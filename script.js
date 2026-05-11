@@ -385,29 +385,32 @@ function displaySpecificTask(task) {
         actions.appendChild(submitBtn);
 
     // ... 在 displaySpecificTask 函數內處理選項的部分 ...
+// 在 script.js 渲染選項的地方 (displaySpecificTask 函數內)
 } else if (task.options) {
     const labels = ["A.", "B.", "C.", "D."];
     const actions = document.getElementById('modal-actions');
     actions.innerHTML = ""; 
 
     task.options.forEach((opt, index) => {
-    const wrapper = document.createElement('div');
-    wrapper.className = "opt-wrapper";
+        // 1. 建立一行容器 (Label + Button 橫向組合)
+        const row = document.createElement('div');
+        row.className = "opt-row-vertical"; 
 
-    const label = document.createElement('div');
-    label.className = "opt-label-text";
-    label.innerText = labels[index]; 
-    wrapper.appendChild(label);
+        // 2. 建立標籤 A. B. C.
+        const label = document.createElement('div');
+        label.className = "opt-label-pure";
+        label.innerText = labels[index]; 
+        row.appendChild(label);
 
-    const btn = document.createElement('button');
-    btn.className = "opt-btn-pure";
-    // 🚩 使用 innerText 確保不會被之前的 HTML 標籤干擾
-    btn.innerText = opt; 
-    btn.onclick = () => checkUserAnswer(opt, task.answer);
-    
-    wrapper.appendChild(btn);
-    actions.appendChild(wrapper);
-});
+        // 3. 建立選項按鈕
+        const btn = document.createElement('button');
+        btn.className = "opt-btn-pure-vertical";
+        btn.innerText = opt;
+        btn.onclick = () => checkUserAnswer(opt, task.answer);
+        row.appendChild(btn);
+
+        actions.appendChild(row);
+    });
 }
 
     // C. 顯示與計時
