@@ -980,62 +980,56 @@ div#board div.cell.goal-cell {
     75% { transform: translateX(5px); }
 }
 
-/* 📦 上方重組句子放置區域的樣式優化 */
-/* 1. 核心：橫向重組區域 (作答框) */
-#reorder-zone {
-    width: 95%;              /* 讓方框變寬 */
-    max-width: 600px;
-    min-height: 80px;        /* 降低高度，看起來更像一行 */
-    border: 3px dashed #bcaaa4 !important;
-    background-color: #fdfaf5;
-    padding: 15px;
-    margin: 0 auto 20px auto;
-    border-radius: 15px;
-    
-    /* 讓裡面的單字橫向排列 */
-    display: flex;
-    flex-direction: row;     /* 橫向 */
-    flex-wrap: wrap;        /* 萬一太長自動換行，但優先橫排 */
-    justify-content: flex-start; /* 從左邊開始排，像寫字一樣 */
-    align-items: center;
-    gap: 8px;               /* 單字之間的間距 */
+/* --- 1. 純文字類：填充、辨析、標點、筆順 (字數少，字體可以大一點) --- */
+#modal.type-fill p, 
+#modal.type-radical p, 
+#modal.type-punc p, 
+#modal.type-stroke p {
+    font-size: 30px !important; 
+    margin: 15px 0 !important;
 }
 
-/* 2. 移除白色文字：統一按鈕樣式 */
-.opt-btn {
-    padding: 10px 20px;
-    font-size: 24px;         /* 稍微縮小字體以適應橫排 */
-    font-weight: bold;
-    color: #5d4037 !important; /* ❌ 絕對不要白色！改用深咖啡色 */
-    background: #fff9c4; 
-    border: 3px solid #ffe082;
-    border-radius: 12px;
-    cursor: pointer;
-    box-shadow: 0 4px 0 #ffccbc;
-    text-shadow: none !important; /* ❌ 移除會造成視覺模糊的陰影 */
-    transition: all 0.2s;
+/* --- 2. 重組句子 (最危險題型：空間壓縮到極致) --- */
+#modal.type-reorder {
+    padding: 8px 15px !important; 
+}
+#modal.type-reorder p {
+    font-size: 22px !important; /* 題目字縮小 */
+    margin: 5px 0 !important;
+}
+#modal.type-reorder #reorder-zone {
+    height: 50px !important;    /* 限制高度 */
+    margin: 5px auto !important;
+}
+#modal.type-reorder .opt-btn {
+    font-size: 18px !important; /* 按鈕字縮小 */
+    padding: 5px 12px !important;
 }
 
-/* 上方重組區內的按鈕樣式（讓它們看起來更像句子的一部分） */
-#reorder-zone .opt-btn {
-    padding: 5px 10px;       /* 在方框內縮小一點點 */
-    margin: 2px;
-    background: #ffffff;     /* 方框內按鈕用白底黑字，對比更清晰 */
-    border-color: #d7ccc8;
-    box-shadow: 0 2px 0 #bcaaa4;
+/* --- 3. 看圖配詞 (有圖片題) --- */
+#modal.type-match img {
+    max-height: 12vh !important; /* 嚴格限制圖片高度，防止擠掉按鈕 */
+    width: auto;
+    margin-bottom: 5px;
+}
+#modal.type-match p {
+    font-size: 22px !important;
 }
 
-/* 3. 完成按鈕（也要避開白色字，建議用深綠或深咖啡） */
-.finish-btn {
-    background: #48bb78 !important;
-    color: #393939 !important; /* 這裡是唯一的例外，深背景配純白字才清楚 */
-    padding: 15px;
-    border-radius: 50px;
-    font-size: 28px;
-    width: 100%;
-    border: none;
-    font-weight: bold;
-    box-shadow: 0 5px 0 #2f855a;
+/* --- 4. 閱讀理解 & 續寫句子 (字數較多) --- */
+#modal.type-understand div, 
+#modal.type-continue p {
+    font-size: 20px !important; 
+    line-height: 1.4;
+}
+
+#modal.type-understand div {
+    background: #f0f7ff;
+    padding: 10px;
+    border-radius: 10px;
+    max-height: 70px;      /* 限制閱讀文本高度 */
+    overflow-y: auto;      /* 萬一太長可以捲動 */
+    text-align: left;
 }
     </style>
     
@@ -1551,8 +1545,13 @@ function showModal() {
     // 每次打開挑戰都要重設機會
     attempts = 3; 
 
-    // 1. 隨機抽一題
     const task = allTasks[Math.floor(Math.random() * allTasks.length)];
+    if (!task) return; // 🚩 防錯：如果沒抽到題目就跳出
+
+    const modal = document.getElementById('modal');
+    modal.className = ""; 
+    modal.classList.add('type-' + task.type); 
+    modal.style.display = 'flex';
     
     // 2. 獲取 HTML 容器
     const content = document.getElementById('modal-content');
