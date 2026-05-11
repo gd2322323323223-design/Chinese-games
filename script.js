@@ -14,7 +14,7 @@ const boosts = [8, 20, 32, 51, 68, 80, 90];
 const dinosaurs = [5, 12, 27, 43, 55, 70, 86, 103]; 
 let words = []; 
 
-// --- 2. 核心題庫 (合併所有題型) ---
+// --- 2. 核心題庫 ---
 const fillTasks = [
     { type: "fill", question: "新年快到了，我和爸媽一起______房子。", options: ["換洗", "打掃", "乾淨"], answer: "打掃" },
     { type: "fill", question: "小朋友起得早，在______下做早操。", options: ["花朵", "桌子", "陽光"], answer: "陽光" },
@@ -105,7 +105,7 @@ const understandTasks = [
 
 const allTasks = [...fillTasks, ...reorderTasks, ...matchTasks, ...radicalTasks, ...puncTasks, ...continueTasks, ...strokeTasks, ...understandTasks]; 
 
-// --- 3. 角色選擇與起始頁邏輯 ---
+// --- 3. 角色選擇邏輯 ---
 function selectChar(element, imgPath) {
     if (currentSelectingPlayer === 1 && selectedP1 === imgPath) { resetSelection(1); return; }
     if (currentSelectingPlayer === 2 && selectedP2 === imgPath) { resetSelection(2); return; }
@@ -173,51 +173,23 @@ function updateHighlight() {
 }
 
 function startGame() {
-    // 1. 檢查是否選好角色
-    if (!selectedP1 || !selectedP2) { 
-        alert("兩位玩家都必須選擇角色喔！"); 
-        return; 
-    }
-    
-    // 2. 設定棋子圖片，並強制設定縮放比例（防止巨大化）
+    if (!selectedP1 || !selectedP2) { alert("兩位玩家都必須選擇角色喔！"); return; }
     const p1 = document.getElementById('p1');
     const p2 = document.getElementById('p2');
-    
     p1.style.backgroundImage = `url('${selectedP1}')`;
-    p1.style.backgroundSize = "contain";      // 🚩 強制縮放，不讓它撐開
+    p1.style.backgroundSize = "contain";
     p1.style.backgroundRepeat = "no-repeat";
-    
     p2.style.backgroundImage = `url('${selectedP2}')`;
-    p2.style.backgroundSize = "contain";      // 🚩 同上
+    p2.style.backgroundSize = "contain";
     p2.style.backgroundRepeat = "no-repeat";
-    
-    // 3. 畫面切換：隱藏首頁，顯示遊戲主體
     document.getElementById('start-screen').style.display = 'none';
-    
     const gameContainer = document.getElementById('game-container');
-    if (gameContainer) {
-        gameContainer.style.display = 'block'; // 🚩 確保遊戲容器出現
-        gameContainer.style.visibility = 'visible';
-    }
-    
-    // 4. 顯示控制列與按鈕
+    if (gameContainer) { gameContainer.style.display = 'block'; gameContainer.style.visibility = 'visible'; }
     const ctrl = document.getElementById('controls');
-    if (ctrl) {
-        ctrl.style.setProperty('display', 'flex', 'important');
-    }
-    
+    if (ctrl) ctrl.style.setProperty('display', 'flex', 'important');
     const rollBtn = document.getElementById('btn-roll');
-    if (rollBtn) {
-        rollBtn.style.setProperty('display', 'inline-block', 'important');
-        rollBtn.disabled = false; // 確保按鈕可以按
-    }
-    
-    // 5. 播放音樂
-    if (typeof audio !== 'undefined' && audio.bgm.paused) {
-        toggleBGM();
-    }
-    
-    // 6. 重新校正棋子位置（搬家後位置可能偏移，跑一次更新）
+    if (rollBtn) { rollBtn.style.setProperty('display', 'inline-block', 'important'); rollBtn.disabled = false; }
+    if (typeof audio !== 'undefined' && audio.bgm.paused) toggleBGM();
     setTimeout(updateDisplay, 100);
 }
 
@@ -226,36 +198,25 @@ const audio = {
     bgm: new Audio('sounds/bgm.mp3'),
     dice: new Audio('sounds/sounds_dice.mp3'),
     win: new Audio('sounds/win.mp3'),
-    wrong: new Audio('sounds/wrong.mp3') // 補上錯題音效
+    wrong: new Audio('sounds/wrong.mp3')
 };
 audio.bgm.loop = true; audio.bgm.volume = 0.05;
 
 function toggleBGM() {
-    if (audio.bgm.paused) {
-        audio.bgm.play().catch(e => {});
-        document.getElementById('music-ctrl').innerText = "🎶";
-    } else {
-        audio.bgm.pause();
-        document.getElementById('music-ctrl').innerText = "🔇";
-    }
+    if (audio.bgm.paused) { audio.bgm.play().catch(e => {}); document.getElementById('music-ctrl').innerText = "🎶"; }
+    else { audio.bgm.pause(); document.getElementById('music-ctrl').innerText = "🔇"; }
 }
 
-function playSound(name) {
-    if (audio[name]) { audio[name].currentTime = 0; audio[name].play().catch(e => {}); }
-}
+function playSound(name) { if (audio[name]) { audio[name].currentTime = 0; audio[name].play().catch(e => {}); } }
 
 // --- 5. 棋盤與移動邏輯 ---
 function init() {
-    // 🚩 核心修正：初始化時先讓遊戲容器隱藏，避免它蓋住首頁選角池
     const gameContainer = document.getElementById('game-container');
-    if (gameContainer) {
-        gameContainer.style.display = 'none'; 
-    }
+    if (gameContainer) gameContainer.style.display = 'none'; 
     const board = document.getElementById('board');
     if (!board) return;
     board.innerHTML = "";
     let displayIndex = 1; 
-
     words = []; 
     for (let i = 0; i < 110; i++) {
         if (i === 0) words.push("起點");
@@ -263,13 +224,10 @@ function init() {
         else if (traps.includes(i) || boosts.includes(i) || dinosaurs.includes(i)) words.push("");
         else words.push("語文挑戰"); 
     }
-    
     words.forEach((w, i) => {
         const cell = document.createElement('div');
         cell.className = 'cell'; cell.id = 'c' + i;
-        const isGoal = (i === words.length - 1);
-
-        if (isGoal) {
+        if (i === words.length - 1) {
             cell.classList.add('goal-cell');
             cell.innerHTML = `<div class="event-icon">🏆</div><div class="cell-text">終點</div>`;
         } else {
@@ -277,7 +235,6 @@ function init() {
             if(traps.includes(i)) { iconText = "🍌"; cell.classList.add('trap-cell'); }
             else if(boosts.includes(i)) { iconText = "🚀"; cell.classList.add('boost-cell'); }
             else if(dinosaurs.includes(i)) { iconText = "🦖"; cell.classList.add('dino-cell'); }
-
             let numberHtml = (!i || iconText) ? "" : `<span class="cell-index">${displayIndex++}</span>`;
             cell.innerHTML = `${numberHtml}${w !== "" ? `<div class="cell-text">${w}</div>` : ""}<span class="event-icon" style="${w !== "" ? 'position: absolute; bottom: 5px; right: 8px; font-size: 24px;' : 'font-size: 50px;'}">${iconText}</span>`;
         }
@@ -307,18 +264,14 @@ async function roll() {
     playSound('dice');
     const rollBtn = document.getElementById('btn-roll');
     if (rollBtn) rollBtn.disabled = true;
-
     const diceBox = document.getElementById('dice-box');
     const num = Math.floor(Math.random() * 6) + 1;
     const rotations = { 1: 'rotateX(0deg) rotateY(0deg)', 2: 'rotateX(0deg) rotateY(180deg)', 3: 'rotateX(0deg) rotateY(-90deg)', 4: 'rotateX(0deg) rotateY(90deg)', 5: 'rotateX(-90deg) rotateY(0deg)', 6: 'rotateX(90deg) rotateY(0deg)' };
-
     diceBox.style.transform = `rotateX(${Math.random() * 360 + 720}deg) rotateY(${Math.random() * 360 + 720}deg)`;
     await new Promise(r => setTimeout(r, 600));
     diceBox.style.transform = rotations[num];
     await new Promise(r => setTimeout(r, 400));
-    
-    dice = num; 
-    waitingForClick = true;
+    dice = num; waitingForClick = true;
     document.getElementById('p' + (turn + 1)).classList.add('can-move');
 }
 
@@ -346,16 +299,9 @@ async function move(pid) {
     }
     moving = false;
     const pos = players[pid].pos;
-    if(traps.includes(pos)) {
-        alert("🍌 哎呀！踩到香蕉滑倒了。後退 1 格");
-        prepareSpecialStep(pid, -1);
-    } else if(boosts.includes(pos)) {
-        alert("🚀 哈哈！坐上火箭衝刺！前進 5 格");
-        prepareSpecialStep(pid, 5);
-    } else if(dinosaurs.includes(pos)) {
-        alert("🦖 哇！是大恐龍！後退 3 格");
-        prepareSpecialStep(pid, -3);
-    }
+    if(traps.includes(pos)) { alert("🍌 哎呀！踩到香蕉滑倒了。後退 1 格"); prepareSpecialStep(pid, -1); }
+    else if(boosts.includes(pos)) { alert("🚀 哈哈！坐上火箭衝刺！前進 5 格"); prepareSpecialStep(pid, 5); }
+    else if(dinosaurs.includes(pos)) { alert("🦖 哇！是大恐龍！後退 3 格"); prepareSpecialStep(pid, -3); }
 }
 
 function prepareSpecialStep(pid, steps) {
@@ -377,77 +323,81 @@ async function moveSteps(pid, steps) {
 
 async function checkEndOrModal(pid) {
     const pos = players[pid].pos;
-    if (pos === words.length - 1) {
-        playSound('win');
-        alert(`🏆 玩家 ${pid + 1} 奪冠！`);
-        location.reload();
-    } else if (traps.includes(pos) || boosts.includes(pos) || dinosaurs.includes(pos) || pos === 0) {
-        finishTurn();
-    } else {
-        showModal();
-    }
+    if (pos === words.length - 1) { playSound('win'); alert(`🏆 玩家 ${pid + 1} 奪冠！`); location.reload(); }
+    else if (traps.includes(pos) || boosts.includes(pos) || dinosaurs.includes(pos) || pos === 0) finishTurn();
+    else showModal();
 }
 
-// --- 6. 彈窗題型核心邏輯 ---
-function showModal() {
+// --- 6. 彈窗與顯示渲染邏輯 ---
+
+/**
+ * 核心渲染函數：負責將題目繪製到彈窗中
+ * 統一了正式遊戲與測試面板的渲染邏輯
+ */
+function displaySpecificTask(task) {
     attempts = 3; 
-    const task = allTasks[Math.floor(Math.random() * allTasks.length)];
-    if (!task) return;
 
     const modal = document.getElementById('modal');
     modal.className = ""; 
     modal.classList.add('type-' + task.type); 
-    modal.style.display = 'flex';
     
     const content = document.getElementById('modal-content');
     const actions = document.getElementById('modal-actions');
-    content.innerHTML = ""; actions.innerHTML = "";
+    if (!content || !actions) return;
 
+    content.innerHTML = ""; 
+    actions.innerHTML = "";
+
+    // A. 渲染題目區域
     let html = `<div class="challenge-container">`;
     if (task.gif) html += `<img src="images/${task.gif}" class="task-image">`;
     if (task.sentence) html += `<div class="task-sentence-box">${task.sentence}</div>`;
     html += `<p class="task-question">${task.question}</p>`;
+    html += `<div id="feedback-msg" style="min-height:30px;"></div>`;
+    html += `</div>`; 
+    content.innerHTML = html;
 
+    // B. 渲染互動元件
     if (task.type === "reorder") {
-        html += `<div id="reorder-zone"></div>`;
-        html += `<div id="feedback-msg" style="min-height:30px;"></div>`;
-        html += `<div class="word-pool">`;
+        // 重組句子特別處理
+        const zone = document.createElement('div');
+        zone.id = "reorder-zone";
+        content.querySelector('.challenge-container').appendChild(zone);
+
+        const pool = document.createElement('div');
+        pool.className = "word-pool";
         task.words.forEach(w => {
-            html += `<button class="opt-btn" onclick="addToReorder(this)">${w}</button>`;
+            const btn = document.createElement('button');
+            btn.className = "opt-btn";
+            btn.innerText = w;
+            btn.onclick = () => addToReorder(btn);
+            pool.appendChild(btn);
         });
-        html += `</div></div>`;
-        content.innerHTML = html;
+        content.querySelector('.challenge-container').appendChild(pool);
 
         const submitBtn = document.createElement('button');
-        submitBtn.className = "submit-btn"; submitBtn.innerText = "提 交";
+        submitBtn.className = "submit-btn";
+        submitBtn.innerText = "提 交";
         submitBtn.onclick = () => {
-            const userSentence = Array.from(document.getElementById('reorder-zone').children).map(node => node.innerText).join("");
+            const userSentence = Array.from(document.getElementById('reorder-zone').children).map(n => n.innerText).join("");
             checkUserAnswer(userSentence, task.answer);
         };
         actions.appendChild(submitBtn);
-    } else {
-        html += `<div id="feedback-msg" style="min-height:30px;"></div></div>`;
-        content.innerHTML = html;
 
-     if (task.options) {
-    const labels = ["A.", "B.", "C.", "D."];
-    const actions = document.getElementById('modal-actions');
-    
-    // 🚩 建議 1: 確保 actions 存在再執行，避免報錯
-    if (actions) {
-        actions.innerHTML = ""; 
-
+    } else if (task.options) {
+        // 選項題型：統一使用 A.B.C. 在上，按鈕在下的結構
+        const labels = ["A.", "B.", "C.", "D."];
         task.options.forEach((opt, index) => {
             const wrapper = document.createElement('div');
             wrapper.className = "opt-wrapper";
 
             const label = document.createElement('div');
             label.className = "opt-label-text";
-            label.innerText = labels[index] || ""; // 🚩 建議 2: 防止選項超過 4 個時報錯
+            label.innerText = labels[index] || "";
             wrapper.appendChild(label);
 
             const btn = document.createElement('button');
-            btn.className = "opt-btn-pure";
+            btn.className = "opt-btn-pure"; 
             btn.innerText = opt;
             btn.onclick = () => checkUserAnswer(opt, task.answer);
             
@@ -455,20 +405,40 @@ function showModal() {
             actions.appendChild(wrapper);
         });
     }
+
+    // C. 顯示與計時
+    document.getElementById('modal-overlay').style.display = 'block';
+    document.getElementById('modal').style.display = 'flex';
+    startModalTimer();
 }
 
-    document.getElementById('modal-overlay').style.display = 'block';
-    document.getElementById('modal').style.display = 'block';
+// 正式遊戲觸發
+function showModal() {
+    const task = allTasks[Math.floor(Math.random() * allTasks.length)];
+    if (task) displaySpecificTask(task);
+}
 
+// 測試面板觸發
+function testModal(targetType) {
+    const filteredTasks = allTasks.filter(t => t.type === targetType);
+    if (filteredTasks.length > 0) {
+        const task = filteredTasks[Math.floor(Math.random() * filteredTasks.length)];
+        displaySpecificTask(task);
+    } else { alert("找不到該題型！"); }
+}
+
+// --- 7. 輔助函數 ---
+
+function startModalTimer() {
     let timeLeft = 120;
     const timerDisplay = document.getElementById('timer');
-    clearInterval(timerInterval); 
+    if (typeof timerInterval !== 'undefined') clearInterval(timerInterval);
     timerInterval = setInterval(() => {
         timeLeft--;
         if (timerDisplay) timerDisplay.innerText = `⏳ 剩餘時間: ${timeLeft}s`;
         if (timeLeft <= 0) { clearInterval(timerInterval); closeModal(); }
     }, 1000);
-} 
+}
 
 function addToReorder(btn) {
     const zone = document.getElementById('reorder-zone');
@@ -515,107 +485,3 @@ function finishTurn() {
 }
 
 window.onload = init;
-
-// --- 1. 測試專用函數 ---
-function testModal(targetType) {
-    const filteredTasks = allTasks.filter(t => t.type === targetType);
-    if (filteredTasks.length > 0) {
-        const task = filteredTasks[Math.floor(Math.random() * filteredTasks.length)];
-        displaySpecificTask(task);
-    } else {
-        alert("找不到題型為 '" + targetType + "' 的題目！");
-    }
-}
-
-// --- 2. 顯示特定題目的核心函數 ---
-function displaySpecificTask(task) {
-    attempts = 3; 
-
-    const modal = document.getElementById('modal');
-    modal.className = ""; 
-    modal.classList.add('type-' + task.type); 
-    
-    const content = document.getElementById('modal-content');
-    const actions = document.getElementById('modal-actions');
-    if (!content || !actions) return;
-
-    content.innerHTML = ""; 
-    actions.innerHTML = "";
-
-    // 🚩 渲染題目內容
-    let html = `<div class="challenge-container">`;
-    if (task.gif) html += `<img src="images/${task.gif}" class="task-image">`;
-    if (task.sentence) html += `<div class="task-sentence-box">${task.sentence}</div>`;
-    html += `<p class="task-question">${task.question}</p>`;
-    html += `<div id="feedback-msg" style="min-height:30px;"></div>`;
-    html += `</div>`; 
-    content.innerHTML = html;
-
-    // 🚩 渲染選項按鈕 (整合 ABC 標籤)
-    if (task.type === "reorder") {
-        // 重組句子特別處理
-        const zone = document.createElement('div');
-        zone.id = "reorder-zone";
-        content.querySelector('.challenge-container').appendChild(zone);
-
-        const pool = document.createElement('div');
-        pool.className = "word-pool";
-        task.words.forEach(w => {
-            const btn = document.createElement('button');
-            btn.className = "opt-btn";
-            btn.innerText = w;
-            btn.onclick = () => addToReorder(btn);
-            pool.appendChild(btn);
-        });
-        content.querySelector('.challenge-container').appendChild(pool);
-
-        const submitBtn = document.createElement('button');
-        submitBtn.className = "submit-btn";
-        submitBtn.innerText = "提 交";
-        submitBtn.onclick = () => {
-            const userSentence = Array.from(document.getElementById('reorder-zone').children).map(n => n.innerText).join("");
-            checkUserAnswer(userSentence, task.answer);
-        };
-        actions.appendChild(submitBtn);
-
-    } else {
-        // 其他題型 (包含續寫句子) 使用 ABC 標籤
-        const labels = ["A", "B", "C", "D"];
-        task.options.forEach((opt, index) => {
-            const btn = document.createElement('button');
-            btn.className = "opt-btn";
-            // 🚩 這裡對應你漂亮的 CSS 字母徽章結構
-            btn.innerHTML = `<span class="opt-label">${labels[index]}</span><span class="opt-text">${opt}</span>`;
-            btn.onclick = () => checkUserAnswer(opt, task.answer);
-            actions.appendChild(btn);
-        });
-    }
-
-    // 顯示
-    document.getElementById('modal-overlay').style.display = 'block';
-    document.getElementById('modal').style.display = 'flex';
-
-    // 🚩 啟動計時器 (如果沒有這個函數，我直接寫在下面)
-    startModalTimer();
-}
-
-// --- 3. 計時器函數 (防報錯補全) ---
-function startModalTimer() {
-    let timeLeft = 120;
-    const timerDisplay = document.getElementById('timer');
-    if (typeof timerInterval !== 'undefined') clearInterval(timerInterval);
-    timerInterval = setInterval(() => {
-        timeLeft--;
-        if (timerDisplay) timerDisplay.innerText = `⏳ 剩餘時間: ${timeLeft}s`;
-        if (timeLeft <= 0) {
-            clearInterval(timerInterval);
-            closeModal();
-        }
-    }, 1000);
-}
-
-// --- 4. 修改原本的隨機抽題函數 (讓它也共用這個顯示 logic) ---
-function showModal() {
-    const task = allTasks[Math.floor(Math.random() * allTasks.length)];
-    if (task) displaySpecificTask(task);
-}
