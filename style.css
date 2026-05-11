@@ -834,7 +834,7 @@ body.game-active #controls {
     font-weight: bold;
 }
 
-#modal.type-continue .challenge-container::before {
+#modal.type-understand .challenge-container::before {
     content: "【 閱讀理解 】";
     display: block;
     font-size: 18px;
