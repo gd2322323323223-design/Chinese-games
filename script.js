@@ -502,13 +502,48 @@ function finishTurn() {
 window.onload = init;
 
 // 🧪 測試專用
+// 🧪 修正後的測試專用函數
 function testModal(targetType) {
+    // 1. 從總題庫中找出符合該類型的所有題目
     const filteredTasks = allTasks.filter(t => t.type === targetType);
+    
     if (filteredTasks.length > 0) {
+        // 2. 隨機從過濾出的題目中挑選一題
         const task = filteredTasks[Math.floor(Math.random() * filteredTasks.length)];
-        const original = [...allTasks];
-        window.allTasks = [task];
-        showModal();
-        window.allTasks = original;
+        
+        // 3. 🚩 關鍵：直接呼叫一個專門顯示特定題目的函數，跳過原本 showModal 的隨機抽取邏輯
+        displaySpecificTask(task);
+    } else {
+        alert("找不到題型為 '" + targetType + "' 的題目，請檢查題庫定義！");
     }
+}
+
+// 🚩 新增：專門用來顯示「指定題目」的函數
+function displaySpecificTask(task) {
+    attempts = 3; // 重設機會
+
+    const modal = document.getElementById('modal');
+    modal.className = ""; 
+    modal.classList.add('type-' + task.type); 
+    modal.style.display = 'flex';
+    
+    const content = document.getElementById('modal-content');
+    const actions = document.getElementById('modal-actions');
+    
+    // 確保容器存在
+    if (!content || !actions) return;
+
+    content.innerHTML = ""; 
+    actions.innerHTML = "";
+
+    // 呼叫原本 showModal 裡面的渲染邏輯
+    // 注意：這裡直接套用你 script.js 裡現有的生成 HTML 邏輯
+    renderTaskContent(task, content, actions);
+
+    // 顯示彈窗
+    document.getElementById('modal-overlay').style.display = 'block';
+    document.getElementById('modal').style.display = 'block';
+
+    // 啟動計時器
+    startModalTimer();
 }
