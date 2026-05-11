@@ -1,4 +1,3 @@
-<script>
 let selectedP1 = "";
 let selectedP2 = "";
 let currentSelectingPlayer = 1; 
@@ -456,86 +455,66 @@ function showModal() {
     
     html += `<p style="font-size:24px; font-weight:bold; margin-bottom:20px;">${task.question}</p>`;
     
-    if (task.type === "reorder") {
-    // --- 1. 頂部標題 ---
-    html += `<div style="font-size: 20px; color: #5d4037; margin-bottom: 10px; font-weight: bold;">重組句子</div>`;
+// --- 3. 根據題型生成 HTML 內容 ---
+let html = `<div class="challenge-container">`;
 
-    // --- 2. 上方：作答長框 (顯示已排好的句子) ---
-    // 這裡我們讓它變成一個明顯的白色大長方框
-    html += `
-        <div id="reorder-zone" style="
-            width: 95%; 
-            min-height: 80px; 
-            background: #ffffff; 
-            border: 3px solid #3182ce; 
-            border-radius: 15px; 
-            margin: 0 auto 20px auto; 
-            display: flex; 
-            flex-wrap: wrap; 
-            gap: 8px; 
-            padding: 15px; 
-            justify-content: center; 
-            align-items: center;
-            box-shadow: inset 0 2px 5px rgba(0,0,0,0.1);
-        "></div>
-    `;
+if (task.gif) { // 看圖配詞
+    html += `<img src="images/${task.gif}" class="task-image">`;
+}
+if (task.sentence) { // 閱讀理解
+    html += `<div class="task-sentence-box">${task.sentence}</div>`;
+}
 
-    // --- 3. 中間：單字池 (散落的零件) ---
-    html += `<div id="feedback-msg" style="font-size: 18px; font-weight: bold; margin: 10px 0;"></div>`;
-    html += `<div class="word-pool" style="display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; padding: 10px;">`;
-    
+// 顯示題目問題
+html += `<p class="task-question">${task.question}</p>`;
+
+if (task.type === "reorder") {
+    // --- 【重組句子題型】 ---
+    html += `<div id="reorder-zone"></div>`;
+    html += `<div id="feedback-msg" style="min-height:30px;"></div>`;
+    html += `<div class="word-pool">`;
     task.words.forEach(w => {
-        // 這裡的按鈕我們加上灰色背景，像零件一樣
-        html += `
-            <button class="opt-btn" style="
-                background: #e2e8f0; 
-                color: #2d3748; 
-                border: 2px solid #cbd5e0;
-                width: auto;
-                min-width: 60px;
-            " onclick="addToReorder(this)">${w}</button>
-        `;
+        html += `<button class="opt-btn" onclick="addToReorder(this)">${w}</button>`;
     });
     html += `</div>`;
+    
+    html += `</div>`; // 🚩 修正：在這裡關閉 challenge-container
     content.innerHTML = html;
 
-    // --- 4. 最下方：提交按鈕 (寬大的長方形) ---
+    // 提交按鈕
     const submitBtn = document.createElement('button');
-    submitBtn.className = "opt-btn";
-    submitBtn.style.cssText = `
-        width: 95%; 
-        background: #ffffff; 
-        color: #2d3748; 
-        border: 3px solid #2d3748; 
-        font-size: 32px; 
-        margin-top: 20px;
-        padding: 15px 0;
-        border-radius: 0; /* 讓它看起來更像長方形 */
-    `;
+    submitBtn.className = "submit-btn";
     submitBtn.innerText = "提 交";
-    
     submitBtn.onclick = () => {
         const userSentence = Array.from(document.getElementById('reorder-zone').children)
                                  .map(node => node.innerText).join("");
         checkUserAnswer(userSentence, task.answer);
     };
     actions.appendChild(submitBtn);
-}else {
-        // --- 其他題型 (填充、選擇等) ---
-        html += `<div id="feedback-msg" style="font-size: 22px; font-weight: bold; margin: 10px 0; min-height: 30px;"></div>`;
-        html += `</div>`;
-        content.innerHTML = html;
 
-        if (task.options) {
-            task.options.forEach(opt => {
-                const btn = document.createElement('button');
-                btn.className = "opt-btn";
+} else {
+    // --- 【其他題型】 ---
+    html += `<div id="feedback-msg" style="min-height:30px;"></div>`;
+    html += `</div>`; // 🚩 在這裡關閉 challenge-container
+    content.innerHTML = html;
+
+    if (task.options) {
+        const labels = ["A.", "B.", "C.", "D."];
+        task.options.forEach((opt, index) => {
+            const btn = document.createElement('button');
+            btn.className = "opt-btn";
+            
+            if (task.type === "stroke") {
+                btn.innerHTML = `<span class="opt-label">${labels[index]}</span>${opt}`;
+            } else {
                 btn.innerText = opt;
-                btn.onclick = () => checkUserAnswer(opt, task.answer);
-                actions.appendChild(btn);
-            });
-        }
+            }
+            
+            btn.onclick = () => checkUserAnswer(opt, task.answer);
+            actions.appendChild(btn);
+        });
     }
+}
 
     // 4. 顯示彈窗與遮罩
     document.getElementById('modal-overlay').style.display = 'block';
@@ -692,10 +671,6 @@ function testModal(targetType) {
         // 隨機從該類別挑一題
         const task = filteredTasks[Math.floor(Math.random() * filteredTasks.length)];
         
-        // 重寫一個臨時的 showModal 邏輯，或者直接修改 showModal
-        // 這裡為了簡單，我們直接修改全域變數調用原本的 showModal
-        // 但因為原本的 showModal 是隨機的，我們需要一點小技巧：
-        
         const originalAllTasks = [...allTasks]; // 備份
         window.allTasks = [task];               // 暫時把題庫改成只有這一題
         showModal();                            // 執行顯示
@@ -704,4 +679,3 @@ function testModal(targetType) {
         alert("找不到此類型的題目，請檢查題庫定義！");
     }
 }
-</script>
