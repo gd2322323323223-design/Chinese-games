@@ -583,7 +583,6 @@ body.game-active #controls {
 }
 
 /* --- 3. 選項按鈕 (.opt-btn) 基礎樣式 --- */
-/* --- 1. 選項按鈕 (.opt-btn) 基礎樣式：統一設計 --- */
 .opt-btn {
     position: relative;
     display: inline-flex;
@@ -739,42 +738,74 @@ body.game-active #controls {
    🚩 最終優化：主次分明 + 自適應選項佈局
    ========================================== */
 
+/* ==========================================
+   🚩 終極整合版：大背景、主次分明、自適應長短
+   ========================================== */
+
+/* 0. 核心背景：放大白色彈窗，確保容納所有內容 */
+#modal {
+    width: 95% !important;   
+    max-width: 1000px !important; 
+    min-height: 80% !important;   
+    padding: 25px !important;     
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
 /* 1. 弱化次要資訊：縮小時間與標題 */
 #modal #timer {
-    font-size: 14px !important; /* 縮小時間 */
+    font-size: 14px !important; 
     margin-bottom: 10px !important;
     opacity: 0.7;
+    text-align: center;
+    width: 100%;
 }
 
 #modal.type-continue .challenge-container::before {
-    font-size: 20px !important; /* 顯著縮小標題 */
-    padding: 5px 0 !important;
-    margin-bottom: 15px !important;
-    background: #edf2f7 !important; /* 改用淡灰色背景，不搶戲 */
+    content: "【 續寫句子 】";
+    display: block;
+    font-size: 20px !important; 
+    padding: 8px 0 !important;
+    margin: -25px -25px 20px -25px !important; /* 頂滿左右 */
+    background: #edf2f7 !important; 
     color: #4a5568 !important;
+    text-align: center;
+    border-radius: 15px 15px 0 0;
 }
 
-/* 2. 強化主角：問題方框 */
+/* 2. 強化主角：問題方框 (強制一行、向左移、字體放大) */
 #modal.type-continue p, 
 #modal.type-continue .task-question {
-    font-size: 36px !important; /* 🚩 大幅放大問題字體 */
+    /* 🚩 你的要求：大幅放大字體，主次分明 */
+    font-size: 36px !important; 
     color: #1a202c !important;
     background: #ffffff !important;
-    border: 4px solid #3182ce !important; /* 加粗邊框 */
+    border: 4px solid #3182ce !important; 
     border-radius: 15px;
-    padding: 25px 30px !important;
-    width: 95% !important;
-    margin: 0 auto 30px auto !important;
+    padding: 20px 30px !important;
+    
+    /* 🚩 你的要求：強制一行、向左移 */
+    white-space: nowrap !important; 
+    text-align: left !important; 
+    width: 92% !important;
+    margin: 0 auto 30px 15px !important; 
+    
     box-shadow: 0 4px 12px rgba(49, 130, 206, 0.2);
+    overflow: hidden;
 }
 
-/* 3. 選項容器：垂直排列 */
+/* 3. 選項容器：垂直排列，確保不擠壓 */
 #modal #modal-actions {
+    width: 100% !important;
+    max-width: none !important;
     display: flex !important;
-    flex-direction: column !important;
-    align-items: flex-start !important; /* 🚩 靠左對齊 */
+    flex-direction: column !important; /* 🚩 垂直排列最能確保「完整看到」 */
+    justify-content: flex-start !important;
+    align-items: flex-start !important; /* 🚩 靠左對齊標籤 */
     gap: 15px !important;
-    margin-left: 5% !important; /* 讓整體稍微往右縮一點點，不貼邊 */
+    padding-left: 20px !important;
+    flex-wrap: nowrap !important; 
 }
 
 /* 4. 選項行：自適應寬度 */
@@ -782,7 +813,7 @@ body.game-active #controls {
     display: flex !important;
     flex-direction: row !important;
     align-items: center !important;
-    width: auto !important; /* 🚩 寬度自適應 */
+    width: auto !important; 
 }
 
 /* 5. 標籤 A. B. C. */
@@ -791,15 +822,16 @@ body.game-active #controls {
     color: #4a5568 !important;
     font-weight: bold !important;
     margin-right: 12px !important; /* 🚩 文字貼近字母 */
-    min-width: 40px;
+    min-width: 45px;
+    text-align: right;
 }
 
-/* 6. 按鈕本體：自適應長短 */
+/* 6. 按鈕本體：🚩 自適應長短，不再固定寬度 */
 .opt-btn-pure-vertical {
-    display: inline-flex !important; /* 🚩 改為 inline-flex 實現長度自適應 */
-    width: auto !important;
-    min-width: 150px; /* 設定最小寬度，防止太短難點 */
-    height: 70px !important;
+    display: inline-flex !important; 
+    width: auto !important; /* 讓方塊隨文字撐開 */
+    min-width: 160px; 
+    height: 75px !important;
     background: #ffb300 !important;
     border: 3px solid #333 !important;
     border-radius: 12px !important;
@@ -809,28 +841,19 @@ body.game-active #controls {
     font-size: 46px !important; 
     font-weight: 200 !important; 
     
-    padding: 0 25px !important; /* 🚩 左右內距，讓方格隨字數撐開 */
+    padding: 0 30px !important; /* 🚩 左右留白，確保長字有空間 */
     align-items: center;
     justify-content: center;
     box-shadow: 0 5px 0 #bf360c !important;
     line-height: 1 !important;
-    white-space: nowrap !important;
+    white-space: nowrap !important; /* 防止按鈕內換行 */
+    cursor: pointer;
 }
 
 /* 按下效果 */
 .opt-btn-pure-vertical:active {
     transform: translateY(3px) !important;
     box-shadow: 0 2px 0 #bf360c !important;
-    
-}
-/* 🚩 額外修正：讓問題區域強制一行且靠左 */
-#modal.type-continue p, 
-#modal.type-continue .task-question {
-    white-space: nowrap !important;
-    text-align: left !important;
-    width: 90% !important;
-    margin-left: 20px !important;
-    font-size: 24px !important; /* 稍微縮小問題字體，確保一行看完 */
 }
 
 /* 5. 供詞填充 */
