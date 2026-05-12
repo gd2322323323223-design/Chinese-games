@@ -380,23 +380,13 @@ function displaySpecificTask(task) {
     } else if (task.options) {
         const labels = ["A.", "B.", "C.", "D."];
         task.options.forEach((opt, index) => {
-            const row = document.createElement('div');
-            row.className = "opt-row-vertical";
-
-            const label = document.createElement('div');
-            label.className = "opt-label-pure";
-            label.innerText = labels[index]; 
-            row.appendChild(label);
-
-            const btn = document.createElement('button');
-            btn.className = "opt-btn-pure-vertical";
-            btn.innerText = opt;
-            btn.onclick = () => checkUserAnswer(opt, task.answer);
-            row.appendChild(btn);
-
-            actions.appendChild(row);
-        });
-    }
+    const btn = document.createElement('button');
+    btn.className = "opt-btn";
+    btn.innerText = opt;
+    btn.setAttribute('data-label', labels[index]); // 加上 A/B/C 標籤
+    btn.onclick = () => checkUserAnswer(opt, task.answer);
+    actions.appendChild(btn);
+});
 
     document.getElementById('modal-overlay').style.display = 'block';
     document.getElementById('modal').style.display = 'flex';
