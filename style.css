@@ -389,7 +389,7 @@ body:not(:has(#start-screen:not([style*="display: none"]))) #controls {
 #btn-roll:hover { background: #38a169; transform: scale(1.05); }
 #btn-roll:disabled { background: #cbd5e0; transform: scale(1); }
 
-/* 彈窗基礎 合併重複定義 */
+/* 彈窗基礎 */
 #modal {
     display: none;
     position: fixed;
@@ -480,7 +480,7 @@ body:not(:has(#start-screen:not([style*="display: none"]))) #controls {
     pointer-events: none;
 }
 
-/* 各題型通用標題前綴 */
+/* 各題型標題前綴 */
 #modal.type-fill .challenge-container::before { content: "【 供詞填充 】"; }
 #modal.type-reorder .challenge-container::before { content: "【 重組句子 】"; }
 #modal.type-stroke .challenge-container::before { content: "【 筆順辨認 】"; }
@@ -498,7 +498,7 @@ body:not(:has(#start-screen:not([style*="display: none"]))) #controls {
     font-weight: bold;
 }
 
-/* 各題型特化 */
+/* 各題型原有特化保留 */
 #modal.type-stroke p { font-size: 28px !important; }
 #modal.type-stroke .opt-btn { width: 180px !important; height: 100px !important; font-size: 55px !important; }
 
@@ -521,18 +521,11 @@ body:not(:has(#start-screen:not([style*="display: none"]))) #controls {
 #modal.type-match .opt-btn { width: 140px !important; height: 70px !important; }
 
 #modal.type-fill p { font-size: 28px !important; }
-#modal.type-fill .opt-btn { width: 150px !important; height: 80px !important; font-size: 28px !important; }
-
 #modal.type-punc p { font-size: 30px !important; letter-spacing: 2px; }
-#modal.type-punc .opt-btn { width: 100px !important; height: 80px !important; font-size: 36px !important; }
-
 #modal.type-radical p { font-size: 26px !important; }
-#modal.type-radical .opt-btn { width: 140px !important; height: 85px !important; font-size: 32px !important; }
-
 #modal.type-understand p { font-size: 22px !important; }
-#modal.type-understand .opt-btn { width: 150px !important; height: 70px !important; font-size: 24px !important; }
 
-/* 續寫句子 - 最終優化版 */
+/* ========== 續寫句子 專用原版樣式 保留 ========== */
 #modal.type-continue {
   width: 700px !important;
   max-width: 90% !important;
@@ -545,7 +538,6 @@ body:not(:has(#start-screen:not([style*="display: none"]))) #controls {
   height: auto !important;
 }
 
-/* 強化題目標題 */
 #modal.type-continue .challenge-container::before {
   font-size: 24px !important;
   font-weight: 900 !important;
@@ -557,7 +549,6 @@ body:not(:has(#start-screen:not([style*="display: none"]))) #controls {
   display: inline-block !important;
 }
 
-/* 題目句子方框 */
 #modal.type-continue .task-question {
   font-size: 34px !important;
   font-weight: 900 !important;
@@ -571,9 +562,10 @@ body:not(:has(#start-screen:not([style*="display: none"]))) #controls {
   width: 90% !important;
   line-height: 1.3 !important;
   box-shadow: 2px 2px 10px rgba(0,0,0,0.05);
+  position: relative !important;
+  padding-right: 50px !important;
 }
 
-/* 選項容器 */
 #modal.type-continue #modal-actions {
   display: flex !important;
   flex-direction: column !important;
@@ -582,7 +574,6 @@ body:not(:has(#start-screen:not([style*="display: none"]))) #controls {
   width: 100% !important;
 }
 
-/* 選項按鈕列 */
 #modal.type-continue .opt-row-vertical {
   display: flex !important;
   align-items: center !important;
@@ -591,7 +582,6 @@ body:not(:has(#start-screen:not([style*="display: none"]))) #controls {
   justify-content: center !important;
 }
 
-/* A B C 標籤 */
 #modal.type-continue .opt-label-pure {
   font-size: 32px !important;
   font-weight: 900 !important;
@@ -600,7 +590,6 @@ body:not(:has(#start-screen:not([style*="display: none"]))) #controls {
   text-align: right !important;
 }
 
-/* 優化選項按鈕字體清晰度 */
 #modal.type-continue .opt-btn-pure-vertical {
   min-width: 320px !important;
   height: 80px !important;
@@ -628,6 +617,43 @@ body:not(:has(#start-screen:not([style*="display: none"]))) #controls {
   transform: translateY(2px) !important;
   box-shadow: 0 3px 0 #bf360c !important;
 }
+
+/* ========== 所有其他題型 強制跟續寫句子統一題目框 ========== */
+#modal.type-fill .task-question,
+#modal.type-punc .task-question,
+#modal.type-radical .task-question,
+#modal.type-stroke .task-question,
+#modal.type-understand .task-question,
+#modal.type-reorder .task-question,
+#modal.type-match .task-question {
+  font-size: 28px !important;
+  font-weight: 900 !important;
+  color: #1a202c !important;
+  background: #f7fafc !important;
+  border-left: 10px solid var(--blue-main) !important;
+  border-radius: 12px !important;
+  padding: 20px 25px !important;
+  margin: 0 auto 20px auto !important;
+  text-align: left !important;
+  width: 90% !important;
+  line-height: 1.4 !important;
+  box-shadow: 2px 2px 10px rgba(0,0,0,0.05);
+  position: relative !important;
+}
+
+/* 全部題型答對統一樣式 */
+#modal.type-continue .task-question.correct,
+#modal.type-fill .task-question.correct,
+#modal.type-punc .task-question.correct,
+#modal.type-radical .task-question.correct,
+#modal.type-stroke .task-question.correct,
+#modal.type-understand .task-question.correct,
+#modal.type-reorder .task-question.correct,
+#modal.type-match .task-question.correct {
+  background: #f0fdf4 !important;
+  border-left: 10px solid #48bb78 !important;
+}
+
 /* 提交按鈕 */
 #modal-actions .submit-btn, 
 #modal-actions .finish-btn {
@@ -653,7 +679,7 @@ body:not(:has(#start-screen:not([style*="display: none"]))) #controls {
     border-color: #e53935 !important;
 }
 
-/* 所有動畫關鍵影格 集中放最後 */
+/* 所有動畫關鍵影格 */
 @keyframes bounce { 
     from { transform: translateY(0); } 
     to { transform: translateY(-20px); }
@@ -701,39 +727,4 @@ body:not(:has(#start-screen:not([style*="display: none"]))) #controls {
     0%, 100% { transform: translateX(0); }
     25% { transform: translateX(-5px); }
     75% { transform: translateX(5px); }
-}
-
-/* 答對後句子方框的基礎樣式 */
-#modal.type-continue .task-question {
-  position: relative !important;
-  padding-right: 50px !important; /* 給勾勾留空間，避免文字擠到邊框 */
-}
-
-/* 答對時的淡綠色背景 */
-#modal.type-continue .task-question.correct {
-  background: #f0fdf4 !important;
-  border-left-color: #48bb78 !important;
-}
-
-/* 動態插入的勾勾，只在答對時顯示 */
-.dynamic-tick {
-  position: absolute !important;
-  top: 12px !important;
-  right: 16px !important;
-  font-size: 26px !important;
-  color: #48bb78 !important;
-  font-weight: bold !important;
-  line-height: 1 !important;
-}
-
-/* 全部題型 答對後 統一樣式（與續寫句子完全相同） */
-#modal.type-continue .task-question.correct,
-#modal.type-fill .task-question.correct,
-#modal.type-punc .task-question.correct,
-#modal.type-radical .task-question.correct,
-#modal.type-stroke .task-question.correct,
-#modal.type-reading .task-question.correct {
-  background: #f0fdf4 !important;
-  border-left: 10px solid #48bb78 !important;
-  position: relative !important;
 }
