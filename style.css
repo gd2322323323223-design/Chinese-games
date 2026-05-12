@@ -715,3 +715,58 @@ body:not(:has(#start-screen:not([style*="display: none"]))) #controls {
     25% { transform: translateX(-5px); }
     75% { transform: translateX(5px); }
 }
+
+/* 1. 讓所有題型的選項容器，和續寫句子一樣垂直居中 */
+#modal:not(.type-continue) #modal-actions {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 12px !important;
+  align-items: center !important;
+  width: 100% !important;
+}
+
+/* 2. 讓所有題型的選項，都加上 A/B/C 標籤 + 同款大按鈕 */
+#modal:not(.type-continue) #modal-actions .opt-btn {
+  display: flex !important;
+  align-items: center !important;
+  gap: 12px !important;
+  width: auto !important;
+}
+#modal:not(.type-continue) #modal-actions .opt-btn::before {
+  content: attr(data-label);
+  display: inline-block;
+  font-size: 32px !important;
+  font-weight: 900 !important;
+  color: var(--blue-main) !important;
+  min-width: 50px !important;
+  text-align: right !important;
+}
+
+/* 3. 強制覆蓋所有舊按鈕樣式，完全繼承續寫句子的大按鈕 */
+#modal .opt-btn {
+  all: unset !important;
+  min-width: 320px !important;
+  height: 80px !important;
+  font-size: 30px !important;
+  font-weight: 700 !important;
+  letter-spacing: 1px !important;
+  color: #000 !important;
+  background: #ffb300 !important;
+  border: 3px solid #333 !important;
+  border-radius: 16px !important;
+  box-shadow: 0 6px 0 #bf360c !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  cursor: pointer !important;
+  transition: 0.2s !important;
+  margin: 8px;
+}
+#modal .opt-btn:hover {
+  transform: translateY(-3px) !important;
+  box-shadow: 0 9px 0 #bf360c !important;
+}
+#modal .opt-btn:active {
+  transform: translateY(2px) !important;
+  box-shadow: 0 3px 0 #bf360c !important;
+}
