@@ -786,10 +786,12 @@ body.game-active #controls {
 #modal #modal-actions {
     display: flex !important;
     flex-direction: column !important;
-    align-items: flex-start !important; /* 🚩 靠左對齊，給標籤空間 */
-    gap: 10px !important;
-    margin-top: 5px !important;
-    padding: 0 20px 20px 30px !important; /* 增加左側內距 */
+    align-items: center !important;
+    gap: 12px !important;
+    width: 100% !important;
+    /* 核心：減少頂部間距，把按鈕區往上拉 */
+    margin-top: 5px !important; 
+    padding: 0 10px 20px 10px !important;
 }
 
 /* 4. 每一行的組合 (A. + 按鈕) */
@@ -797,7 +799,8 @@ body.game-active #controls {
     display: flex !important;
     flex-direction: row !important;
     align-items: center !important;
-    width: 100% !important;
+    width: 95% !important;
+    max-width: 600px;
 }
 
 /* 5. 標籤 A. B. C. (縮小寬度，絕不遮擋) */
@@ -805,39 +808,51 @@ body.game-active #controls {
     font-size: 32px !important;
     color: #5d4037 !important;
     font-weight: bold !important;
-    width: 50px !important; /* 固定寬度 */
+    min-width: 50px !important; /* 固定寬度，確保對齊 */
+    text-align: right;
     margin-right: 15px !important;
-    text-align: center;
 }
 
 /* 6. 按鈕本體：方格放大，字體 50px 極幼細 */
 .opt-btn-pure-vertical {
-    flex: 1 !important; /* 自動撐開剩餘寬度 */
-    max-width: 550px !important; /* 🚩 適當放大方格寬度 */
-    height: 75px !important; /* 🚩 鎖定高度，避免切底 */
+    flex: 1 !important;
+    height: 75px !important; /* 鎖定高度，防止切到底部 */
     background: #ffb300 !important;
     border: 3px solid #333 !important;
     border-radius: 12px !important;
     
+    /* 🚩 字體平衡：42px 是大字與空間的最佳平衡點 */
     color: #000 !important;
-    font-size: 50px !important; /* 🚩 保持 50px 大字 */
-    font-weight: 100 !important; /* 🚩 100 權重，確保線條極細不模糊 */
-    font-family: "Microsoft JhengHei", "Heiti TC", sans-serif !important;
+    font-size: 42px !important; 
+    font-weight: 500 !important; /* 中等權重，既幼又清晰 */
+    font-family: "Microsoft JhengHei", sans-serif !important;
     
     display: flex !important;
     align-items: center !important;
-    justify-content: center !important; /* 字在方格中間 */
+    justify-content: center !important;
     
     box-shadow: 0 5px 0 #bf360c !important;
     line-height: 1 !important;
     cursor: pointer !important;
+    white-space: nowrap !important; /* 防止換行 */
 }
 
 /* 按下效果 */
 .opt-btn-pure-vertical:active {
     transform: translateY(3px) !important;
     box-shadow: 0 2px 0 #bf360c !important;
+    
 }
+/* 🚩 額外修正：讓問題區域強制一行且靠左 */
+#modal.type-continue p, 
+#modal.type-continue .task-question {
+    white-space: nowrap !important;
+    text-align: left !important;
+    width: 90% !important;
+    margin-left: 20px !important;
+    font-size: 24px !important; /* 稍微縮小問題字體，確保一行看完 */
+}
+
 /* 5. 供詞填充 */
 #modal.type-fill p { font-size: 28px !important; }
 #modal.type-fill .opt-btn { width: 150px !important; height: 80px !important; font-size: 28px !important; }
