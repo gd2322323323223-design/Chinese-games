@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>語文挑戰遊戲 - 豪華升級版</title>
+    <title>語文挑戰遊戲</title>
     <link rel="stylesheet" href="style.css">
 </head>
     
@@ -51,8 +51,8 @@
 
     <div id="music-ctrl" onclick="toggleBGM()">🎵</div>
 
-    <!-- 新增：積分顯示面板 -->
-    <div id="score-board">
+    <!-- 新增：積分顯示面板（只加這個，不改你原本的東西） -->
+    <div id="score-board" style="display:none;">
         <div class="score-item">玩家1：<span id="score-p1">0</span> 分</div>
         <div class="score-item">玩家2：<span id="score-p2">0</span> 分</div>
     </div>
@@ -82,15 +82,15 @@
         <div id="modal-actions"></div>
     </div>
 
-   <!-- 勝利滿版動畫彈窗 -->
-<div id="win-modal" style="display: none;">
-    <div class="win-content">
-        <div class="win-title">🏆 恭喜奪冠 🏆</div>
-        <div id="win-player"></div>
-        <div id="win-score"></div>
-        <button onclick="restartGame()" class="win-btn">再玩一局</button>
+    <!-- 修正：勝利彈窗預設隱藏 -->
+    <div id="win-modal" style="display:none;">
+        <div class="win-content">
+            <div class="win-title">🏆 恭喜奪冠 🏆</div>
+            <div id="win-player"></div>
+            <div id="win-score"></div>
+            <button onclick="restartGame()" class="win-btn">再玩一局</button>
+        </div>
     </div>
-</div>
 
     <div id="test-panel">
         <strong style="color:#5d4037; text-align:center;">題型測試面板</strong>
