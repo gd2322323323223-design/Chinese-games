@@ -534,30 +534,17 @@ body.game-active #controls {
 
 /* --- 修正後的彈窗與通知樣式 --- */
 
-/* --- 針對 60vw / 40vh 比例優化的彈窗樣式 --- */
-/* --- 1. 彈窗基礎結構修正 (適配 60vw / 40vh) --- */
 #modal {
-    display: none;
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 60vw;          
-    height: 40vh;         
-    max-width: 800px;     
-    min-height: 380px;    /* 確保有足夠空間顯示提交按鈕 */
-    background: #ffffff;
-    border: 8px solid #3182ce; 
-    border-radius: 40px;      
-    padding: 30px;
-    z-index: 2050;
-    text-align: center;
-    box-shadow: 0 15px 50px rgba(0,0,0,0.3);
+ width: 75% !important;        /* 🚩 縮窄寬度，嚴禁拉長 */
+    max-width: 700px !important; 
+    height: auto !important;      /* 🚩 高度自動 */
+    min-height: 85% !important;   /* 🚩 強制向下放寬背景，確保3個選項看得到 */
+    
+    padding: 20px !important;
     display: flex;
     flex-direction: column;
-    justify-content: space-between; 
     align-items: center;
-    overflow: hidden;    /* 防止內容爆框 */
+    justify-content: flex-start;
 }
 
 /* --- 2. 題目文字與內容樣式 (解決白色字與溢出) --- */
@@ -769,41 +756,43 @@ body.game-active #controls {
 /* 2. 強化主角：問題方框 (強制一行、向左移、字體放大) */
 #modal.type-continue p, 
 #modal.type-continue .task-question {
-    font-size: 38px !important;   /* 🚩 保持大字體，強化重點 */
-    color: #1a202c !important;
-    background: #ffffff !important;
-    border-left: 10px solid #3182ce !important;
-    border-radius: 8px;
-    padding: 15px 25px !important;
-    
-    width: 95% !important;
-    white-space: nowrap !important;
-    /* 🚩 關鍵：將底部間距從 35px 壓縮到 10px */
-    margin: 0 auto 10px 5px !important; 
-    text-align: left !important;
-    box-shadow: 2px 2px 0px rgba(49, 130, 206, 0.1);
+    font-size: 34px !important;
+    width: 90% !important;
+    margin: 0 auto 10px auto !important; /* 縮減與選項的距離，騰出空間 */
+    padding: 15px 20px !important;
+    white-space: normal !important; /* 容許窄背景下適度換行 */
+    line-height: 1.3 !important;
 }
 
 /* 3. 選項容器：垂直排列，確保不擠壓 */
 #modal #modal-actions {
-    width: auto !important;
-    display: flex !important;
+ display: flex !important;
     flex-direction: column !important;
     align-items: flex-start !important;
     justify-content: center !important;
-    /* 🚩 核心修正：利用 auto margin 讓整個 A.B.C. 區塊水平置中 */
-    margin: 0 auto !important; 
-    gap: 10px !important;        /* 緊湊按鈕間距 */
-    padding: 10px 0 !important;
+    margin: 0 auto !important; /* 區塊整體水平置中 */
+    gap: 12px !important;
+    padding-bottom: 30px !important; /* 確保底部有呼吸感，不切斷 */
 }
 
 /* 4. 選項行：自適應寬度 */
-.opt-row-vertical {
-    display: flex !important;
-    flex-direction: row !important;
-    align-items: center !important;
+.opt-btn-pure-vertical {
+    display: inline-flex !important;
+    height: 70px !important;      /* 稍微降低高度，騰出垂直空間 */
+    background: #ffb300 !important;
+    border: 3px solid #333 !important;
+    border-radius: 12px !important;
+    
+    color: #000 !important;
+    font-size: 42px !important;   /* 稍微調整大小，確保窄背景下不溢出 */
+    font-weight: 200 !important; 
+    
+    padding: 0 30px !important;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 5px 0 #bf360c !important;
+    line-height: 1 !important;
 }
-
 /* 5. 標籤 A. B. C. */
 .opt-label-pure {
     font-size: 32px !important;
