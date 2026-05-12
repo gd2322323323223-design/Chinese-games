@@ -460,7 +460,21 @@ function checkUserAnswer(userSelect, correctAnswer) {
     const feedbackText = document.getElementById('feedback-msg'); 
     if (userSelect === correctAnswer) {
         playSound('win');
-        if (feedbackText) { feedbackText.innerHTML = "🌟 太棒了！"; feedbackText.style.color = "#48bb78"; }
+        
+        // 取得當前題目，替換成完整句子
+        const taskQuestionEl = document.querySelector('.task-question');
+        if (taskQuestionEl) {
+            const originalText = taskQuestionEl.textContent;
+            // 把底線替換成正確答案，組成完整句子
+            const fullSentence = originalText.replace(/_____+/, correctAnswer);
+            // 加上 ✔ 符號
+            taskQuestionEl.innerHTML = `<span style="color: #48bb78; font-size: 32px; margin-right: 10px;">✔</span>${fullSentence}`;
+        }
+
+        if (feedbackText) { 
+            feedbackText.innerHTML = "🌟 哇！你太厲害了！"; 
+            feedbackText.style.color = "#48bb78"; 
+        }
         document.getElementById('modal-actions').innerHTML = `<button onclick="closeModal()" class="finish-btn">完成挑戰 🏆</button>`;
     } else {
         attempts--; playSound('wrong');
