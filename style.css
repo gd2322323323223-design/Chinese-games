@@ -703,3 +703,11 @@ body:not(:has(#start-screen:not([style*="display: none"]))) #controls {
     25% { transform: translateX(-5px); }
     75% { transform: translateX(5px); }
 }
+
+/* 答對後的完整句子與勾號 */
+#modal.type-continue .task-question span {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    vertical-align: middle;
+}
