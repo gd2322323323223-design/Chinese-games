@@ -735,106 +735,86 @@ body.game-active #controls {
 /* ==========================================
    4. 續寫句子 (Continue) 特化樣式區
    ========================================== */
-/* a. 頂部時間標籤 */
-#modal #timer {
-    font-size: 18px !important;
-    color: #7f8c8d !important;
-    background: transparent;
-    padding: 0;
-    margin-bottom: 25px !important; 
-    text-align: center;
-    width: 100%;
-}
-
 /* ==========================================
-   🚩 最終穩定版：解決重疊、確保不換行、大字清晰
+   🚩 最終優化：主次分明 + 自適應選項佈局
    ========================================== */
 
-/* 1. 標題區：深藍色背景 */
-#modal.type-continue .challenge-container::before {
-    content: "【 續寫句子 】";
-    display: block;
-    font-size: 30px !important;
-    color: #ffffff !important;
-    background: #3182ce !important;
-    padding: 8px 0;
-    margin: -15px -20px 15px -20px;
-    border-radius: 15px 15px 0 0;
-    text-align: center;
+/* 1. 弱化次要資訊：縮小時間與標題 */
+#modal #timer {
+    font-size: 14px !important; /* 縮小時間 */
+    margin-bottom: 10px !important;
+    opacity: 0.7;
 }
 
-/* 2. 問題區：向左移並強制不換行 */
+#modal.type-continue .challenge-container::before {
+    font-size: 20px !important; /* 顯著縮小標題 */
+    padding: 5px 0 !important;
+    margin-bottom: 15px !important;
+    background: #edf2f7 !important; /* 改用淡灰色背景，不搶戲 */
+    color: #4a5568 !important;
+}
+
+/* 2. 強化主角：問題方框 */
 #modal.type-continue p, 
 #modal.type-continue .task-question {
-    font-size: 26px !important;
-    color: #1a365d !important;
-    background: #ebf8ff !important;
-    border: 2px solid #3182ce !important;
-    border-radius: 10px;
-    padding: 12px 20px !important;
-    
-    /* 🚩 強制橫向不換行，並向左對齊 */
-    width: 92% !important;
-    white-space: nowrap !important; /* 禁止換行 */
-    overflow: hidden;
-    text-overflow: ellipsis; /* 若真的太長則顯示省略號 */
-    margin: 0 auto 15px 15px !important; /* 🚩 向左移一點 */
-    text-align: left !important;
+    font-size: 36px !important; /* 🚩 大幅放大問題字體 */
+    color: #1a202c !important;
+    background: #ffffff !important;
+    border: 4px solid #3182ce !important; /* 加粗邊框 */
+    border-radius: 15px;
+    padding: 25px 30px !important;
+    width: 95% !important;
+    margin: 0 auto 30px auto !important;
+    box-shadow: 0 4px 12px rgba(49, 130, 206, 0.2);
 }
 
-/* 3. 選項總容器：垂直排列 */
+/* 3. 選項容器：垂直排列 */
 #modal #modal-actions {
     display: flex !important;
     flex-direction: column !important;
-    align-items: center !important;
-    gap: 12px !important;
-    width: 100% !important;
-    /* 核心：減少頂部間距，把按鈕區往上拉 */
-    margin-top: 5px !important; 
-    padding: 0 10px 20px 10px !important;
+    align-items: flex-start !important; /* 🚩 靠左對齊 */
+    gap: 15px !important;
+    margin-left: 5% !important; /* 讓整體稍微往右縮一點點，不貼邊 */
 }
 
-/* 4. 每一行的組合 (A. + 按鈕) */
+/* 4. 選項行：自適應寬度 */
 .opt-row-vertical {
     display: flex !important;
     flex-direction: row !important;
     align-items: center !important;
-    width: 95% !important;
-    max-width: 600px;
+    width: auto !important; /* 🚩 寬度自適應 */
 }
 
-/* 5. 標籤 A. B. C. (縮小寬度，絕不遮擋) */
+/* 5. 標籤 A. B. C. */
 .opt-label-pure {
     font-size: 32px !important;
-    color: #5d4037 !important;
+    color: #4a5568 !important;
     font-weight: bold !important;
-    min-width: 50px !important; /* 固定寬度，確保對齊 */
-    text-align: right;
-    margin-right: 15px !important;
+    margin-right: 12px !important; /* 🚩 文字貼近字母 */
+    min-width: 40px;
 }
 
-/* 6. 按鈕本體：方格放大，字體 50px 極幼細 */
+/* 6. 按鈕本體：自適應長短 */
 .opt-btn-pure-vertical {
-    flex: 1 !important;
-    height: 75px !important; /* 鎖定高度，防止切到底部 */
+    display: inline-flex !important; /* 🚩 改為 inline-flex 實現長度自適應 */
+    width: auto !important;
+    min-width: 150px; /* 設定最小寬度，防止太短難點 */
+    height: 70px !important;
     background: #ffb300 !important;
     border: 3px solid #333 !important;
     border-radius: 12px !important;
     
-    /* 🚩 字體平衡：42px 是大字與空間的最佳平衡點 */
+    /* 文字大、筆畫幼 */
     color: #000 !important;
-    font-size: 42px !important; 
-    font-weight: 500 !important; /* 中等權重，既幼又清晰 */
-    font-family: "Microsoft JhengHei", sans-serif !important;
+    font-size: 46px !important; 
+    font-weight: 200 !important; 
     
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    
+    padding: 0 25px !important; /* 🚩 左右內距，讓方格隨字數撐開 */
+    align-items: center;
+    justify-content: center;
     box-shadow: 0 5px 0 #bf360c !important;
     line-height: 1 !important;
-    cursor: pointer !important;
-    white-space: nowrap !important; /* 防止換行 */
+    white-space: nowrap !important;
 }
 
 /* 按下效果 */
