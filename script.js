@@ -467,10 +467,11 @@ function checkUserAnswer(userSelect, correctAnswer) {
             taskQuestionEl.classList.add('correct');
         }
 
-        if (feedbackText) {
-            feedbackText.innerHTML = "🌟 太棒了！";
-            feedbackText.style.color = "#48bb78";
-        }
+       if (feedbackText) {
+    feedbackText.innerHTML = "🎉 答對了！";
+    feedbackText.style.color = "#48bb78";
+    feedbackText.classList.add("correct-feedback"); // 加上特效 class
+}
 
         document.getElementById('modal-actions').innerHTML = `<button onclick="closeModal()" class="finish-btn">完成挑戰 🏆</button>`;
     } 
