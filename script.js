@@ -463,18 +463,27 @@ function checkUserAnswer(userSelect, correctAnswer) {
 
   const taskQuestionEl = document.querySelector('.task-question');
   if (taskQuestionEl) {
+    // 1. 組成完整句子
     const originalText = taskQuestionEl.textContent;
     const fullSentence = originalText.replace(/_____+/, correctAnswer);
-    taskQuestionEl.textContent = fullSentence;
-    taskQuestionEl.classList.add('correct'); // 只加現有風格的 class
+
+    // 2. 答對時才插入句子 + 右上角勾勾（只會出現一次）
+    taskQuestionEl.innerHTML = `
+      ${fullSentence}
+      <span class="dynamic-tick">✔</span>
+    `;
+    taskQuestionEl.classList.add('correct');
   }
 
+  // 反饋文字
   if (feedbackText) {
-    feedbackText.innerHTML = "🌟 哇！你太厲害了！";
+    feedbackText.innerHTML = "🌟 太棒了！";
     feedbackText.style.color = "#48bb78";
   }
 
-  document.getElementById('modal-actions').innerHTML = `<button onclick="closeModal()" class="finish-btn">完成挑戰 🏆</button>`;
+  // 完成按鈕
+  document.getElementById('modal-actions').innerHTML = 
+    `<button onclick="closeModal()" class="finish-btn">完成挑戰 🏆</button>`;
 } else {
         attempts--; playSound('wrong');
         if (attempts > 0) {
