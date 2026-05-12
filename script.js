@@ -459,24 +459,23 @@ function addToReorder(btn) {
 function checkUserAnswer(userSelect, correctAnswer) {
     const feedbackText = document.getElementById('feedback-msg'); 
     if (userSelect === correctAnswer) {
-        playSound('win');
-        
-        // 取得當前題目，替換成完整句子
-        const taskQuestionEl = document.querySelector('.task-question');
-        if (taskQuestionEl) {
-            const originalText = taskQuestionEl.textContent;
-            // 把底線替換成正確答案，組成完整句子
-            const fullSentence = originalText.replace(/_____+/, correctAnswer);
-            // 加上 ✔ 符號
-            taskQuestionEl.innerHTML = `<span style="color: #48bb78; font-size: 32px; margin-right: 10px;">✔</span>${fullSentence}`;
-        }
+  playSound('win');
 
-        if (feedbackText) { 
-            feedbackText.innerHTML = "🌟 哇！你太厲害了！"; 
-            feedbackText.style.color = "#48bb78"; 
-        }
-        document.getElementById('modal-actions').innerHTML = `<button onclick="closeModal()" class="finish-btn">完成挑戰 🏆</button>`;
-    } else {
+  const taskQuestionEl = document.querySelector('.task-question');
+  if (taskQuestionEl) {
+    const originalText = taskQuestionEl.textContent;
+    const fullSentence = originalText.replace(/_____+/, correctAnswer);
+    taskQuestionEl.textContent = fullSentence;
+    taskQuestionEl.classList.add('correct'); // 只加現有風格的 class
+  }
+
+  if (feedbackText) {
+    feedbackText.innerHTML = "🌟 哇！你太厲害了！";
+    feedbackText.style.color = "#48bb78";
+  }
+
+  document.getElementById('modal-actions').innerHTML = `<button onclick="closeModal()" class="finish-btn">完成挑戰 🏆</button>`;
+} else {
         attempts--; playSound('wrong');
         if (attempts > 0) {
             if (feedbackText) { feedbackText.innerHTML = `😮 還有 ${attempts} 次機會！`; feedbackText.style.color = "#f56565"; }
