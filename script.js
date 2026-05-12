@@ -63,7 +63,7 @@ const puncTasks = [
     { type: "punc", question: "小恩，你為甚麼不開心___", options: ["。", "？", "："], answer: "？" },
     { type: "punc", question: "下午三時___哥哥在公園跑步。", options: ["。", "，", "「"], answer: "，" },
     { type: "punc", question: "哥哥對弟弟說___「你的新書包真好看啊！」", options: ["。", "？", "："], answer: "：" },
-    { type: "punc", question: "你知道小貓去了哪裏嗎___", options: ["。", "？", "！"], answer: "？" },
+    { type: "punc", question: "你知道小貓去了哪裡嗎___", options: ["。", "？", "！"], answer: "？" },
     { type: "punc", question: "老師說：___今天沒有功課。」", options: ["「", "」", "，"], answer: "「" },
     { type: "punc", question: "老師說：「今天沒有功課。___", options: ["。」", "」", "。"], answer: "」" },
     { type: "punc", question: "今天，我會到商場買衣服___", options: ["。", "？", "！"], answer: "。" },
@@ -330,10 +330,6 @@ async function checkEndOrModal(pid) {
 
 // --- 6. 彈窗與顯示渲染邏輯 ---
 
-/**
- * 核心渲染函數：負責將題目繪製到彈窗中
- * 統一了正式遊戲與測試面板的渲染邏輯
- */
 function displaySpecificTask(task) {
     attempts = 3; 
 
@@ -348,7 +344,6 @@ function displaySpecificTask(task) {
     content.innerHTML = ""; 
     actions.innerHTML = "";
 
-    // A. 渲染題目區域
     let html = `<div class="challenge-container">`;
     if (task.gif) html += `<img src="images/${task.gif}" class="task-image">`;
     if (task.sentence) html += `<div class="task-sentence-box">${task.sentence}</div>`;
@@ -357,9 +352,7 @@ function displaySpecificTask(task) {
     html += `</div>`; 
     content.innerHTML = html;
 
-    // B. 渲染互動元件
     if (task.type === "reorder") {
-        // 重組句子特別處理
         const zone = document.createElement('div');
         zone.id = "reorder-zone";
         content.querySelector('.challenge-container').appendChild(zone);
@@ -384,35 +377,27 @@ function displaySpecificTask(task) {
         };
         actions.appendChild(submitBtn);
 
- // 在 script.js 的 displaySpecificTask 函數內
-} else if (task.options) {
-    const labels = ["A.", "B.", "C.", "D."];
-    const actions = document.getElementById('modal-actions');
-    actions.innerHTML = ""; 
+    } else if (task.options) {
+        const labels = ["A.", "B.", "C.", "D."];
+        task.options.forEach((opt, index) => {
+            const row = document.createElement('div');
+            row.className = "opt-row-vertical";
 
-    task.options.forEach((opt, index) => {
-        // 建立一行包裹容器
-        const row = document.createElement('div');
-        row.className = "opt-row-vertical"; 
+            const label = document.createElement('div');
+            label.className = "opt-label-pure";
+            label.innerText = labels[index]; 
+            row.appendChild(label);
 
-        // 左邊的 A. B. C.
-        const label = document.createElement('div');
-        label.className = "opt-label-pure";
-        label.innerText = labels[index]; 
-        row.appendChild(label);
+            const btn = document.createElement('button');
+            btn.className = "opt-btn-pure-vertical";
+            btn.innerText = opt;
+            btn.onclick = () => checkUserAnswer(opt, task.answer);
+            row.appendChild(btn);
 
-        // 右邊的按鈕
-        const btn = document.createElement('button');
-        btn.className = "opt-btn-pure-vertical";
-        btn.innerText = opt;
-        btn.onclick = () => checkUserAnswer(opt, task.answer);
-        row.appendChild(btn);
+            actions.appendChild(row);
+        });
+    }
 
-        actions.appendChild(row);
-    });
-}
-
-    // C. 顯示與計時
     document.getElementById('modal-overlay').style.display = 'block';
     document.getElementById('modal').style.display = 'flex';
     startModalTimer();
@@ -468,50 +453,37 @@ function checkUserAnswer(userSelect, correctAnswer) {
             const originalText = taskQuestionEl.textContent.trim();
             let fullText = originalText;
 
-            // ==============================
-            // 全部題型 自動匹配 續寫句子風格
-            // ==============================
             if (modal.classList.contains('type-continue')) {
-                // 續寫句子
                 fullText = originalText.replace(/_____+/, correctAnswer);
             } 
             else if (modal.classList.contains('type-fill')) {
-                // 供詞填充
                 fullText = originalText.replace(/_____+/, correctAnswer);
             } 
             else if (modal.classList.contains('type-punc')) {
-                // 標點符號
                 fullText = originalText.replace(/___+/, correctAnswer);
             } 
             else if (modal.classList.contains('type-radical')) {
-                // 部件辨識
                 fullText = `✅ 正確答案：${correctAnswer}`;
             } 
             else if (modal.classList.contains('type-stroke')) {
-                // 筆順辨認
                 fullText = `✅ 正確答案：${correctAnswer}`;
             } 
-            else if (modal.classList.contains('type-reading')) {
-                // 閱讀理解（也套用同款樣式）
+            else if (modal.classList.contains('type-understand')) {
                 fullText = `✅ 正確答案：${correctAnswer}`;
             }
 
-            // 統一樣式：全部題型答對後都變綠色框
             taskQuestionEl.textContent = fullText;
             taskQuestionEl.classList.add('correct');
         }
 
-        // 統一反饋
         if (feedbackText) {
             feedbackText.innerHTML = "🌟 太棒了！";
             feedbackText.style.color = "#48bb78";
         }
 
-        // 統一按鈕
         document.getElementById('modal-actions').innerHTML = `<button onclick="closeModal()" class="finish-btn">完成挑戰 🏆</button>`;
     } 
     else {
-        // 答錯邏輯（不動）
         attempts--;
         playSound('wrong');
         if (attempts > 0) {
