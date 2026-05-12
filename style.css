@@ -746,95 +746,98 @@ body.game-active #controls {
     width: 100%;
 }
 
-/* b. 【 續寫句子 】大標題 */
+/* ==========================================
+   🚩 最終穩定版：解決重疊、確保不換行、大字清晰
+   ========================================== */
+
+/* 1. 標題區：深藍色背景 */
 #modal.type-continue .challenge-container::before {
     content: "【 續寫句子 】";
     display: block;
-    font-size: 32px !important; /* 縮小一點標題 */
+    font-size: 30px !important;
     color: #ffffff !important;
-    background: #3182ce !important; /* 藍色背景區分 */
-    padding: 10px 0;
-    margin: -15px -20px 20px -20px; /* 頂滿左右，拉開下方 */
+    background: #3182ce !important;
+    padding: 8px 0;
+    margin: -15px -20px 15px -20px;
     border-radius: 15px 15px 0 0;
     text-align: center;
 }
 
-/* b. 問題區：藍色背景，固定高度防止撐爆 */
+/* 2. 問題區：向左移並強制不換行 */
 #modal.type-continue p, 
 #modal.type-continue .task-question {
     font-size: 26px !important;
     color: #1a365d !important;
-    background: #ebf8ff !important; /* 淡藍色背景區分 */
+    background: #ebf8ff !important;
     border: 2px solid #3182ce !important;
-    border-radius: 12px;
-    padding: 15px 25px !important;
+    border-radius: 10px;
+    padding: 12px 20px !important;
     
-    /* 🚩 空間關鍵：限制寬度與高度 */
-    width: 85% !important;
-    max-width: 700px;
-    margin: 0 auto 20px auto !important; 
-    line-height: 1.4 !important;
+    /* 🚩 強制橫向不換行，並向左對齊 */
+    width: 92% !important;
+    white-space: nowrap !important; /* 禁止換行 */
+    overflow: hidden;
+    text-overflow: ellipsis; /* 若真的太長則顯示省略號 */
+    margin: 0 auto 15px 15px !important; /* 🚩 向左移一點 */
+    text-align: left !important;
 }
 
-/* c. 選項容器：改為豎排，徹底解決橫向遮擋 */
+/* 3. 選項總容器：垂直排列 */
 #modal #modal-actions {
     display: flex !important;
-    flex-direction: column !important; /* 🚩 改為豎排最穩，字可以放到最大 */
-    align-items: center !important;
-    gap: 12px !important;
+    flex-direction: column !important;
+    align-items: flex-start !important; /* 🚩 靠左對齊，給標籤空間 */
+    gap: 10px !important;
     margin-top: 5px !important;
-    padding-bottom: 20px !important;
+    padding: 0 20px 20px 30px !important; /* 增加左側內距 */
 }
 
-/* d. 選項行組合 (A. + 按鈕) */
+/* 4. 每一行的組合 (A. + 按鈕) */
 .opt-row-vertical {
     display: flex !important;
     flex-direction: row !important;
     align-items: center !important;
-    width: 90% !important;
-    max-width: 600px;
+    width: 100% !important;
 }
 
-/* e. 標籤 A. B. C. (純文字標籤) */
+/* 5. 標籤 A. B. C. (縮小寬度，絕不遮擋) */
 .opt-label-pure {
     font-size: 32px !important;
     color: #5d4037 !important;
     font-weight: bold !important;
+    width: 50px !important; /* 固定寬度 */
     margin-right: 15px !important;
-    min-width: 45px;
-    text-align: right;
+    text-align: center;
 }
 
-/* f. 按鈕本體：字體極大、筆畫極幼 */
+/* 6. 按鈕本體：方格放大，字體 50px 極幼細 */
 .opt-btn-pure-vertical {
-    flex: 1 !important;
-    height: 70px !important; /* 🚩 縮短高度，確保三行按鈕都放得下 */
+    flex: 1 !important; /* 自動撐開剩餘寬度 */
+    max-width: 550px !important; /* 🚩 適當放大方格寬度 */
+    height: 75px !important; /* 🚩 鎖定高度，避免切底 */
     background: #ffb300 !important;
     border: 3px solid #333 !important;
-    border-radius: 15px !important;
+    border-radius: 12px !important;
     
-    /* 🚩 字體關鍵：50px 超大字，100 極幼筆畫 */
     color: #000 !important;
-    font-size: 50px !important; 
-    font-weight: 100 !important; 
+    font-size: 50px !important; /* 🚩 保持 50px 大字 */
+    font-weight: 100 !important; /* 🚩 100 權重，確保線條極細不模糊 */
     font-family: "Microsoft JhengHei", "Heiti TC", sans-serif !important;
     
     display: flex !important;
     align-items: center !important;
-    justify-content: flex-start !important;
-    padding-left: 25px !important;
+    justify-content: center !important; /* 字在方格中間 */
     
     box-shadow: 0 5px 0 #bf360c !important;
     line-height: 1 !important;
     cursor: pointer !important;
 }
 
-/* 按下動態 */
+/* 按下效果 */
 .opt-btn-pure-vertical:active {
     transform: translateY(3px) !important;
     box-shadow: 0 2px 0 #bf360c !important;
 }
-
 /* 5. 供詞填充 */
 #modal.type-fill p { font-size: 28px !important; }
 #modal.type-fill .opt-btn { width: 150px !important; height: 80px !important; font-size: 28px !important; }
