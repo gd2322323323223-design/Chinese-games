@@ -750,85 +750,88 @@ body.game-active #controls {
 #modal.type-continue .challenge-container::before {
     content: "【 續寫句子 】";
     display: block;
-    font-size: 40px !important;
-    color: #3182ce !important;
-    font-weight: 900 !important;
+    font-size: 32px !important; /* 縮小一點標題 */
+    color: #ffffff !important;
+    background: #3182ce !important; /* 藍色背景區分 */
+    padding: 10px 0;
+    margin: -15px -20px 20px -20px; /* 頂滿左右，拉開下方 */
+    border-radius: 15px 15px 0 0;
     text-align: center;
-    margin-bottom: 35px !important; 
 }
 
-/* c. 問題方框：藍色圓角區 */
+/* b. 問題區：藍色背景，固定高度防止撐爆 */
 #modal.type-continue p, 
-/* --- 終極比例修正：確保不切底、字體細、位置準 --- */
-
-/* 1. 調整題目方框，縮小高度騰出空間 */
 #modal.type-continue .task-question {
-    font-size: 24px !important; /* 稍微縮小題目字體 */
-    padding: 15px 30px !important;
-    margin: 0 auto 20px auto !important; /* 減少下方留白 */
-    width: 80% !important;
+    font-size: 26px !important;
+    color: #1a365d !important;
+    background: #ebf8ff !important; /* 淡藍色背景區分 */
+    border: 2px solid #3182ce !important;
+    border-radius: 12px;
+    padding: 15px 25px !important;
+    
+    /* 🚩 空間關鍵：限制寬度與高度 */
+    width: 85% !important;
+    max-width: 700px;
+    margin: 0 auto 20px auto !important; 
+    line-height: 1.4 !important;
 }
 
-/* ==========================================
-   🚩 最終豎排方案：極大大字 + 垂直佈局
-   ========================================== */
-
-/* 1. 選項容器：改為垂直列印 */
+/* c. 選項容器：改為豎排，徹底解決橫向遮擋 */
 #modal #modal-actions {
     display: flex !important;
-    flex-direction: column !important; /* 🚩 核心：改為豎排 */
+    flex-direction: column !important; /* 🚩 改為豎排最穩，字可以放到最大 */
     align-items: center !important;
-    gap: 15px !important; /* 每一行之間的距離 */
-    width: 100% !important;
-    margin-top: 10px !important;
+    gap: 12px !important;
+    margin-top: 5px !important;
     padding-bottom: 20px !important;
 }
 
-/* 2. 每一行的包裹容器 */
+/* d. 選項行組合 (A. + 按鈕) */
 .opt-row-vertical {
     display: flex !important;
-    flex-direction: row !important; /* A. 與 按鈕 橫向排列 */
+    flex-direction: row !important;
     align-items: center !important;
-    width: 90% !important; /* 寬度佔滿彈窗 */
+    width: 90% !important;
     max-width: 600px;
 }
 
-/* 3. 標籤 A. B. C. (站在按鈕左邊) */
+/* e. 標籤 A. B. C. (純文字標籤) */
 .opt-label-pure {
-    font-size: 38px !important;
+    font-size: 32px !important;
     color: #5d4037 !important;
     font-weight: bold !important;
-    margin-right: 20px !important; /* 與按鈕保持距離 */
-    min-width: 50px;
+    margin-right: 15px !important;
+    min-width: 45px;
     text-align: right;
 }
 
-/* 4. 豎排專用大按鈕 */
+/* f. 按鈕本體：字體極大、筆畫極幼 */
 .opt-btn-pure-vertical {
-    flex: 1 !important; /* 讓按鈕自動撐滿剩餘空間 */
-    height: 85px !important; 
-    background: #ffb300 !important; /* 金色 */
+    flex: 1 !important;
+    height: 70px !important; /* 🚩 縮短高度，確保三行按鈕都放得下 */
+    background: #ffb300 !important;
     border: 3px solid #333 !important;
     border-radius: 15px !important;
     
-    /* 🚩 核心：超級大字 + 極幼細筆畫 */
-    font-size: 52px !important; 
-    font-weight: 200 !important; /* 強制使用幼細筆畫，不再糊掉 */
+    /* 🚩 字體關鍵：50px 超大字，100 極幼筆畫 */
     color: #000 !important;
+    font-size: 50px !important; 
+    font-weight: 100 !important; 
+    font-family: "Microsoft JhengHei", "Heiti TC", sans-serif !important;
     
     display: flex !important;
     align-items: center !important;
-    justify-content: flex-start !important; /* 文字靠左對齊，符合閱讀習慣 */
-    padding-left: 30px !important;
+    justify-content: flex-start !important;
+    padding-left: 25px !important;
     
-    box-shadow: 0 6px 0 #bf360c !important;
-    cursor: pointer !important;
+    box-shadow: 0 5px 0 #bf360c !important;
     line-height: 1 !important;
+    cursor: pointer !important;
 }
 
-/* 按下效果 */
+/* 按下動態 */
 .opt-btn-pure-vertical:active {
-    transform: translateY(4px) !important;
+    transform: translateY(3px) !important;
     box-shadow: 0 2px 0 #bf360c !important;
 }
 
