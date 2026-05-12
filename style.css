@@ -770,3 +770,34 @@ body:not(:has(#start-screen:not([style*="display: none"]))) #controls {
   transform: translateY(2px) !important;
   box-shadow: 0 3px 0 #bf360c !important;
 }
+
+/* 答對特效容器 */
+#feedback-msg.correct-feedback {
+  position: relative;
+  font-size: 28px !important;
+  font-weight: bold !important;
+  color: #4caf50 !important;
+  text-shadow: 0 0 8px rgba(76, 175, 80, 0.6);
+  animation: bounce 0.6s ease infinite alternate;
+}
+
+/* 彈跳動畫 */
+@keyframes bounce {
+  from { transform: translateY(0); }
+  to { transform: translateY(-8px); }
+}
+
+/* 彩色氣泡背景 */
+#feedback-msg.correct-feedback::before {
+  content: "";
+  position: absolute;
+  top: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 120%;
+  height: 150%;
+  background: radial-gradient(circle, #ffeb3b 0%, #4caf50 40%, transparent 70%);
+  opacity: 0.3;
+  border-radius: 50%;
+  z-index: -1;
+}
