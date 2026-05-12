@@ -703,25 +703,13 @@ body:not(:has(#start-screen:not([style*="display: none"]))) #controls {
     75% { transform: translateX(5px); }
 }
 
-/* 答對後正確句子樣式 + 右上角小勾勾 */
+/* 答對後句子方框的基礎樣式 */
 #modal.type-continue .task-question {
   position: relative !important;
-  padding-right: 50px !important; /* 給勾勾留空間，不會擠到文字 */
+  padding-right: 50px !important; /* 給勾勾留空間，避免文字擠到邊框 */
 }
 
-/* 勾勾：右上角、大小適中、不超出方框 */
-#modal.type-continue .task-question::after {
-  content: "✔" !important;
-  position: absolute !important;
-  top: 12px !important;
-  right: 16px !important;
-  font-size: 26px !important;
-  color: #48bb78 !important;
-  font-weight: bold !important;
-  line-height: 1 !important;
-}
-
-/* 答對背景變淡綠 */
+/* 答對時的淡綠色背景 */
 #modal.type-continue .task-question.correct {
   background: #f0fdf4 !important;
   border-left-color: #48bb78 !important;
