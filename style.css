@@ -33,6 +33,24 @@ body {
     min-height: 100vh;
 }
 
+/* 積分面板 */
+#score-board {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    background: rgba(255,255,255,0.92);
+    padding: 12px 20px;
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+    z-index: 1001;
+    font-size: 20px;
+    font-weight: bold;
+    display: flex;
+    gap: 20px;
+}
+.score-item:nth-child(1) { color: var(--p1-color); }
+.score-item:nth-child(2) { color: var(--p2-color); }
+
 #start-screen {
     z-index: 1000;
     background: rgba(255, 255, 255, 0.1);
@@ -200,7 +218,6 @@ body {
 .dino-cell::after, 
 .dino-cell::before {
     display: none !important;
-    content: none !important;
 }
 .dino-cell .event-icon {
     font-size: 55px !important;
@@ -432,7 +449,7 @@ body:not(:has(#start-screen:not([style*="display: none"]))) #controls {
     margin-bottom: 5px;
 }
 
-/* --- 統一按鈕樣式：全部題型強制跟續寫句子一樣 --- */
+/* 統一按鈕樣式 */
 .opt-btn {
     min-width: 320px !important;
     height: 80px !important;
@@ -498,7 +515,7 @@ body:not(:has(#start-screen:not([style*="display: none"]))) #controls {
     font-weight: bold;
 }
 
-/* 重組句子區域保留 */
+/* 重組句子區域 */
 #modal.type-reorder #reorder-zone {
     width: 95%;
     min-height: 70px;
@@ -512,7 +529,7 @@ body:not(:has(#start-screen:not([style*="display: none"]))) #controls {
     margin-bottom: 15px;
 }
 
-/* ========== 續寫句子 專用原版樣式 保留 ========== */
+/* 續寫句子專用 */
 #modal.type-continue {
   width: 700px !important;
   max-width: 90% !important;
@@ -524,7 +541,6 @@ body:not(:has(#start-screen:not([style*="display: none"]))) #controls {
   min-height: unset !important;
   height: auto !important;
 }
-
 #modal.type-continue .challenge-container::before {
   font-size: 24px !important;
   font-weight: 900 !important;
@@ -535,7 +551,6 @@ body:not(:has(#start-screen:not([style*="display: none"]))) #controls {
   margin-bottom: 20px !important;
   display: inline-block !important;
 }
-
 #modal.type-continue .task-question {
   font-size: 34px !important;
   font-weight: 900 !important;
@@ -552,7 +567,6 @@ body:not(:has(#start-screen:not([style*="display: none"]))) #controls {
   position: relative !important;
   padding-right: 50px !important;
 }
-
 #modal.type-continue #modal-actions {
   display: flex !important;
   flex-direction: column !important;
@@ -560,7 +574,6 @@ body:not(:has(#start-screen:not([style*="display: none"]))) #controls {
   align-items: center !important;
   width: 100% !important;
 }
-
 #modal.type-continue .opt-row-vertical {
   display: flex !important;
   align-items: center !important;
@@ -568,7 +581,6 @@ body:not(:has(#start-screen:not([style*="display: none"]))) #controls {
   width: 100% !important;
   justify-content: center !important;
 }
-
 #modal.type-continue .opt-label-pure {
   font-size: 32px !important;
   font-weight: 900 !important;
@@ -576,7 +588,6 @@ body:not(:has(#start-screen:not([style*="display: none"]))) #controls {
   min-width: 50px !important;
   text-align: right !important;
 }
-
 #modal.type-continue .opt-btn-pure-vertical {
   min-width: 320px !important;
   height: 80px !important;
@@ -594,18 +605,16 @@ body:not(:has(#start-screen:not([style*="display: none"]))) #controls {
   cursor: pointer !important;
   transition: 0.2s !important;
 }
-
 #modal.type-continue .opt-btn-pure-vertical:hover {
   transform: translateY(-3px) !important;
   box-shadow: 0 9px 0 #bf360c !important;
 }
-
 #modal.type-continue .opt-btn-pure-vertical:active {
   transform: translateY(2px) !important;
   box-shadow: 0 3px 0 #bf360c !important;
 }
 
-/* ========== 所有其他題型 強制跟續寫句子統一題目框 ========== */
+/* 所有其他題型統一題目框 */
 #modal.type-fill .task-question,
 #modal.type-punc .task-question,
 #modal.type-radical .task-question,
@@ -628,7 +637,7 @@ body:not(:has(#start-screen:not([style*="display: none"]))) #controls {
   position: relative !important;
 }
 
-/* 全部題型答對統一樣式 */
+/* 答對統一樣式 */
 #modal.type-continue .task-question.correct,
 #modal.type-fill .task-question.correct,
 #modal.type-punc .task-question.correct,
@@ -666,7 +675,53 @@ body:not(:has(#start-screen:not([style*="display: none"]))) #controls {
     border-color: #e53935 !important;
 }
 
-/* 所有動畫關鍵影格 */
+/* 勝利滿版彈窗 */
+#win-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.85);
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.win-content {
+    background: #fff;
+    padding: 40px 60px;
+    border-radius: 30px;
+    text-align: center;
+    animation: popIn 0.6s ease;
+}
+.win-title {
+    font-size: 48px;
+    font-weight: 900;
+    color: #ffae00;
+    margin-bottom: 20px;
+}
+#win-player, #win-score {
+    font-size: 28px;
+    margin: 10px 0;
+}
+.win-btn {
+    margin-top: 30px;
+    padding: 15px 40px;
+    font-size: 24px;
+    border-radius: 50px;
+    border: none;
+    background: var(--green-main);
+    color: #fff;
+    cursor: pointer;
+}
+
+/* 動畫關鍵影格 */
+@keyframes popIn {
+    0% { transform: scale(0.5); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
+}
 @keyframes bounce { 
     from { transform: translateY(0); } 
     to { transform: translateY(-20px); }
@@ -716,62 +771,7 @@ body:not(:has(#start-screen:not([style*="display: none"]))) #controls {
     75% { transform: translateX(5px); }
 }
 
-/* 1. 讓所有題型的選項容器，和續寫句子一樣垂直居中 */
-#modal:not(.type-continue) #modal-actions {
-  display: flex !important;
-  flex-direction: column !important;
-  gap: 12px !important;
-  align-items: center !important;
-  width: 100% !important;
-}
-
-/* 2. 讓所有題型的選項，都加上 A/B/C 標籤 + 同款大按鈕 */
-#modal:not(.type-continue) #modal-actions .opt-btn {
-  display: flex !important;
-  align-items: center !important;
-  gap: 12px !important;
-  width: auto !important;
-}
-#modal:not(.type-continue) #modal-actions .opt-btn::before {
-  content: attr(data-label);
-  display: inline-block;
-  font-size: 32px !important;
-  font-weight: 900 !important;
-  color: var(--blue-main) !important;
-  min-width: 50px !important;
-  text-align: right !important;
-}
-
-/* 3. 強制覆蓋所有舊按鈕樣式，完全繼承續寫句子的大按鈕 */
-#modal .opt-btn {
-  all: unset !important;
-  min-width: 320px !important;
-  height: 80px !important;
-  font-size: 30px !important;
-  font-weight: 700 !important;
-  letter-spacing: 1px !important;
-  color: #000 !important;
-  background: #ffb300 !important;
-  border: 3px solid #333 !important;
-  border-radius: 16px !important;
-  box-shadow: 0 6px 0 #bf360c !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  cursor: pointer !important;
-  transition: 0.2s !important;
-  margin: 8px;
-}
-#modal .opt-btn:hover {
-  transform: translateY(-3px) !important;
-  box-shadow: 0 9px 0 #bf360c !important;
-}
-#modal .opt-btn:active {
-  transform: translateY(2px) !important;
-  box-shadow: 0 3px 0 #bf360c !important;
-}
-
-/* 答對特效容器 */
+/* 答對特效 */
 #feedback-msg.correct-feedback {
   position: relative;
   font-size: 28px !important;
@@ -780,14 +780,6 @@ body:not(:has(#start-screen:not([style*="display: none"]))) #controls {
   text-shadow: 0 0 8px rgba(76, 175, 80, 0.6);
   animation: bounce 0.6s ease infinite alternate;
 }
-
-/* 彈跳動畫 */
-@keyframes bounce {
-  from { transform: translateY(0); }
-  to { transform: translateY(-8px); }
-}
-
-/* 彩色氣泡背景 */
 #feedback-msg.correct-feedback::before {
   content: "";
   position: absolute;
@@ -800,4 +792,44 @@ body:not(:has(#start-screen:not([style*="display: none"]))) #controls {
   opacity: 0.3;
   border-radius: 50%;
   z-index: -1;
+}
+
+/* 響應式手機版 */
+@media (max-width: 768px) {
+    #score-board {
+        font-size: 16px;
+        padding: 8px 12px;
+        gap: 10px;
+    }
+    #board {
+        gap: 80px 8px !important;
+        padding: 20px 10px 100px 10px !important;
+    }
+    .cell {
+        --cell-size: 60px;
+    }
+    .player {
+        width: 45px;
+        height: 45px;
+    }
+    .opt-btn {
+        min-width: 220px !important;
+        height: 60px !important;
+        font-size: 22px !important;
+    }
+    #controls {
+        bottom: 10px;
+        right: 10px;
+        padding: 8px 15px !important;
+    }
+    #btn-roll {
+        padding: 10px 20px !important;
+        font-size: 18px !important;
+    }
+    .win-content {
+        padding: 20px 30px;
+    }
+    .win-title {
+        font-size: 32px;
+    }
 }
