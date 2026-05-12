@@ -432,32 +432,32 @@ body:not(:has(#start-screen:not([style*="display: none"]))) #controls {
     margin-bottom: 5px;
 }
 
-/* 選項按鈕基礎 */
+/* --- 統一按鈕樣式：全部題型強制跟續寫句子一樣 --- */
 .opt-btn {
-    position: relative;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    min-width: 140px;
-    height: 80px;
+    min-width: 320px !important;
+    height: 80px !important;
+    font-size: 30px !important;
+    font-weight: 700 !important;
+    letter-spacing: 1px !important;
+    color: #000 !important;
+    background: #ffb300 !important;
+    border: 3px solid #333 !important;
+    border-radius: 16px !important;
+    box-shadow: 0 6px 0 #bf360c !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    cursor: pointer !important;
+    transition: 0.2s !important;
     margin: 8px;
-    padding: 10px 25px;
-    background: #ffffff !important;
-    color: #5d4037 !important; 
-    font-size: 32px !important;
-    font-weight: 900 !important;
-    border: 3px solid var(--wood-brown) !important; 
-    border-radius: 20px;
-    box-shadow: 0 5px 0 var(--wood-brown);
-    text-shadow: none !important;
-    cursor: pointer;
-    transition: all 0.2s;
-    overflow: visible;
 }
 .opt-btn:hover {
-    background: #fdf2e9 !important;
-    transform: translateY(-2px);
-    box-shadow: 0 7px 0 var(--wood-brown);
+    transform: translateY(-3px) !important;
+    box-shadow: 0 9px 0 #bf360c !important;
+}
+.opt-btn:active {
+    transform: translateY(2px) !important;
+    box-shadow: 0 3px 0 #bf360c !important;
 }
 .opt-label {
     position: absolute;
@@ -498,12 +498,7 @@ body:not(:has(#start-screen:not([style*="display: none"]))) #controls {
     font-weight: bold;
 }
 
-/* 各題型原有特化保留 */
-#modal.type-stroke p { font-size: 28px !important; }
-#modal.type-stroke .opt-btn { width: 180px !important; height: 100px !important; font-size: 55px !important; }
-
-#modal.type-reorder p { font-size: 22px !important; }
-#modal.type-reorder .opt-btn { font-size: 18px !important; min-width: 60px; height: 50px !important; }
+/* 重組句子區域保留 */
 #modal.type-reorder #reorder-zone {
     width: 95%;
     min-height: 70px;
@@ -516,14 +511,6 @@ body:not(:has(#start-screen:not([style*="display: none"]))) #controls {
     flex-wrap: wrap;
     margin-bottom: 15px;
 }
-
-#modal.type-match p { font-size: 24px !important; }
-#modal.type-match .opt-btn { width: 140px !important; height: 70px !important; }
-
-#modal.type-fill p { font-size: 28px !important; }
-#modal.type-punc p { font-size: 30px !important; letter-spacing: 2px; }
-#modal.type-radical p { font-size: 26px !important; }
-#modal.type-understand p { font-size: 22px !important; }
 
 /* ========== 續寫句子 專用原版樣式 保留 ========== */
 #modal.type-continue {
