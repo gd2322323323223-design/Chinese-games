@@ -725,3 +725,15 @@ body:not(:has(#start-screen:not([style*="display: none"]))) #controls {
   font-weight: bold !important;
   line-height: 1 !important;
 }
+
+/* 全部題型 答對後 統一樣式（與續寫句子完全相同） */
+#modal.type-continue .task-question.correct,
+#modal.type-fill .task-question.correct,
+#modal.type-punc .task-question.correct,
+#modal.type-radical .task-question.correct,
+#modal.type-stroke .task-question.correct,
+#modal.type-reading .task-question.correct {
+  background: #f0fdf4 !important;
+  border-left: 10px solid #48bb78 !important;
+  position: relative !important;
+}
