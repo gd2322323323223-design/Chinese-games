@@ -380,17 +380,18 @@ function displaySpecificTask(task) {
     } else if (task.options) {
         const labels = ["A.", "B.", "C.", "D."];
         task.options.forEach((opt, index) => {
-    const btn = document.createElement('button');
-    btn.className = "opt-btn";
-    btn.innerText = opt;
-    btn.setAttribute('data-label', labels[index]); // 加上 A/B/C 標籤
-    btn.onclick = () => checkUserAnswer(opt, task.answer);
-    actions.appendChild(btn);
-});
+            const btn = document.createElement('button');
+            btn.className = "opt-btn";
+            btn.innerText = opt;
+            btn.setAttribute('data-label', labels[index]);
+            btn.onclick = () => checkUserAnswer(opt, task.answer);
+            actions.appendChild(btn);
+        });
 
-    document.getElementById('modal-overlay').style.display = 'block';
-    document.getElementById('modal').style.display = 'flex';
-    startModalTimer();
+        document.getElementById('modal-overlay').style.display = 'block';
+        document.getElementById('modal').style.display = 'flex';
+        startModalTimer();
+    }
 }
 
 // 正式遊戲觸發
