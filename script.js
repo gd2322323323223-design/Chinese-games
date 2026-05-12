@@ -457,40 +457,74 @@ function addToReorder(btn) {
 }
 
 function checkUserAnswer(userSelect, correctAnswer) {
-    const feedbackText = document.getElementById('feedback-msg'); 
+    const feedbackText = document.getElementById('feedback-msg');
+    const modal = document.getElementById('modal');
+    const taskQuestionEl = document.querySelector('.task-question');
+
     if (userSelect === correctAnswer) {
-  playSound('win');
+        playSound('win');
 
-  const taskQuestionEl = document.querySelector('.task-question');
-  if (taskQuestionEl) {
-    // 1. 組成完整句子
-    const originalText = taskQuestionEl.textContent;
-    const fullSentence = originalText.replace(/_____+/, correctAnswer);
+        if (taskQuestionEl) {
+            const originalText = taskQuestionEl.textContent.trim();
+            let fullText = originalText;
 
-    // 2. 答對時才插入句子 + 右上角勾勾（只會出現一次）
-    taskQuestionEl.innerHTML = `
-      ${fullSentence}
-      <span class="dynamic-tick">✔</span>
-    `;
-    taskQuestionEl.classList.add('correct');
-  }
+            // ==============================
+            // 全部題型 自動匹配 續寫句子風格
+            // ==============================
+            if (modal.classList.contains('type-continue')) {
+                // 續寫句子
+                fullText = originalText.replace(/_____+/, correctAnswer);
+            } 
+            else if (modal.classList.contains('type-fill')) {
+                // 供詞填充
+                fullText = originalText.replace(/_____+/, correctAnswer);
+            } 
+            else if (modal.classList.contains('type-punc')) {
+                // 標點符號
+                fullText = originalText.replace(/___+/, correctAnswer);
+            } 
+            else if (modal.classList.contains('type-radical')) {
+                // 部件辨識
+                fullText = `✅ 正確答案：${correctAnswer}`;
+            } 
+            else if (modal.classList.contains('type-stroke')) {
+                // 筆順辨認
+                fullText = `✅ 正確答案：${correctAnswer}`;
+            } 
+            else if (modal.classList.contains('type-reading')) {
+                // 閱讀理解（也套用同款樣式）
+                fullText = `✅ 正確答案：${correctAnswer}`;
+            }
 
-  // 反饋文字
-  if (feedbackText) {
-    feedbackText.innerHTML = "🌟 太棒了！";
-    feedbackText.style.color = "#48bb78";
-  }
+            // 統一樣式：全部題型答對後都變綠色框
+            taskQuestionEl.textContent = fullText;
+            taskQuestionEl.classList.add('correct');
+        }
 
-  // 完成按鈕
-  document.getElementById('modal-actions').innerHTML = 
-    `<button onclick="closeModal()" class="finish-btn">完成挑戰 🏆</button>`;
-} else {
-        attempts--; playSound('wrong');
+        // 統一反饋
+        if (feedbackText) {
+            feedbackText.innerHTML = "🌟 太棒了！";
+            feedbackText.style.color = "#48bb78";
+        }
+
+        // 統一按鈕
+        document.getElementById('modal-actions').innerHTML = `<button onclick="closeModal()" class="finish-btn">完成挑戰 🏆</button>`;
+    } 
+    else {
+        // 答錯邏輯（不動）
+        attempts--;
+        playSound('wrong');
         if (attempts > 0) {
-            if (feedbackText) { feedbackText.innerHTML = `😮 還有 ${attempts} 次機會！`; feedbackText.style.color = "#f56565"; }
+            if (feedbackText) {
+                feedbackText.innerHTML = `😮 還有 ${attempts} 次機會！`;
+                feedbackText.style.color = "#f56565";
+            }
         } else {
-            if (feedbackText) { feedbackText.innerHTML = "💔 正確答案是「" + correctAnswer + "」"; feedbackText.style.color = "#5d4037"; }
-            setTimeout(closeModal, 2000); 
+            if (feedbackText) {
+                feedbackText.innerHTML = "💔 正確答案：「" + correctAnswer + "」";
+                feedbackText.style.color = "#5d4037";
+            }
+            setTimeout(closeModal, 2000);
         }
     }
 }
