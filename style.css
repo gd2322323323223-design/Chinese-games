@@ -533,22 +533,32 @@ body:not(:has(#start-screen:not([style*="display: none"]))) #controls {
 #modal.type-understand .opt-btn { width: 150px !important; height: 70px !important; font-size: 24px !important; }
 
 /* 續寫句子 合併後最終版 (已刪除重複區塊) */
+/* 續寫句子 - 最終優化版 */
 #modal.type-continue {
   width: 700px !important;
   max-width: 90% !important;
   background: #ffffff !important;
   border: 8px solid var(--blue-main) !important;
   border-radius: 40px !important;
-  padding: 30px !important;
+  padding: 20px !important;
   box-shadow: 0 15px 50px rgba(0,0,0,0.3) !important;
+  min-height: unset !important;
+  height: auto !important;
 }
-#modal.type-continue #timer {
-    font-size: 14px !important; 
-    margin-bottom: 10px !important;
-    opacity: 0.7;
-    text-align: center;
-    width: 100%;
+
+/* 強化題目標題 */
+#modal.type-continue .challenge-container::before {
+  font-size: 24px !important;
+  font-weight: 900 !important;
+  color: var(--blue-main) !important;
+  background: rgba(49, 130, 206, 0.1);
+  padding: 8px 16px !important;
+  border-radius: 10px !important;
+  margin-bottom: 20px !important;
+  display: inline-block !important;
 }
+
+/* 題目句子方框 */
 #modal.type-continue .task-question {
   font-size: 34px !important;
   font-weight: 900 !important;
@@ -557,19 +567,23 @@ body:not(:has(#start-screen:not([style*="display: none"]))) #controls {
   border-left: 10px solid var(--blue-main) !important;
   border-radius: 12px !important;
   padding: 20px 25px !important;
-  margin: 0 auto 30px auto !important;
+  margin: 0 auto 20px auto !important;
   text-align: left !important;
   width: 90% !important;
   line-height: 1.3 !important;
   box-shadow: 2px 2px 10px rgba(0,0,0,0.05);
 }
+
+/* 選項容器 */
 #modal.type-continue #modal-actions {
   display: flex !important;
   flex-direction: column !important;
-  gap: 16px !important;
+  gap: 12px !important;
   align-items: center !important;
   width: 100% !important;
 }
+
+/* 選項按鈕列 */
 #modal.type-continue .opt-row-vertical {
   display: flex !important;
   align-items: center !important;
@@ -577,6 +591,8 @@ body:not(:has(#start-screen:not([style*="display: none"]))) #controls {
   width: 100% !important;
   justify-content: center !important;
 }
+
+/* A B C 標籤 */
 #modal.type-continue .opt-label-pure {
   font-size: 32px !important;
   font-weight: 900 !important;
@@ -584,11 +600,14 @@ body:not(:has(#start-screen:not([style*="display: none"]))) #controls {
   min-width: 50px !important;
   text-align: right !important;
 }
+
+/* 優化選項按鈕字體清晰度 */
 #modal.type-continue .opt-btn-pure-vertical {
   min-width: 320px !important;
   height: 80px !important;
-  font-size: 32px !important;
-  font-weight: 900 !important;
+  font-size: 30px !important;
+  font-weight: 700 !important;
+  letter-spacing: 1px !important;
   color: #000 !important;
   background: #ffb300 !important;
   border: 3px solid #333 !important;
@@ -600,15 +619,16 @@ body:not(:has(#start-screen:not([style*="display: none"]))) #controls {
   cursor: pointer !important;
   transition: 0.2s !important;
 }
+
 #modal.type-continue .opt-btn-pure-vertical:hover {
   transform: translateY(-3px) !important;
   box-shadow: 0 9px 0 #bf360c !important;
 }
+
 #modal.type-continue .opt-btn-pure-vertical:active {
   transform: translateY(2px) !important;
   box-shadow: 0 3px 0 #bf360c !important;
 }
-
 /* 提交按鈕 */
 #modal-actions .submit-btn, 
 #modal-actions .finish-btn {
