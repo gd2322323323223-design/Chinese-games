@@ -532,7 +532,6 @@ body:not(:has(#start-screen:not([style*="display: none"]))) #controls {
 #modal.type-understand p { font-size: 22px !important; }
 #modal.type-understand .opt-btn { width: 150px !important; height: 70px !important; font-size: 24px !important; }
 
-/* 續寫句子 合併後最終版 (已刪除重複區塊) */
 /* 續寫句子 - 最終優化版 */
 #modal.type-continue {
   width: 700px !important;
@@ -704,10 +703,26 @@ body:not(:has(#start-screen:not([style*="display: none"]))) #controls {
     75% { transform: translateX(5px); }
 }
 
-/* 答對後的完整句子與勾號 */
-#modal.type-continue .task-question span {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    vertical-align: middle;
+/* 答對後正確句子樣式 + 右上角小勾勾 */
+#modal.type-continue .task-question {
+  position: relative !important;
+  padding-right: 50px !important; /* 給勾勾留空間，不會擠到文字 */
+}
+
+/* 勾勾：右上角、大小適中、不超出方框 */
+#modal.type-continue .task-question::after {
+  content: "✔" !important;
+  position: absolute !important;
+  top: 12px !important;
+  right: 16px !important;
+  font-size: 26px !important;
+  color: #48bb78 !important;
+  font-weight: bold !important;
+  line-height: 1 !important;
+}
+
+/* 答對背景變淡綠 */
+#modal.type-continue .task-question.correct {
+  background: #f0fdf4 !important;
+  border-left-color: #48bb78 !important;
 }
