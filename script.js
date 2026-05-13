@@ -474,17 +474,14 @@ function finishTurn() {
 
 // ========== 測試與重置 ==========
 function testModal(type) {
-    const map = { 
-        fill: fillTasks, 
-        reorder: reorderTasks, 
-        match: matchTasks, 
-        radical: radicalTasks, 
-        punc: puncTasks, 
-        continue: continueTasks, 
-        stroke: strokeTasks, 
-        understand: understandTasks 
-    };
-    if (map[type]) displaySpecificTask(map[type][0]);
+    const map = { fill: fillTasks, reorder: reorderTasks, match: matchTasks, radical: radicalTasks, punc: puncTasks, continue: continueTasks, stroke: strokeTasks, understand: understandTasks };
+    if (map[type]) {
+        // 強制顯示彈窗 ← 就是少了這行才沒反應
+        document.getElementById('modal-overlay').style.display = 'block';
+        document.getElementById('modal').style.display = 'block';
+        
+        displaySpecificTask(map[type][0]);
+    }
 }
 
 function restartGame() {
