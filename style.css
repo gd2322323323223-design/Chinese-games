@@ -515,18 +515,55 @@ body:not(:has(#start-screen:not([style*="display: none"]))) #controls {
     font-weight: bold;
 }
 
-/* 重組句子區域 */
-#modal.type-reorder #reorder-zone {
-    width: 95%;
+/* 重組句子專用版面 原版完整設計 */
+#reorder-answer-zone {
+    border: 3px dashed #3182ce;
+    border-radius: 12px;
+    padding: 20px;
     min-height: 70px;
-    background: #fdf2e9;
-    border: 2px dashed var(--wood-brown);
-    border-radius: 15px;
+    font-size: 24px;
+    margin: 15px 10px;
+    text-align: left;
+    background: #f8fbff;
+}
+
+#reorder-options-pool {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 12px;
+    margin: 20px 0;
+    padding: 0 10px;
+}
+
+.word-span {
+    background: #e6f2ff;
+    padding: 8px 14px;
+    border-radius: 8px;
+    margin: 0 6px;
+    font-size: 22px;
+    border: 1px solid #3182ce;
+}
+
+/* 重組句子專用按鈕區 */
+#modal-actions {
     display: flex;
     justify-content: center;
-    align-items: center;
-    flex-wrap: wrap;
-    margin-bottom: 15px;
+    gap: 15px;
+    margin-top: 10px;
+}
+
+.submit-btn {
+    padding: 12px 35px;
+    font-size: 24px;
+    border-radius: 12px;
+    border: none;
+    background: #48bb78;
+    color: #fff;
+    cursor: pointer;
+}
+.submit-btn:hover {
+    background: #38a169;
 }
 
 /* 續寫句子專用 */
