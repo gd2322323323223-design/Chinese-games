@@ -358,20 +358,30 @@ function displaySpecificTask(task) {
     content.innerHTML = html;
 
     if (task.type === "reorder") {
-        const zone = document.createElement('div'); zone.id = "reorder-zone";
-        content.querySelector('.challenge-container').appendChild(zone);
-        const pool = document.createElement('div'); pool.className = "word-pool";
+        // 👉 生成「答案方格」（對應你圖片的上方）
+        const answerZone = document.createElement('div');
+        answerZone.id = "reorder-answer-zone";
+        answerZone.innerHTML = `<span style="color:#888; font-size:20px;">（點擊下方詞語加入這裡）</span>`;
+        content.querySelector('.challenge-container').appendChild(answerZone);
+
+        // 👉 生成「四素方格」（對應你圖片的下方選項池）
+        const optionsPool = document.createElement('div');
+        optionsPool.id = "reorder-options-pool";
         task.words.forEach(w => {
             const btn = document.createElement('button');
             btn.className = "opt-btn"; btn.innerText = w;
             btn.onclick = () => addToReorder(btn);
-            pool.appendChild(btn);
+            optionsPool.appendChild(btn);
         });
-        content.querySelector('.challenge-container').appendChild(pool);
+        content.querySelector('.challenge-container').appendChild(optionsPool);
+
+        // 提交按鈕
         const submitBtn = document.createElement('button');
         submitBtn.className = "submit-btn"; submitBtn.innerText = "提交";
         submitBtn.onclick = () => {
-            const user = Array.from(document.getElementById('reorder-zone').children).map(n => n.innerText).join("");
+            const user = Array.from(document.getElementById('reorder-answer-zone').children)
+                .filter(el => el.classList.contains('opt-btn'))
+                .map(n => n.innerText).join("");
             checkUserAnswer(user, task.answer);
         };
         actions.appendChild(submitBtn);
@@ -393,13 +403,25 @@ function showModal() {
 }
 
 function addToReorder(btn) {
-    const zone = document.getElementById('reorder-zone');
-    if (!zone || btn.classList.contains('used')) return;
+    const answerZone = document.getElementById('reorder-answer-zone');
+    if (!answerZone || btn.classList.contains('used')) return;
     btn.classList.add('used');
     const newBtn = document.createElement('button');
     newBtn.className = "opt-btn"; newBtn.innerText = btn.innerText;
-    newBtn.onclick = function () { this.remove(); btn.classList.remove('used'); };
-    zone.appendChild(newBtn);
+    // 點擊答案區的詞語，可以移除
+    newBtn.onclick = function () {
+        this.remove(); 
+        btn.classList.remove('used');
+        // 如果答案區空了，顯示提示文字
+        if (answerZone.children.length === 0) {
+            answerZone.innerHTML = `<span style="color:#888; font-size:20px;">（點擊下方詞語加入這裡）</span>`;
+        }
+    };
+    // 移除提示文字
+    if (answerZone.querySelector('span')) {
+        answerZone.innerHTML = "";
+    }
+    answerZone.appendChild(newBtn);
 }
 
 function checkUserAnswer(userSelect, correctAnswer) {
