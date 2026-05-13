@@ -378,12 +378,13 @@ function displaySpecificTask(task) {
         // 提交按鈕
         const submitBtn = document.createElement('button');
         submitBtn.className = "submit-btn"; submitBtn.innerText = "提交";
-        submitBtn.onclick = () => {
-            const user = Array.from(document.getElementById('reorder-answer-zone').children)
-                .filter(el => el.classList.contains('opt-btn'))
-                .map(n => n.innerText).join("");
-            checkUserAnswer(user, task.answer);
-        };
+        // 提交按鈕部分改成這樣
+submitBtn.onclick = () => {
+    const user = Array.from(document.getElementById('reorder-answer-zone').children)
+        .filter(el => el.classList.contains('word-span'))
+        .map(n => n.innerText).join("");
+    checkUserAnswer(user, task.answer);
+};
         actions.appendChild(submitBtn);
     } else {
         task.options.forEach(opt => {
