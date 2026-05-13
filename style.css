@@ -516,15 +516,21 @@ body:not(:has(#start-screen:not([style*="display: none"]))) #controls {
 }
 
 /* 重組句子專用版面 原版完整設計 */
+/* 答題區 - 替換原本的 #reorder-answer-zone 樣式 */
 #reorder-answer-zone {
     border: 3px dashed #3182ce;
     border-radius: 12px;
-    padding: 20px;
+    padding: 15px;
     min-height: 70px;
     font-size: 24px;
     margin: 15px 10px;
     text-align: left;
     background: #f8fbff;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 4px; /* 讓詞語之間緊密相連 */
+    position: relative;
 }
 
 /* 左上角的「答題區」標題 */
