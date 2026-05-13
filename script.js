@@ -1,22 +1,22 @@
-// --- 1. 全域變數定義 ---
+// --- 全域變數 ---
 let selectedP1 = "";
 let selectedP2 = "";
 let currentSelectingPlayer = 1; 
-let pendingSteps = 0; 
 let turn = 0, dice = 0, moving = false;
 let waitingForClick = false; 
 let specialEventActive = false;
 let attempts = 3; 
 
-// 取消計分制，只比誰先到終點
-const players = [{pos: 0}, {pos: 0}];
-
-const traps = [1, 16, 39, 48, 61, 76, 96];     // 香蕉 倒退1
-const boosts = [8, 20, 32, 51, 68, 80, 90];   // 火箭 前進5
-const dinosaurs = [5, 12, 27, 43, 55, 70, 86, 103]; // 恐龍 倒退3
+// 格子定義
+const traps = [1, 16, 39, 48, 61, 76, 96];     // 香蕉
+const boosts = [8, 20, 32, 51, 68, 80, 90];   // 火箭
+const dinosaurs = [5, 12, 27, 43, 55, 70, 86, 103]; // 恐龍
 let words = []; 
 
-// --- 2. 完整題庫完全保留 ---
+// 玩家位置
+const players = [{pos: 0}, {pos: 0}];
+
+// --- 題庫省略（完全保留不變）---
 const fillTasks = [
     { type: "fill", question: "新年快到了，我和爸媽一起______房子。", options: ["換洗", "打掃", "乾淨"], answer: "打掃" },
     { type: "fill", question: "小朋友起得早，在______下做早操。", options: ["花朵", "桌子", "陽光"], answer: "陽光" },
@@ -27,7 +27,6 @@ const fillTasks = [
     { type: "fill", question: "星期六，我和家人去海灘______。", options: ["學校", "午餐", "游泳"], answer: "游泳" },
     { type: "fill", question: "我笑______說：「媽媽做的餃子最好吃！」", options: ["看", "着", "著"], answer: "着" }
 ];
-
 const reorderTasks = [ 
     { type: "reorder", question: "重組句子：", words: ["操場上", "在", "小明", "今天", "跑步", "，", "。"], answer: "今天，小明在操場上跑步。" },
     { type: "reorder", question: "重組句子：", words: ["在", "禮堂", "哥哥", "星期一", "表演跳舞", "，", "。"], answer: "星期一，哥哥在禮堂表演跳舞。" },
@@ -38,7 +37,6 @@ const reorderTasks = [
     { type: "reorder", question: "重組句子：", words: ["抹窗戶", "在", "家裏", "星期六", "我和姐姐", "，", "。"], answer: "星期六，我和姐姐在家裏抹窗戶。" },
     { type: "reorder", question: "重組句子：", words: ["早上七時", "在", "做早操", "叔叔", "公園", "，", "。"], answer: "早上七時，叔叔在公園做早操。" }
 ];
-
 const matchTasks = [ 
     { type: "match", question: "哪一個詞語最能形容這張圖？", gif: "swimming.png", options: ["跳繩", "游泳", "打球"], answer: "游泳" },
     { type: "match", question: "哪一個詞語最能形容這張圖？", gif: "scared.png", options: ["生氣", "開心", "害怕"], answer: "害怕" },
@@ -49,7 +47,6 @@ const matchTasks = [
     { type: "match", question: "哪一個詞語最能形容這張圖？", gif: "rainbow.png", options: ["太陽", "月亮", "彩虹"], answer: "彩虹" },
     { type: "match", question: "哪一個詞語最能形容這張圖？", gif: "leaf.png", options: ["樹木", "樹葉", "花朵"], answer: "樹葉" }
 ];
-
 const radicalTasks = [
     { type: "radical", question: "下列哪一個字有「目」字部件？", options: ["清", "睛", "晴"], answer: "睛" },
     { type: "radical", question: "下列哪一個字有「目」字部件？", options: ["春", "看", "吞"], answer: "看" },
@@ -60,7 +57,6 @@ const radicalTasks = [
     { type: "radical", question: "下列哪一個字有「虫」字部件？", options: ["媽", "嗎", "螞"], answer: "螞" },
     { type: "radical", question: "下列哪一個字有「虫」字部件？", options: ["湖", "蝴", "糊"], answer: "蝴" }
 ];
-
 const puncTasks = [
     { type: "punc", question: "小恩，你為甚麼不開心___", options: ["。", "？", "："], answer: "？" },
     { type: "punc", question: "下午三時___哥哥在公園跑步。", options: ["。", "，", "「"], answer: "，" },
@@ -71,7 +67,6 @@ const puncTasks = [
     { type: "punc", question: "今天，我會到商場買衣服___", options: ["。", "？", "！"], answer: "。" },
     { type: "punc", question: "媽媽，我們一起到理髮店剪髮___", options: ["。", "？", "！"], answer: "。" }
 ];
-
 const continueTasks = [
     { type: "continue", question: "今天，我和哥哥______________。", options: ["一邊看手機", "一起上學去", "一會兒吃飯"], answer: "一起上學去" },
     { type: "continue", question: "新年，我和家人______________。", options: ["一起倒數", "一會兒聽音樂", "一邊跑步"], answer: "一起倒數" },
@@ -82,7 +77,6 @@ const continueTasks = [
     { type: "continue", question: "中文考試開始了，同學們認真地______________。", options: ["寫啊寫", "跑啊跑", "游啊游"], answer: "寫啊寫" },
     { type: "continue", question: "春天到了，美麗的蝴蝶在花朵上______________。", options: ["跳啊跳", "讀啊讀", "飛啊飛"], answer: "飛啊飛" }
 ];
-
 const strokeTasks = [
     { type: "stroke", question: "哪一個字是依照「先中央後對稱」的筆順規則來寫的？", options: ["湖", "思", "小"], answer: "小" },
     { type: "stroke", question: "哪一個字是依照「先中央後對稱」的筆順規則來寫的？", options: ["凹", "山", "凸"], answer: "山" },
@@ -92,7 +86,6 @@ const strokeTasks = [
     { type: "stroke", question: "哪一個字是依照「中間主橫最後寫」的筆順規則來寫的？", options: ["車", "下", "主"], answer: "車" },
     { type: "stroke", question: "哪一個字是依照「先進入後關門」的筆順規則來寫的？", options: ["甲", "口", "內"], answer: "口" },
     { type: "stroke", question: "哪一個字是依照「先進入後關門」的筆順規則來寫的？", options: ["趣", "區", "固"], answer: "固" }];
-
 const understandTasks = [
     { type: "understand", sentence: "「暑假，爸爸帶我坐飛機去北京遊玩，我們一起登上了長城。」", question: "我和爸爸去了哪裡？", options: ["香港", "上海", "北京"], answer: "北京" },
     { type: "understand", sentence: "「早上，媽媽去了理髮店。中午，媽媽去了麵包店。晚上，媽媽去了餐廳。」", question: "媽媽在中午的時候去了哪裡？", options: ["理髮店", "麵包店", "餐廳"], answer: "麵包店" },
@@ -103,97 +96,88 @@ const understandTasks = [
     { type: "understand", sentence: "「下午三時，我和同學一起來到公園玩溜滑梯，我們感到很快樂。」", question: "我和同學在甚麼時候來到公園？", options: ["下午二時", "上午三時", "下午三時"], answer: "下午三時" },
     { type: "understand", sentence: "「七時半，我來到了學校。十一時半，我在上中文課。一時半，我在上數學課。三時半，我回到了家裏。」", question: "我在甚麼時候上數學課？", options: ["十一時半", "一時半", "三時半"], answer: "一時半" }
 ];
-
 const allTasks = [...fillTasks, ...reorderTasks, ...matchTasks, ...radicalTasks, ...puncTasks, ...continueTasks, ...strokeTasks, ...understandTasks]; 
 
-// --- 3. 角色選擇 ---
+// --- 角色選擇、開始遊戲、音效不變 ---
 function selectChar(element, imgPath) {
     if (currentSelectingPlayer === 1 && selectedP1 === imgPath) { resetSelection(1); return; }
     if (currentSelectingPlayer === 2 && selectedP2 === imgPath) { resetSelection(2); return; }
     if (imgPath === selectedP1 || imgPath === selectedP2) { alert("這個角色已經被選走囉！"); return; }
-
     if (currentSelectingPlayer === 1) {
         selectedP1 = imgPath;
         const p1Preview = document.getElementById('p1-big-preview');
-        if(p1Preview) {
-            p1Preview.style.background = "linear-gradient(135deg, rgba(49, 130, 206, 0.4), rgba(255, 255, 255, 0.3))";
-            p1Preview.innerHTML = `<img src="${imgPath}" class="pop-effect" style="width: 85%; height: 85%; object-fit: contain;">`;
+        if(p1Preview){
+            p1Preview.style.background = "linear-gradient(135deg, rgba(49,130,206,0.4), rgba(255,255,255,0.3))";
+            p1Preview.innerHTML = `<img src="${imgPath}" class="pop-effect" style="width:85%;height:85%;object-fit:contain;">`;
         }
         currentSelectingPlayer = 2;
-        updateHint("請 玩家 2 選擇一個角色", "#d53f8c");
-    } else {
+        updateHint("請 玩家 2 選擇一個角色","#d53f8c");
+    }else{
         selectedP2 = imgPath;
         const p2Preview = document.getElementById('p2-big-preview');
-        if(p2Preview) {
-            p2Preview.style.background = "linear-gradient(135deg, rgba(213, 63, 140, 0.4), rgba(255, 255, 255, 0.3))";
-            p2Preview.innerHTML = `<img src="${imgPath}" class="pop-effect" style="width: 85%; height: 85%; object-fit: contain;">`;
-            p2Preview.onclick = function() { resetSelection(2); };
-            p2Preview.style.cursor = "pointer";
+        if(p2Preview){
+            p2Preview.style.background = "linear-gradient(135deg, rgba(213,63,140,0.4), rgba(255,255,255,0.3))";
+            p2Preview.innerHTML = `<img src="${imgPath}" class="pop-effect" style="width:85%;height:85%;object-fit:contain;">`;
+            p2Preview.onclick=()=>resetSelection(2);
+            p2Preview.style.cursor="pointer";
         }
-        updateHint("選擇完成！可以點擊下方按鈕開始遊戲。", "#48bb78");
+        updateHint("選擇完成！可以點擊下方按鈕開始遊戲。","#48bb78");
     }
     updateHighlight();
 }
-
-function resetSelection(playerNum) {
-    if (playerNum === 1) {
-        selectedP1 = ""; currentSelectingPlayer = 1;
-        const p1Preview = document.getElementById('p1-big-preview');
-        if(p1Preview) {
-            p1Preview.style.background = "rgba(255, 255, 255, 0.3)"; 
-            p1Preview.innerHTML = `<span style="color: #ffffff; font-weight: bold;">P1 棋子</span>`;
+function resetSelection(playerNum){
+    if(playerNum===1){
+        selectedP1="";currentSelectingPlayer=1;
+        const p1Preview=document.getElementById('p1-big-preview');
+        if(p1Preview){
+            p1Preview.style.background="rgba(255,255,255,0.3)";
+            p1Preview.innerHTML=`<span style="color:#fff;font-weight:bold;">P1 棋子</span>`;
         }
-        updateHint("請 玩家 1 重新選擇角色", "#3182ce");
-    } else {
-        selectedP2 = ""; currentSelectingPlayer = 2;
-        const p2Preview = document.getElementById('p2-big-preview');
-        if(p2Preview) {
-            p2Preview.style.background = "rgba(255, 255, 255, 0.3)"; 
-            p2Preview.innerHTML = `<span style="color: #ffffff; font-weight: bold;">P2 棋子</span>`;
-            p2Preview.onclick = null; p2Preview.style.cursor = "default";
+        updateHint("請 玩家 1 重新選擇角色","#3182ce");
+    }else{
+        selectedP2="";currentSelectingPlayer=2;
+        const p2Preview=document.getElementById('p2-big-preview');
+        if(p2Preview){
+            p2Preview.style.background="rgba(255,255,255,0.3)";
+            p2Preview.innerHTML=`<span style="color:#fff;font-weight:bold;">P2 棋子</span>`;
+            p2Preview.onclick=null;p2Preview.style.cursor="default";
         }
-        updateHint("請 玩家 2 重新選擇角色", "#d53f8c");
+        updateHint("請 玩家 2 重新選擇角色","#d53f8c");
     }
     updateHighlight();
 }
-
-function updateHint(text, color) {
-    const hint = document.getElementById('selection-hint');
-    if(hint) { hint.innerText = text; hint.style.color = color; }
+function updateHint(text,color){
+    const hint=document.getElementById('selection-hint');
+    if(hint){hint.innerText=text;hint.style.color=color;}
 }
-
-function updateHighlight() {
-    const opts = document.querySelectorAll('.char-opt');
-    opts.forEach(opt => {
-        const path = opt.getAttribute('src');
-        opt.classList.remove('selected-p1', 'selected-p2');
-        opt.style.opacity = (path === selectedP2 && selectedP2 !== "") ? "0.6" : "1";
-        if (path === selectedP1) opt.classList.add('selected-p1');
-        if (path === selectedP2) opt.classList.add('selected-p2');
+function updateHighlight(){
+    const opts=document.querySelectorAll('.char-opt');
+    opts.forEach(opt=>{
+        const path=opt.getAttribute('src');
+        opt.classList.remove('selected-p1','selected-p2');
+        opt.style.opacity=(path===selectedP2&&selectedP2)?"0.6":"1";
+        if(path===selectedP1)opt.classList.add('selected-p1');
+        if(path===selectedP2)opt.classList.add('selected-p2');
     });
 }
-
-function startGame() {
-    if (!selectedP1 || !selectedP2) { alert("兩位玩家都必須選擇角色喔！"); return; }
-    const p1 = document.getElementById('p1');
-    const p2 = document.getElementById('p2');
-    p1.style.backgroundImage = `url('${selectedP1}')`;
-    p1.style.backgroundSize = "contain";
-    p1.style.backgroundRepeat = "no-repeat";
-    p2.style.backgroundImage = `url('${selectedP2}')`;
-    p2.style.backgroundSize = "contain";
-    p2.style.backgroundRepeat = "no-repeat";
-    document.getElementById('start-screen').style.display = 'none';
-    const gameContainer = document.getElementById('game-container');
-    if (gameContainer) { gameContainer.style.display = 'block'; gameContainer.style.visibility = 'visible'; }
-    const ctrl = document.getElementById('controls');
-    if (ctrl) ctrl.style.setProperty('display', 'flex', 'important');
-    const rollBtn = document.getElementById('btn-roll');
-    if (rollBtn) { rollBtn.style.setProperty('display', 'inline-block', 'important'); rollBtn.disabled = false; }
-    setTimeout(updateDisplay, 100);
+function startGame(){
+    if(!selectedP1||!selectedP2){alert("兩位玩家都必須選擇角色喔！");return;}
+    const p1=document.getElementById('p1'),p2=document.getElementById('p2');
+    p1.style.backgroundImage=`url('${selectedP1}')`;
+    p1.style.backgroundSize="contain";p1.style.backgroundRepeat="no-repeat";
+    p2.style.backgroundImage=`url('${selectedP2}')`;
+    p2.style.backgroundSize="contain";p2.style.backgroundRepeat="no-repeat";
+    document.getElementById('start-screen').style.display='none';
+    const gameContainer=document.getElementById('game-container');
+    if(gameContainer){gameContainer.style.display='block';gameContainer.style.visibility='visible';}
+    const ctrl=document.getElementById('controls');
+    if(ctrl)ctrl.style.setProperty('display','flex','important');
+    const rollBtn=document.getElementById('btn-roll');
+    if(rollBtn){rollBtn.style.setProperty('display','inline-block','important');rollBtn.disabled=false;}
+    setTimeout(updateDisplay,100);
 }
 
-// --- 4. 音效系統 ---
+// 音效
 const audio = {
     bgm: new Audio('sounds/bgm.mp3'),
     dice: new Audio('sounds/sounds_dice.mp3'),
@@ -201,302 +185,260 @@ const audio = {
 };
 audio.bgm.loop = true;
 audio.bgm.volume = 0.4;
-
-window.addEventListener('load', () => {
-    audio.bgm.play().catch(() => {});
-});
-
-function toggleBGM() {
-    const btn = document.getElementById('music-ctrl');
-    if (audio.bgm.paused) {
-        audio.bgm.play();
-        btn.innerText = "🎵";
-    } else {
-        audio.bgm.pause();
-        btn.innerText = "🔇";
-    }
+window.addEventListener('load', ()=>audio.bgm.play().catch(()=>{}));
+function toggleBGM(){
+    const btn=document.getElementById('music-ctrl');
+    if(audio.bgm.paused){audio.bgm.play();btn.innerText="🎵";}
+    else{audio.bgm.pause();btn.innerText="🔇";}
+}
+function playSound(name){
+    if(audio[name]){audio[name].currentTime=0;audio[name].play().catch(()=>{});}
 }
 
-function playSound(name) {
-    if (audio[name]) {
-        audio[name].currentTime = 0;
-        audio[name].play().catch(() => {});
+// 棋盤
+function init(){
+    const gameContainer=document.getElementById('game-container');
+    if(gameContainer)gameContainer.style.display='none';
+    const board=document.getElementById('board');
+    if(!board)return;
+    board.innerHTML="";let displayIndex=1;words=[];
+    for(let i=0;i<110;i++){
+        if(i===0)words.push("起點");
+        else if(i===109)words.push("終點 🏆");
+        else if(traps.includes(i)||boosts.includes(i)||dinosaurs.includes(i))words.push("");
+        else words.push("語文挑戰");
     }
-}
-
-// --- 5. 棋盤初始化 ---
-function init() {
-    const gameContainer = document.getElementById('game-container');
-    if (gameContainer) gameContainer.style.display = 'none'; 
-    const board = document.getElementById('board');
-    if (!board) return;
-    board.innerHTML = "";
-    let displayIndex = 1; 
-    words = []; 
-    for (let i = 0; i < 110; i++) {
-        if (i === 0) words.push("起點");
-        else if (i === 109) words.push("終點 🏆");
-        else if (traps.includes(i) || boosts.includes(i) || dinosaurs.includes(i)) words.push("");
-        else words.push("語文挑戰"); 
-    }
-    words.forEach((w, i) => {
-        const cell = document.createElement('div');
-        cell.className = 'cell'; cell.id = 'c' + i;
-        if (i === words.length - 1) {
+    words.forEach((w,i)=>{
+        const cell=document.createElement('div');
+        cell.className='cell';cell.id='c'+i;
+        if(i===words.length-1){
             cell.classList.add('goal-cell');
-            cell.innerHTML = `<div class="event-icon">🏆</div><div class="cell-text">終點</div>`;
-        } else {
-            let iconText = "";
-            if(traps.includes(i)) { iconText = "🍌"; cell.classList.add('trap-cell'); }
-            else if(boosts.includes(i)) { iconText = "🚀"; cell.classList.add('boost-cell'); }
-            else if(dinosaurs.includes(i)) { iconText = "🦖"; cell.classList.add('dino-cell'); }
-            let numberHtml = (!i || iconText) ? "" : `<span class="cell-index">${displayIndex++}</span>`;
-            cell.innerHTML = `${numberHtml}${w !== "" ? `<div class="cell-text">${w}</div>` : ""}<span class="event-icon" style="${w !== "" ? 'position: absolute; bottom: 5px; right: 8px; font-size: 24px;' : 'font-size: 50px;'}">${iconText}</span>`;
+            cell.innerHTML=`<div class="event-icon">🏆</div><div class="cell-text">終點</div>`;
+        }else{
+            let iconText="";
+            if(traps.includes(i)){iconText="🍌";cell.classList.add('trap-cell');}
+            else if(boosts.includes(i)){iconText="🚀";cell.classList.add('boost-cell');}
+            else if(dinosaurs.includes(i)){iconText="🦖";cell.classList.add('dino-cell');}
+            let numberHtml=(!i||iconText)?"":`<span class="cell-index">${displayIndex++}</span>`;
+            cell.innerHTML=`${numberHtml}${w?"<div class='cell-text'>"+w+"</div>":""}<span class="event-icon" style="${w?'position:absolute;bottom:5px;right:8px;font-size:24px;':'font-size:50px;'}">${iconText}</span>`;
         }
         board.appendChild(cell);
     });
-    setTimeout(updateDisplay, 100);
+    setTimeout(updateDisplay,100);
 }
-
-function updateDisplay() {
-    players.forEach((p, i) => {
-        const cell = document.getElementById('c' + p.pos);
-        const pEl = document.getElementById('p' + (i + 1));
-        if (!cell || !pEl) return;
-        const centerX = cell.offsetLeft + (cell.offsetWidth / 2) - (pEl.offsetWidth / 2);
-        pEl.style.left = centerX + 'px';
-        if (cell.classList.contains('goal-cell')) {
-            pEl.style.top = (cell.offsetTop + cell.offsetHeight / 2 + (i === 0 ? -40 : 20)) + 'px';
-        } else {
-            const roadAreaTop = cell.offsetTop + cell.offsetHeight + 15; 
-            pEl.style.top = (i === 0 ? roadAreaTop - 10 : roadAreaTop + 35) + 'px';
+function updateDisplay(){
+    players.forEach((p,i)=>{
+        const cell=document.getElementById('c'+p.pos);
+        const pEl=document.getElementById('p'+(i+1));
+        if(!cell||!pEl)return;
+        const centerX=cell.offsetLeft+cell.offsetWidth/2-pEl.offsetWidth/2;
+        pEl.style.left=centerX+'px';
+        if(cell.classList.contains('goal-cell')){
+            pEl.style.top=(cell.offsetTop+cell.offsetHeight/2+(i===0?-40:20))+'px';
+        }else{
+            const roadAreaTop=cell.offsetTop+cell.offsetHeight+15;
+            pEl.style.top=(i===0?roadAreaTop-10:roadAreaTop+35)+'px';
         }
     });
 }
 
-async function roll() {
-    if(moving || waitingForClick) return;
+// 擲骰子
+async function roll(){
+    if(moving||waitingForClick)return;
     playSound('dice');
-    const rollBtn = document.getElementById('btn-roll');
-    if (rollBtn) rollBtn.disabled = true;
-
-    const diceBox = document.getElementById('dice-box');
-    const num = Math.floor(Math.random() * 6) + 1;
-    const rotations = { 1: 'rotateX(0deg) rotateY(0deg)', 2: 'rotateX(0deg) rotateY(180deg)', 3: 'rotateX(0deg) rotateY(-90deg)', 4: 'rotateX(0deg) rotateY(90deg)', 5: 'rotateX(-90deg) rotateY(0deg)', 6: 'rotateX(90deg) rotateY(0deg)' };
-    diceBox.style.transform = `rotateX(${Math.random() * 360 + 720}deg) rotateY(${Math.random() * 360 + 720}deg)`;
-    await new Promise(r => setTimeout(r, 600));
-    diceBox.style.transform = rotations[num];
-    await new Promise(r => setTimeout(r, 400));
-
-    dice = num;
-    waitingForClick = true;
-    document.getElementById('p' + (turn + 1)).classList.add('can-move');
+    const rollBtn=document.getElementById('btn-roll');
+    if(rollBtn)rollBtn.disabled=true;
+    const diceBox=document.getElementById('dice-box');
+    const num=Math.floor(Math.random()*6)+1;
+    const rotations={1:'rotateX(0deg) rotateY(0deg)',2:'rotateX(0deg) rotateY(180deg)',3:'rotateX(0deg) rotateY(-90deg)',4:'rotateX(0deg) rotateY(90deg)',5:'rotateX(-90deg) rotateY(0deg)',6:'rotateX(90deg) rotateY(0deg)'};
+    diceBox.style.transform=`rotateX(${Math.random()*360+720}deg) rotateY(${Math.random()*360+720}deg)`;
+    await new Promise(r=>setTimeout(r,600));
+    diceBox.style.transform=rotations[num];
+    await new Promise(r=>setTimeout(r,400));
+    dice=num;
+    waitingForClick=true;
+    document.getElementById('p'+(turn+1)).classList.add('can-move');
 }
 
-async function handlePlayerClick(pid) {
-    if (!waitingForClick || pid !== turn || moving) return;
-    waitingForClick = false;
-    document.getElementById('p' + (turn + 1)).classList.remove('can-move');
-
-    if (specialEventActive) {
-        let steps = pendingSteps; 
-        specialEventActive = false; 
-        pendingSteps = 0;
-        await moveSteps(pid, steps);
-        // 移動完直接檢查新位置
-        checkEndAndQuestion(pid);
-    } else {
-        await move(pid);
-    }
+// 點擊棋子
+async function handlePlayerClick(pid){
+    if(!waitingForClick||pid!==turn||moving)return;
+    waitingForClick=false;
+    document.getElementById('p'+(turn+1)).classList.remove('can-move');
+    await moveNormal(pid);
 }
 
-async function move(pid) {
-    moving = true;
-    for(let i=0; i<dice; i++) {
-        if (players[pid].pos < words.length - 1) {
-            players[pid].pos++; 
+// 正常走到格子
+async function moveNormal(pid){
+    moving=true;
+    for(let i=0;i<dice;i++){
+        if(players[pid].pos<words.length-1){
+            players[pid].pos++;
             updateDisplay();
-            await new Promise(r => setTimeout(r, 300));
+            await new Promise(r=>setTimeout(r,300));
         }
     }
-    moving = false;
+    moving=false;
 
-    let pos = players[pid].pos;
-
-    // 終點直接獲勝
-    if (pos === words.length - 1) {
+    let pos=players[pid].pos;
+    // 終點直接勝利
+    if(pos===words.length-1){
         playSound('win');
-        document.getElementById('win-modal').style.display = 'flex';
-        document.getElementById('win-player').textContent = `玩家 ${pid + 1}`;
+        document.getElementById('win-modal').style.display='flex';
+        document.getElementById('win-player').textContent=`玩家 ${pid+1}`;
         return;
     }
 
-    // 香蕉：倒退1格
-    if(traps.includes(pos)) {
-        alert("🍌 踩到香蕉，倒退 1 格");
-        await moveSteps(pid, -1);
-        return;
-    }
-    // 火箭：前進5格
-    if(boosts.includes(pos)) {
-        alert("🚀 踩到火箭，前進 5 格");
-        await moveSteps(pid, 5);
-        return;
-    }
-    // 恐龍：倒退3格
-    if(dinosaurs.includes(pos)) {
-        alert("🦖 踩到恐龍，倒退 3 格");
-        await moveSteps(pid, -3);
+    // 特殊格：只彈提示、不動、棋子閃爍等待點擊
+    if(traps.includes(pos)||boosts.includes(pos)||dinosaurs.includes(pos)){
+        specialEventActive=true;
+        // 彈提示
+        if(traps.includes(pos)) alert("🍌 踩到香蕉，請點擊格子執行倒退");
+        if(boosts.includes(pos)) alert("🚀 踩到火箭，請點擊格子執行前進");
+        if(dinosaurs.includes(pos)) alert("🦖 踩到恐龍，請點擊格子執行倒退");
+        // 棋子保持可點擊閃亮狀態
+        waitingForClick=true;
+        document.getElementById('p'+(pid+1)).classList.add('can-move');
         return;
     }
 
-    // 普通格子 → 答題
+    // 普通格直接答題
     showModal();
 }
 
-async function moveSteps(pid, steps) {
-    moving = true;
-    const isForward = steps > 0;
-    for (let i = 0; i < Math.abs(steps); i++) {
-        if (isForward) { 
-            if (players[pid].pos < words.length - 1) players[pid].pos++; 
-        } else { 
-            if (players[pid].pos > 0) players[pid].pos--; 
-        }
-        updateDisplay();
-        await new Promise(r => setTimeout(r, 300));
-    }
-    moving = false;
+// 玩家點擊特殊格後執行移動
+async function handleSpecialCellClick(){
+    if(!specialEventActive)return;
+    let pid=turn;
+    let pos=players[pid].pos;
+    let step=0;
 
-    // 移動完檢查終點 / 普通格子答題
+    if(traps.includes(pos)) step=-1;
+    if(boosts.includes(pos)) step=5;
+    if(dinosaurs.includes(pos)) step=-3;
+
+    specialEventActive=false;
+    waitingForClick=false;
+    await moveSteps(pid,step);
+    // 移完檢查終點/答題
     checkEndAndQuestion(pid);
 }
 
-// 統一檢查：是否終點，不是就強制彈題
-function checkEndAndQuestion(pid) {
-    let pos = players[pid].pos;
-    if (pos === words.length - 1) {
+// 強制移動步數
+async function moveSteps(pid,steps){
+    moving=true;
+    const isForward=steps>0;
+    for(let i=0;i<Math.abs(steps);i++){
+        if(isForward){
+            if(players[pid].pos<words.length-1) players[pid].pos++;
+        }else{
+            if(players[pid].pos>0) players[pid].pos--;
+        }
+        updateDisplay();
+        await new Promise(r=>setTimeout(r,300));
+    }
+    moving=false;
+}
+
+// 檢查終點與彈題
+function checkEndAndQuestion(pid){
+    let pos=players[pid].pos;
+    if(pos===words.length-1){
         playSound('win');
-        document.getElementById('win-modal').style.display = 'flex';
-        document.getElementById('win-player').textContent = `玩家 ${pid + 1}`;
+        document.getElementById('win-modal').style.display='flex';
+        document.getElementById('win-player').textContent=`玩家 ${pid+1}`;
         return;
     }
-    // 只要不是終點，一律彈題目
     showModal();
 }
 
-// --- 題目彈窗 ---
-function displaySpecificTask(task) {
-    attempts = 3; 
-    const modal = document.getElementById('modal');
-    modal.className = ""; 
-    modal.classList.add('type-' + task.type); 
-    
-    const content = document.getElementById('modal-content');
-    const actions = document.getElementById('modal-actions');
-    if (!content || !actions) return;
-
-    content.innerHTML = ""; 
-    actions.innerHTML = "";
-
-    let html = `<div class="challenge-container">`;
-    if (task.gif) html += `<img src="images/${task.gif}" class="task-image">`;
-    if (task.sentence) html += `<div class="task-sentence-box">${task.sentence}</div>`;
-    html += `<p class="task-question">${task.question}</p>`;
-    html += `<div id="feedback-msg" style="min-height:30px;"></div>`;
-    html += `</div>`; 
-    content.innerHTML = html;
-
-    if (task.type === "reorder") {
-        const zone = document.createElement('div');
-        zone.id = "reorder-zone";
+// 題目彈窗
+function displaySpecificTask(task){
+    attempts=3;
+    const modal=document.getElementById('modal');
+    modal.className="";modal.classList.add('type-'+task.type);
+    const content=document.getElementById('modal-content');
+    const actions=document.getElementById('modal-actions');
+    if(!content||!actions)return;
+    content.innerHTML="";actions.innerHTML="";
+    let html=`<div class="challenge-container">`;
+    if(task.gif)html+=`<img src="images/${task.gif}" class="task-image">`;
+    if(task.sentence)html+=`<div class="task-sentence-box">${task.sentence}</div>`;
+    html+=`<p class="task-question">${task.question}</p><div id="feedback-msg" style="min-height:30px;"></div></div>`;
+    content.innerHTML=html;
+    if(task.type==="reorder"){
+        const zone=document.createElement('div');zone.id="reorder-zone";
         content.querySelector('.challenge-container').appendChild(zone);
-
-        const pool = document.createElement('div');
-        pool.className = "word-pool";
-        task.words.forEach(w => {
-            const btn = document.createElement('button');
-            btn.className = "opt-btn";
-            btn.innerText = w;
-            btn.onclick = () => addToReorder(btn);
+        const pool=document.createElement('div');pool.className="word-pool";
+        task.words.forEach(w=>{
+            const btn=document.createElement('button');
+            btn.className="opt-btn";btn.innerText=w;
+            btn.onclick=()=>addToReorder(btn);
             pool.appendChild(btn);
         });
         content.querySelector('.challenge-container').appendChild(pool);
-
-        const submitBtn = document.createElement('button');
-        submitBtn.className = "submit-btn";
-        submitBtn.innerText = "提 交";
-        submitBtn.onclick = () => {
-            const userSentence = Array.from(document.getElementById('reorder-zone').children).map(n => n.innerText).join("");
-            checkUserAnswer(userSentence, task.answer);
+        const submitBtn=document.createElement('button');
+        submitBtn.className="submit-btn";submitBtn.innerText="提 交";
+        submitBtn.onclick=()=>{
+            const user=Array.from(document.getElementById('reorder-zone').children).map(n=>n.innerText).join("");
+            checkUserAnswer(user,task.answer);
         };
         actions.appendChild(submitBtn);
-    } else {
-        task.options.forEach((opt) => {
-            const btn = document.createElement('button');
-            btn.className = "opt-btn";
-            btn.innerText = opt;
-            btn.onclick = () => checkUserAnswer(opt, task.answer);
+    }else{
+        task.options.forEach(opt=>{
+            const btn=document.createElement('button');
+            btn.className="opt-btn";btn.innerText=opt;
+            btn.onclick=()=>checkUserAnswer(opt,task.answer);
             actions.appendChild(btn);
         });
     }
-    document.getElementById('modal-overlay').style.display = 'block';
-    document.getElementById('modal').style.display = 'flex';
+    document.getElementById('modal-overlay').style.display='block';
+    document.getElementById('modal').style.display='flex';
 }
-
-function showModal() {
-    const task = allTasks[Math.floor(Math.random() * allTasks.length)];
-    if (task) displaySpecificTask(task);
+function showModal(){
+    const task=allTasks[Math.floor(Math.random()*allTasks.length)];
+    if(task)displaySpecificTask(task);
 }
-
-function addToReorder(btn) {
-    const zone = document.getElementById('reorder-zone');
-    if (!zone || btn.classList.contains('used')) return;
+function addToReorder(btn){
+    const zone=document.getElementById('reorder-zone');
+    if(!zone||btn.classList.contains('used'))return;
     btn.classList.add('used');
-    const newBtn = document.createElement('button');
-    newBtn.className = "opt-btn"; newBtn.innerText = btn.innerText;
-    newBtn.onclick = function() { this.remove(); btn.classList.remove('used'); };
+    const newBtn=document.createElement('button');
+    newBtn.className="opt-btn";newBtn.innerText=btn.innerText;
+    newBtn.onclick=function(){this.remove();btn.classList.remove('used');};
     zone.appendChild(newBtn);
 }
-
-function checkUserAnswer(userSelect, correctAnswer) {
-    const feedbackText = document.getElementById('feedback-msg');
-    if (userSelect === correctAnswer) {
-        feedbackText.innerHTML = "🎉 答對了！";
-        feedbackText.style.color = "#48bb78";
-        document.getElementById('modal-actions').innerHTML = `<button onclick="closeModal()" class="finish-btn">完成 🏆</button>`;
-    } else {
+function checkUserAnswer(userSelect,correctAnswer){
+    const feedback=document.getElementById('feedback-msg');
+    if(userSelect===correctAnswer){
+        feedback.innerHTML="🎉 答對了！";feedback.style.color="#48bb78";
+        document.getElementById('modal-actions').innerHTML=`<button onclick="closeModal()" class="finish-btn">完成 🏆</button>`;
+    }else{
         attempts--;
-        if (attempts > 0) {
-            feedbackText.innerHTML = `還有 ${attempts} 次機會！`;
-            feedbackText.style.color = "#f56565";
-        } else {
-            feedbackText.innerHTML = "💔 正確答案：" + correctAnswer;
-            feedbackText.style.color = "#5d4037";
-            setTimeout(closeModal, 1500);
+        if(attempts>0){
+            feedback.innerHTML=`還有 ${attempts} 次機會！`;feedback.style.color="#f56565";
+        }else{
+            feedback.innerHTML="💔 正確答案："+correctAnswer;feedback.style.color="#5d4037";
+            setTimeout(closeModal,1500);
         }
     }
 }
-
-function closeModal() {
-    document.getElementById('modal-overlay').style.display = 'none';
-    document.getElementById('modal').style.display = 'none';
+function closeModal(){
+    document.getElementById('modal-overlay').style.display='none';
+    document.getElementById('modal').style.display='none';
     finishTurn();
 }
 
-// 回合輪流切換
-function finishTurn() {
-    turn = 1 - turn;
-    const tn = document.getElementById('player-turn-name');
-    if (tn) {
-        tn.innerText = "玩家 " + (turn + 1);
-        tn.style.color = turn === 0 ? "#3182ce" : "#d53f8c";
+// 換回合
+function finishTurn(){
+    turn=1-turn;
+    const tn=document.getElementById('player-turn-name');
+    if(tn){
+        tn.innerText="玩家 "+(turn+1);
+        tn.style.color=turn===0?"#3182ce":"#d53f8c";
     }
-    document.getElementById('btn-roll').disabled = false;
+    document.getElementById('btn-roll').disabled=false;
 }
+function restartGame(){location.reload();}
 
-function restartGame() {
-    location.reload();
-}
-
-window.onload = init;
+window.onload=init;
