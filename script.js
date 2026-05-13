@@ -1,495 +1,580 @@
-// --- 全域變數 ---
-let selectedP1 = "";
-let selectedP2 = "";
-let currentSelectingPlayer = 1;
-let turn = 0, dice = 0, moving = false;
-let waitingForClick = false;
-let specialEventActive = false;
-let attempts = 3;
-let pendingSteps = 0;
+:root { 
+    --p1-color: #3182ce; 
+    --p2-color: #d53f8c; 
+    --cell-size: 90px; 
+    --road-height: 90px;
+    --wood-brown: #8d6e63;
+    --wood-dark: #795548;
+    --text-dark: #1a202c;
+    --blue-main: #3182ce;
+    --green-main: #48bb78;
+}
 
-// 格子定義
-const traps = [1, 16, 39, 48, 61, 76, 96];
-const boosts = [8, 20, 32, 51, 68, 80, 90];
-const dinosaurs = [5, 12, 27, 43, 55, 70, 86, 103];
-let words = [];
+body::before {
+    content: "";
+    position: fixed; 
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url('images/board-bg-frontpage.png');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    z-index: 0;
+}
 
-// 玩家位置
-const players = [{ pos: 0 }, { pos: 0 }];
+body {
+    font-family: "Microsoft JhengHei", sans-serif;
+    margin: 0;
+    background-color: #f0f0f0;
+    position: relative;
+    overflow-x: hidden;
+    min-height: 100vh;
+}
 
-// --- 題庫 ---
-const fillTasks = [
-    { type: "fill", question: "新年快到了，我和爸媽一起______房子。", options: ["換洗", "打掃", "乾淨"], answer: "打掃" },
-    { type: "fill", question: "小朋友起得早，在______下做早操。", options: ["花朵", "桌子", "陽光"], answer: "陽光" },
-    { type: "fill", question: "雨停了，小晴______看見金色的太陽。", options: ["低頭", "抬頭", "搖頭"], answer: "抬頭" },
-    { type: "fill", question: "我______：「媽媽，你喜歡吃甚麼水果？」", options: ["問", "說", "話"], answer: "問" },
-    { type: "fill", question: "早上，學生在學校______老師打招呼。", options: ["說", "向", "跑"], answer: "向" },
-    { type: "fill", question: "今天，你______沒有去學校？", options: ["甚麼", "怎樣", "為甚麼"], answer: "為甚麼" },
-    { type: "fill", question: "星期六，我和家人去海灘______。", options: ["學校", "午餐", "游泳"], answer: "游泳" },
-    { type: "fill", question: "我笑______說：「媽媽做的餃子最好吃！」", options: ["看", "着", "著"], answer: "着" }
-];
-const reorderTasks = [
-    { type: "reorder", question: "重組句子：", words: ["操場上", "在", "小明", "今天", "跑步", "，", "。"], answer: "今天，小明在操場上跑步。" },
-    { type: "reorder", question: "重組句子：", words: ["在", "禮堂", "哥哥", "星期一", "表演跳舞", "，", "。"], answer: "星期一，哥哥在禮堂表演跳舞。" },
-    { type: "reorder", question: "重組句子：", words: ["家裏", "媽媽", "在", "下午", "看電話", "，", "。"], answer: "下午，媽媽在家裏看電話。" },
-    { type: "reorder", question: "重組句子：", words: ["吃聖誕大餐", "餐廳", "在", "聖誕節", "我和家人", "，", "。"], answer: "聖誕節，我和家人在餐廳吃聖誕大餐。" },
-    { type: "reorder", question: "重組句子：", words: ["圖書館", "我和同學", "小息", "在", "看書", "，", "。"], answer: "小息，我和同學在圖書館看書。" },
-    { type: "reorder", question: "重組句子：", words: ["晚上八時", "睡房", "弟弟", "做功課", "在", "，", "。"], answer: "晚上八時，弟弟在睡房做功課。" },
-    { type: "reorder", question: "重組句子：", words: ["抹窗戶", "在", "家裏", "星期六", "我和姐姐", "，", "。"], answer: "星期六，我和姐姐在家裏抹窗戶。" },
-    { type: "reorder", question: "重組句子：", words: ["早上七時", "在", "做早操", "叔叔", "公園", "，", "。"], answer: "早上七時，叔叔在公園做早操。" }
-];
-const matchTasks = [
-    { type: "match", question: "哪一個詞語最能形容這張圖？", gif: "swimming.png", options: ["跳繩", "游泳", "打球"], answer: "游泳" },
-    { type: "match", question: "哪一個詞語最能形容這張圖？", gif: "scared.png", options: ["生氣", "開心", "害怕"], answer: "害怕" },
-    { type: "match", question: "哪一個詞語最能形容這張圖？", gif: "boat.png", options: ["飛機", "船", "車"], answer: "船" },
-    { type: "match", question: "哪一個詞語最能形容這張圖？", gif: "sunshine.png", options: ["陽光", "彩虹", "雲朵"], answer: "陽光" },
-    { type: "match", question: "哪一個詞語最能形容這張圖？", gif: "like.png", options: ["討厭", "擔心", "喜歡"], answer: "喜歡" },
-    { type: "match", question: "哪一個詞語最能形容這張圖？", gif: "angry.png", options: ["快樂", "生氣", "緊張"], answer: "生氣" },
-    { type: "match", question: "哪一個詞語最能形容這張圖？", gif: "rainbow.png", options: ["太陽", "月亮", "彩虹"], answer: "彩虹" },
-    { type: "match", question: "哪一個詞語最能形容這張圖？", gif: "leaf.png", options: ["樹木", "樹葉", "花朵"], answer: "樹葉" }
-];
-const radicalTasks = [
-    { type: "radical", question: "下列哪一個字有「目」字部件？", options: ["清", "睛", "晴"], answer: "睛" },
-    { type: "radical", question: "下列哪一個字有「目」字部件？", options: ["春", "看", "吞"], answer: "看" },
-    { type: "radical", question: "下列哪一個字有「木」字部件？", options: ["季", "早", "桌"], answer: "桌" },
-    { type: "radical", question: "下列哪一個字有「木」字部件？", options: ["任", "桃", "很"], answer: "桃" },
-    { type: "radical", question: "下列哪一個字有「足」字部件（⻊）？", options: ["泡", "跑", "炮"], answer: "跑" },
-    { type: "radical", question: "下列哪一個字有「足」字部件（⻊）？", options: ["路", "走", "從"], answer: "路" },
-    { type: "radical", question: "下列哪一個字有「虫」字部件？", options: ["媽", "嗎", "螞"], answer: "螞" },
-    { type: "radical", question: "下列哪一個字有「虫」字部件？", options: ["湖", "蝴", "糊"], answer: "蝴" }
-];
-const puncTasks = [
-    { type: "punc", question: "小恩，你為甚麼不開心___", options: ["。", "？", "："], answer: "？" },
-    { type: "punc", question: "下午三時___哥哥在公園跑步。", options: ["。", "，", "「"], answer: "，" },
-    { type: "punc", question: "哥哥對弟弟說___「你的新書包真好看啊！」", options: ["。", "？", "："], answer: "：" },
-    { type: "punc", question: "你知道小貓去了哪裡嗎___", options: ["。", "？", "！"], answer: "？" },
-    { type: "punc", question: "老師說：___今天沒有功課。」", options: ["「", "」", "，"], answer: "「" },
-    { type: "punc", question: "老師說：「今天沒有功課。___", options: ["。」", "」", "。"], answer: "」" },
-    { type: "punc", question: "今天，我會到商場買衣服___", options: ["。", "？", "！"], answer: "。" },
-    { type: "punc", question: "媽媽，我們一起到理髮店剪髮___", options: ["。", "？", "！"], answer: "。" }
-];
-const continueTasks = [
-    { type: "continue", question: "今天，我和哥哥______________。", options: ["一邊看手機", "一起上學去", "一會兒吃飯"], answer: "一起上學去" },
-    { type: "continue", question: "新年，我和家人______________。", options: ["一起倒數", "一會兒聽音樂", "一邊跑步"], answer: "一起倒數" },
-    { type: "continue", question: "動物園裏的獅子一會兒走來走去，______________。", options: ["一邊吃飯", "一起游泳", "一會兒睡覺"], answer: "一會兒睡覺" },
-    { type: "continue", question: "晚上，哥哥在房間裏一會兒做功課，______________。", options: ["一會兒看手機", "一直吃零食", "一邊看看窗外"], answer: "一會兒看手機" },
-    { type: "continue", question: "這個西瓜又香甜______________。", options: ["很好吃", "又多汁", "又是我"], answer: "又多汁" },
-    { type: "continue", question: "這把雨傘又便宜______________。", options: ["又買東西", "我喜歡", "又好看"], answer: "又好看" },
-    { type: "continue", question: "中文考試開始了，同學們認真地______________。", options: ["寫啊寫", "跑啊跑", "游啊游"], answer: "寫啊寫" },
-    { type: "continue", question: "春天到了，美麗的蝴蝶在花朵上______________。", options: ["跳啊跳", "讀啊讀", "飛啊飛"], answer: "飛啊飛" }
-];
-const strokeTasks = [
-    { type: "stroke", question: "請選出「先中央後對稱」的字。", options: ["湖", "思", "小"], answer: "小" },
-    { type: "stroke", question: "請選出「先中央後對稱」的字。", options: ["凹", "山", "凸"], answer: "山" },
-    { type: "stroke", question: "請選出「中間主橫最後寫」的字。", options: ["日", "木", "子"], answer: "子" },
-    { type: "stroke", question: "請選出「中間主橫最後寫」的字。", options: ["月", "母", "田"], answer: "母" },
-    { type: "stroke", question: "請選出「中間主直最後寫」的字。", options: ["休", "中", "女"], answer: "中" },
-    { type: "stroke", question: "請選出「中間主橫最後寫」的字。", options: ["車", "下", "主"], answer: "車" },
-    { type: "stroke", question: "請選出「先進入後關門」的字。", options: ["甲", "口", "內"], answer: "口" },
-    { type: "stroke", question: "請選出「先進入後關門」的字。", options: ["趣", "區", "固"], answer: "固" }];
-const understandTasks = [
-    { type: "understand", sentence: "「暑假，爸爸帶我坐飛機去北京遊玩，我們一起登上了長城。」", question: "我和爸爸去了哪裡？", options: ["香港", "上海", "北京"], answer: "北京" },
-    { type: "understand", sentence: "「早上，媽媽去了理髮店。中午，媽媽去了麵包店。晚上，媽媽去了餐廳。」", question: "媽媽在中午的時候去了哪裡？", options: ["理髮店", "麵包店", "餐廳"], answer: "麵包店" },
-    { type: "understand", sentence: "「今天是小明七歲的生日。小方送了帽子，小美送了文具。」", question: "今天是誰的生日？", options: ["小明", "小方", "小美"], answer: "小明" },
-    { type: "understand", sentence: "「夏天的晚上，池塘裏有兩隻青蛙坐在荷葉上呱呱地叫着。」", question: "池塘裏是誰在叫？", options: ["荷葉", "魚", "青蛙"], answer: "青蛙" },
-    { type: "understand", sentence: "「弟弟喜歡吃雪糕。哥哥喜歡吃糖果。我喜歡吃餅乾。」", question: "弟弟喜歡吃甚麼？", options: ["餅乾", "糖果", "雪糕"], answer: "雪糕" },
-    { type: "understand", sentence: "「沙灘上有很多人。小朋友在堆沙，大人在游泳，老人家在散步。」", question: "老人家在做甚麼？", options: ["游泳", "堆沙", "散步"], answer: "散步" },
-    { type: "understand", sentence: "「下午三時，我和同學一起來到公園玩溜滑梯，我們感到很快樂。」", question: "我和同學在甚麼時候來到公園？", options: ["下午二時", "上午三時", "下午三時"], answer: "下午三時" },
-    { type: "understand", sentence: "「七時半，我來到了學校。十一時半，我在上中文課。一時半，我在上數學課。三時半，我回到了家裏。」", question: "我在甚麼時候上數學課？", options: ["十一時半", "一時半", "三時半"], answer: "一時半" }
-];
-const allTasks = [...fillTasks, ...reorderTasks, ...matchTasks, ...radicalTasks, ...puncTasks, ...continueTasks, ...strokeTasks, ...understandTasks];
+#start-screen {
+    display: block;
+    position: relative;
+    z-index: 2000;
+    background: rgba(255, 255, 255, 0.3);
+    min-height: 100vh;
+    padding: 30px 20px;
+}
 
-// ===============================
-// ========= 角色選擇系統 =========
-// ===============================
-function selectChar(element, imgPath) {
-    // 防止重覆選擇同一個角色
-    if (selectedP1 === imgPath || selectedP2 === imgPath) {
-        alert("這個角色已經被選走囉！");
-        return;
+#game-container { 
+    display: none;
+    position: relative; 
+    z-index: 10;
+    width: 95%; 
+    max-width: 1400px; 
+    margin: 20px auto; 
+    background: transparent;
+}
+
+#controls {
+    display: none;
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: auto;
+    background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(5px);
+    border: 2px solid var(--green-main);
+    border-radius: 50px;
+    padding: 10px 25px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    align-items: center;
+    gap: 15px;
+    z-index: 1000;
+}
+body.game-active #controls {
+    display: flex;
+}
+
+#score-board {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    background: rgba(255,255,255,0.92);
+    padding: 12px 20px;
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+    z-index: 1001;
+    font-size: 20px;
+    font-weight: bold;
+    display: flex;
+    gap: 20px;
+}
+.score-item:nth-child(1) { color: var(--p1-color); }
+.score-item:nth-child(2) { color: var(--p2-color); }
+
+.char-opt[style*="var(--p1-color)"] {
+    outline: 5px solid var(--p1-color);
+    outline-offset: -5px;
+    box-shadow: 0 0 20px var(--p1-color);
+    border: none;
+}
+.char-opt[style*="var(--p2-color)"] {
+    outline: 5px solid var(--p2-color);
+    outline-offset: -5px;
+    box-shadow: 0 0 20px var(--p2-color);
+    border: none;
+}
+.char-opt[style*="var(--p1-color)"]:hover,
+.char-opt[style*="var(--p2-color)"]:hover {
+    transform: scale(1.05) translateY(0);
+}
+
+.preview-box img {
+    width: 85%;
+    height: 85%;
+    object-fit: contain;
+}
+.char-opt {
+    width: 80px;
+    height: 80px;
+    object-fit: contain;
+}
+
+#board { 
+    display: grid; 
+    grid-template-columns: repeat(10, 1fr); 
+    gap: 140px 15px; 
+    padding: 40px 40px 150px 40px; 
+    border-radius: 40px; 
+    background: rgba(226, 210, 180, 0.7); 
+    border: 12px solid var(--wood-brown);
+    box-shadow: 0 20px 60px rgba(0,0,0,0.1);
+    width: 95%;
+    max-width: 1400px;
+    margin: -40px auto 20px auto;
+}
+
+.cell { 
+    height: var(--cell-size);
+    border-radius: 20px; 
+    display: flex; 
+    flex-direction: column; 
+    align-items: center; 
+    justify-content: center; 
+    position: relative; 
+    transition: 0.3s; 
+    padding: 5px; 
+    box-sizing: border-box;
+}
+.cell:not(.trap-cell):not(.boost-cell):not(.dino-cell) {
+    background: #ffffff; 
+    color: #3d4a22; 
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 4px 0 #cbd5e1;
+    border-radius: 15px;
+}
+.cell:not(.trap-cell):not(.boost-cell):not(.dino-cell):hover {
+    background: #f8fafc;
+    transform: translateY(-5px);
+    box-shadow: 0 8px 0 #9ba67e;
+}
+
+.trap-cell {
+    background: radial-gradient(circle, #fff3bf 0%, #fab005 100%);
+    border: 3px dashed #873800;
+    position: relative;
+    z-index: 10;
+    box-shadow: inset 0 0 15px rgba(0,0,0,0.2);
+}
+.trap-cell .event-icon {
+    font-size: 50px;
+    filter: drop-shadow(2px 4px 6px rgba(0,0,0,0.2));
+    animation: banana-wiggle 2s infinite ease-in-out;
+}
+.trap-cell:hover .event-icon {
+    animation: rotate-trap 0.3s infinite linear;
+}
+.trap-cell:hover {
+    background: radial-gradient(circle, #fff3bf 0%, #e67e22 100%);
+    border-style: solid;
+}
+
+.boost-cell {
+    background: 
+        radial-gradient(1.2px 1.2px at 15% 20%, #ffffff, transparent),
+        radial-gradient(1.5px 1.5px at 80% 15%, #ffffff, transparent),
+        radial-gradient(1px 1px at 50% 40%, #ffffff, transparent),
+        radial-gradient(1.3px 1.3px at 25% 75%, #ffffff, transparent),
+        radial-gradient(1.1px 1.1px at 70% 65%, #ffffff, transparent),
+        radial-gradient(1.4px 1.4px at 85% 85%, #ffffff, transparent),
+        linear-gradient(180deg, #0b1e3b 0%, #1a365d 100%);
+    border: 3px solid #63b3ed;
+    position: relative;
+    z-index: 10;
+    box-shadow: 0 0 15px rgba(99, 179, 237, 0.4), inset 0 0 10px rgba(0,0,0,0.5);
+    transition: all 0.5s ease;
+}
+.boost-cell .event-icon {
+    font-size: 50px;
+    filter: drop-shadow(0 0 8px rgba(66, 153, 225, 0.8));
+    animation: rocket-engine 0.2s infinite alternate;
+}
+.boost-cell:hover {
+    background: 
+        linear-gradient(90deg, transparent, #fff, transparent) 10% 20% / 20px 1px no-repeat,
+        linear-gradient(90deg, transparent, #fff, transparent) 80% 15% / 30px 1px no-repeat,
+        linear-gradient(90deg, transparent, #fff, transparent) 40% 70% / 25px 1px no-repeat,
+        linear-gradient(180deg, #0b1e3b 0%, #2c5282 100%);
+    box-shadow: 0 0 25px rgba(66, 153, 225, 0.8);
+    transform: scale(1.05);
+}
+.boost-cell:hover .event-icon {
+    animation: rocket-launch 0.5s infinite ease-in-out;
+}
+
+.dino-cell {
+    background: linear-gradient(135deg, #1b4332 0%, #2d6a4f 100%);
+    position: relative;
+    z-index: 10;
+    border-radius: 20px;
+    border: 10px solid transparent;
+    border-image: repeating-linear-gradient(45deg, #f1c40f, #f1c40f 10px, #000 10px, #000 20px) 10;
+    box-shadow: inset 0 0 25px rgba(0,0,0,0.7);
+    transition: 0.3s;
+}
+.dino-cell .event-icon {
+    font-size: 55px;
+    filter: drop-shadow(2px 4px 10px rgba(0,0,0,0.6));
+    animation: dino-breath 2s infinite ease-in-out;
+}
+.dino-cell:hover {
+    box-shadow: inset 0 0 40px rgba(0,0,0,0.8), 0 0 15px rgba(116, 195, 101, 0.4);
+}
+.dino-cell:hover .event-icon {
+    animation: dino-roar 0.3s infinite;
+}
+
+.cell.goal-cell {
+    grid-column: span 2;
+    grid-row: span 2;
+    height: auto;
+    min-height: calc(var(--cell-size) * 2 + 20px);
+    background: linear-gradient(135deg, #ffd700, #ffae00, #fff700);
+    background-size: 200% 200%;
+    border: 5px solid #fff;
+    box-shadow: 0 0 30px rgba(255, 215, 0, 0.8), inset 0 0 20px rgba(255,255,255,0.5);
+    z-index: 10;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    animation: goal-shine 3s infinite ease-in-out, gold-flow 3s infinite linear;
+}
+.goal-cell .cell-text {
+    font-size: 48px;
+    font-weight: 900;
+    color: #8b4513;
+    text-shadow: 2px 2px 0px rgba(255,255,255,0.5);
+    order: 2;
+}
+.goal-cell .event-icon {
+    font-size: 100px;
+    order: 1;
+    filter: drop-shadow(0 0 10px rgba(255,255,255,0.8));
+}
+.cell.goal-cell:hover {
+    transform: scale(1.05) translateY(-5px);
+    filter: brightness(1.2);
+}
+
+.cell::after {
+    content: "";
+    position: absolute;
+    bottom: -110px;
+    left: -5px;
+    right: -5px;
+    height: var(--road-height);
+    background: var(--wood-brown);
+    opacity: 1;
+    border-bottom: 6px solid var(--wood-dark);
+    z-index: 1;
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+.cell::before {
+    content: "";
+    position: absolute;
+    bottom: calc(-110px + (var(--road-height) / 2));
+    left: 10%;
+    right: 10%;
+    height: 2px;
+    border-top: 2px dashed rgba(255, 255, 255, 0.4);
+    z-index: 2;
+}
+.cell-text { 
+    font-size: 30px; 
+    font-weight: 900; 
+    color: var(--text-dark); 
+    z-index: 3; 
+    margin: 0; 
+    line-height: 1.2; 
+}
+.cell-index { 
+    position: absolute; 
+    top: 8px; 
+    left: 10px; 
+    font-size: 14px; 
+    color: #a0aec0; 
+}
+
+.player { 
+    width: 65px; 
+    height: 65px; 
+    position: absolute; 
+    z-index: 100; 
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    filter: drop-shadow(0 4px 8px rgba(0,0,0,0.3));
+}
+.can-move { 
+    animation: bounce 0.6s infinite alternate; 
+    cursor: pointer; 
+    filter: drop-shadow(0 0 15px #48bb78) brightness(1.2);
+}
+
+#dice-box {
+    width: 60px;
+    height: 60px;
+    position: relative;
+    transform-style: preserve-3d;
+    transition: transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    margin: 0 auto;
+}
+.dice-face {
+    position: absolute;
+    width: 60px;
+    height: 60px;
+    background: #ffffff;
+    border: 2px solid #cbd5e0;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 32px;
+    font-weight: bold;
+    color: #000000;
+    box-shadow: inset 0 0 10px rgba(0,0,0,0.1);
+}
+.face-1 { transform: translateZ(30px); }
+.face-2 { transform: rotateY(180deg) translateZ(30px); }
+.face-3 { transform: rotateY(90deg) translateZ(30px); }
+.face-4 { transform: rotateY(-90deg) translateZ(30px); }
+.face-5 { transform: rotateX(90deg) translateZ(30px); }
+.face-6 { transform: rotateX(-90deg) translateZ(30px); }
+
+#btn-roll {
+    padding: 15px 40px;
+    font-size: 22px;
+    background: var(--green-main);
+    color: #393939;
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+}
+#btn-roll:hover { background: #38a169; transform: scale(1.05); }
+#btn-roll:disabled { background: #cbd5e0; transform: scale(1); }
+
+#modal {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 80%;
+    max-width: 800px;
+    background: #ffffff;
+    border: 8px solid var(--blue-main);
+    border-radius: 40px;
+    padding: 15px 20px;
+    z-index: 2050;
+    text-align: center;
+    box-shadow: 0 15px 50px rgba(0,0,0,0.3);
+    flex-direction: column;
+    align-items: center;
+}
+
+#modal p, .challenge-container p, .task-question {
+    font-size: 26px;
+    color: #1a365d;
+    font-weight: 900;
+    margin: 5px 0;
+    line-height: 1.2;
+}
+.task-sentence-box, #modal.type-understand div {
+    background: #f0f7ff;
+    padding: 10px;
+    border-radius: 12px;
+    font-size: 20px;
+    max-height: 70px;
+    overflow-y: auto;
+    text-align: left;
+    margin-bottom: 5px;
+}
+
+.opt-btn {
+    min-width: 320px;
+    height: 80px;
+    font-size: 30px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    color: #000;
+    background: #ffb300;
+    border: 3px solid #333;
+    border-radius: 16px;
+    box-shadow: 0 6px 0 #bf360c;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: 0.2s;
+    margin: 8px;
+}
+.opt-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 9px 0 #bf360c;
+}
+.opt-btn:active {
+    transform: translateY(2px);
+    box-shadow: 0 3px 0 #bf360c;
+}
+.opt-label {
+    position: absolute;
+    top: -5px;
+    left: 5px;
+    font-size: 20px;
+    color: var(--wood-brown);
+    font-weight: bold;
+    background: white;
+    padding: 0 5px;
+    border-radius: 5px;
+}
+.opt-btn.used {
+    background: #eeeeee;
+    color: #bdbdbd;
+    border-color: #d1d1d1;
+    box-shadow: none;
+    opacity: 0.5;
+    pointer-events: none;
+}
+
+#win-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.85);
+    z-index: 9999;
+    align-items: center;
+    justify-content: center;
+}
+.win-content {
+    background: #fff;
+    padding: 40px 60px;
+    border-radius: 30px;
+    text-align: center;
+    animation: popIn 0.6s ease;
+}
+.win-title {
+    font-size: 48px;
+    font-weight: 900;
+    color: #ffae00;
+    margin-bottom: 20px;
+}
+#win-player, #win-score {
+    font-size: 28px;
+    margin: 10px 0;
+}
+.win-btn {
+    margin-top: 30px;
+    padding: 15px 40px;
+    font-size: 24px;
+    border-radius: 50px;
+    border: none;
+    background: var(--green-main);
+    color: #fff;
+    cursor: pointer;
+}
+
+@keyframes popIn {
+    0% { transform: scale(0.5); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
+}
+@keyframes bounce { 
+    from { transform: translateY(0); } 
+    to { transform: translateY(-20px); }
+}
+@keyframes banana-wiggle {
+    0%, 100% { transform: rotate(0deg) scale(1); }
+    50% { transform: rotate(15deg) scale(1.1); }
+}
+@keyframes rotate-trap {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+@keyframes rocket-engine {
+    from { transform: translate(0, 0) rotate(-2deg); }
+    to { transform: translate(1px, 1px) rotate(2deg); }
+}
+@keyframes rocket-launch {
+    0% { transform: translate(0, 0) scale(1); }
+    50% { transform: translate(5px, -5px) scale(1.1); }
+    100% { transform: translate(0, 0) scale(1); }
+}
+@keyframes dino-breath {
+    0%, 100% { transform: translateY(0) scale(1); }
+    50% { transform: translateY(-6px) scale(1.03); }
+}
+@keyframes dino-roar {
+    0% { transform: translate(1px, 1px) rotate(0deg); }
+    20% { transform: translate(-1px, -1px) rotate(-1deg); }
+    40% { transform: translate(-2px, 0px) rotate(1deg); }
+    60% { transform: translate(2px, 1px) rotate(0deg); }
+    80% { transform: translate(-1px, -1px) rotate(1deg); }
+    100% { transform: translate(1px, -2px) rotate(-1deg); }
+}
+@keyframes gold-flow {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+@keyframes goal-shine {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); filter: brightness(1.2); }
+    100% { transform: scale(1); }
+}
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-5px); }
+    75% { transform: translateX(5px); }
+}
+
+@media (max-width: 768px) {
+    #score-board {
+        font-size: 16px;
+        padding: 8px 12px;
+        gap: 10px;
     }
-
-    if (currentSelectingPlayer === 1) {
-        selectedP1 = imgPath;
-        const preview = document.getElementById('p1-big-preview');
-        preview.innerHTML = `<img src="${imgPath}" style="width:90%;height:90%;object-fit:contain;">`;
-        currentSelectingPlayer = 2;
-        updateHint("請 玩家 2 選擇角色", "#d53f8c");
-    } else {
-        selectedP2 = imgPath;
-        const preview = document.getElementById('p2-big-preview');
-        preview.innerHTML = `<img src="${imgPath}" style="width:90%;height:90%;object-fit:contain;">`;
-        updateHint("選擇完成！點擊開始遊戲", "#48bb78");
+    #board {
+        gap: 80px 8px;
+        padding: 20px 10px 100px 10px;
     }
-    updateHighlight();
-}
-
-function resetSelection(playerNum) {
-    if (playerNum === 1) {
-        selectedP1 = "";
-        currentSelectingPlayer = 1;
-        document.getElementById('p1-big-preview').innerHTML = `<span class="placeholder-text">P1 棋子</span>`;
-        updateHint("請 玩家 1 重新選擇角色", "#3182ce");
-    } else {
-        selectedP2 = "";
-        currentSelectingPlayer = 2;
-        document.getElementById('p2-big-preview').innerHTML = `<span class="placeholder-text">P2 棋子</span>`;
-        updateHint("請 玩家 2 重新選擇角色", "#d53f8c");
+    .cell {
+        --cell-size: 60px;
     }
-    updateHighlight();
-}
-
-function updateHint(text, color) {
-    const el = document.getElementById('selection-hint');
-    if (el) {
-        el.innerText = text;
-        el.style.color = color;
+    .player {
+        width: 45px;
+        height: 45px;
+    }
+    .opt-btn {
+        min-width: 220px;
+        height: 60px;
+        font-size: 22px;
+    }
+    #controls {
+        bottom: 10px;
+        right: 10px;
+        padding: 8px 15px;
+    }
+    #btn-roll {
+        padding: 10px 20px;
+        font-size: 18px;
+    }
+    .win-content {
+        padding: 20px 30px;
+    }
+    .win-title {
+        font-size: 32px;
     }
 }
-
-function updateHighlight() {
-    document.querySelectorAll('.char-opt').forEach(img => {
-        const path = img.getAttribute('src');
-        img.style.opacity = (path === selectedP1 || path === selectedP2) ? "0.5" : "1";
-        img.style.border = (path === selectedP1 || path === selectedP2) ? "3px solid red" : "2px solid white";
-    });
-}
-
-function startGame() {
-    if (!selectedP1 || !selectedP2) {
-        alert("兩位玩家都要選擇角色才能開始喔！");
-        return;
-    }
-
-    document.getElementById('start-screen').style.display = 'none';
-    document.getElementById('game-container').style.display = 'block';
-
-    const p1 = document.getElementById('p1');
-    const p2 = document.getElementById('p2');
-    p1.style.backgroundImage = `url('${selectedP1}')`;
-    p1.style.backgroundSize = "contain";
-    p1.style.backgroundRepeat = "no-repeat";
-
-    p2.style.backgroundImage = `url('${selectedP2}')`;
-    p2.style.backgroundSize = "contain";
-    p2.style.backgroundRepeat = "no-repeat";
-
-    updateDisplay();
-}
-
-// ===============================
-// ========== 音效與遊戲 ==========
-// ===============================
-const audio = {
-    bgm: new Audio('sounds/bgm.mp3'),
-    dice: new Audio('sounds/sounds_dice.mp3'),
-    win: new Audio('sounds/win.mp3')
-};
-audio.bgm.loop = true;
-audio.bgm.volume = 0.4;
-
-function toggleBGM() {
-    const btn = document.getElementById('music-ctrl');
-    if (audio.bgm.paused) {
-        audio.bgm.play();
-        btn.innerText = "🎵";
-    } else {
-        audio.bgm.pause();
-        btn.innerText = "🔇";
-    }
-}
-
-function playSound(name) {
-    if (audio[name]) {
-        audio[name].currentTime = 0;
-        audio[name].play().catch(() => {});
-    }
-}
-
-// ===============================
-// ========== 棋盤初始化 ==========
-// ===============================
-function init() {
-    const board = document.getElementById('board');
-    if (!board) return;
-    board.innerHTML = "";
-    let displayIndex = 1;
-    words = [];
-
-    for (let i = 0; i < 110; i++) {
-        if (i === 0) words.push("起點");
-        else if (i === 109) words.push("終點 🏆");
-        else if (traps.includes(i) || boosts.includes(i) || dinosaurs.includes(i)) words.push("");
-        else words.push("語文挑戰");
-    }
-
-    words.forEach((w, i) => {
-        const cell = document.createElement('div');
-        cell.className = 'cell';
-        cell.id = 'c' + i;
-
-        if (i === 109) {
-            cell.classList.add('goal-cell');
-            cell.innerHTML = `<div class="event-icon">🏆</div><div class="cell-text">終點</div>`;
-        } else {
-            let icon = "";
-            if (traps.includes(i)) { icon = "🍌"; cell.classList.add("trap-cell"); }
-            else if (boosts.includes(i)) { icon = "🚀"; cell.classList.add("boost-cell"); }
-            else if (dinosaurs.includes(i)) { icon = "🦖"; cell.classList.add("dino-cell"); }
-
-            let numHtml = i === 0 ? "" : `<span class="cell-index">${displayIndex++}</span>`;
-            cell.innerHTML = `${numHtml}${w ? "<div class='cell-text'>" + w + "</div>" : ""}
-                <span class='event-icon' style='${w ? "position:absolute;bottom:5px;right:8px;font-size:22px;" : "font-size:46px;"}'>${icon}</span>`;
-        }
-        board.appendChild(cell);
-    });
-    updateDisplay();
-}
-
-function updateDisplay() {
-    players.forEach((p, i) => {
-        const cell = document.getElementById('c' + p.pos);
-        const pEl = document.getElementById('p' + (i + 1));
-        if (!cell || !pEl) return;
-
-        const x = cell.offsetLeft + cell.offsetWidth / 2 - pEl.offsetWidth / 2;
-        pEl.style.left = x + "px";
-
-        if (cell.classList.contains('goal-cell')) {
-            pEl.style.top = cell.offsetTop + cell.offsetHeight / 2 - 20 + (i * 40) + "px";
-        } else {
-            const base = cell.offsetTop + cell.offsetHeight + 10;
-            pEl.style.top = base + (i === 0 ? 0 : 40) + "px";
-        }
-    });
-}
-
-// ===============================
-// ========== 擲骰子與移動 =========
-// ===============================
-async function roll() {
-    if (moving || waitingForClick) return;
-    playSound('dice');
-    document.getElementById('btn-roll').disabled = true;
-
-    dice = Math.floor(Math.random() * 6) + 1;
-    const diceBox = document.getElementById('dice-box');
-    diceBox.classList.add('rolling');
-
-    await new Promise(r => setTimeout(r, 600));
-    diceBox.classList.remove('rolling');
-    diceBox.className = '';
-    diceBox.classList.add('show-' + dice);
-
-    waitingForClick = true;
-    document.getElementById('p' + (turn + 1)).classList.add('can-move');
-}
-
-async function handlePlayerClick(pid) {
-    if (!waitingForClick || pid !== turn || moving) return;
-    waitingForClick = false;
-    document.getElementById('p' + (turn + 1)).classList.remove('can-move');
-
-    if (specialEventActive) {
-        let steps = pendingSteps;
-        specialEventActive = false;
-        pendingSteps = 0;
-        await moveSteps(pid, steps);
-        checkEndOrModal(pid);
-    } else {
-        await move(pid);
-        if (!specialEventActive) checkEndOrModal(pid);
-    }
-}
-
-async function move(pid) {
-    moving = true;
-    for (let i = 0; i < dice; i++) {
-        if (players[pid].pos < 109) {
-            players[pid].pos++;
-            updateDisplay();
-            await new Promise(r => setTimeout(r, 300));
-        }
-    }
-    moving = false;
-
-    const pos = players[pid].pos;
-    if (traps.includes(pos)) {
-        alert("🍌 踩到香蕉！後退 1 格");
-        prepareSpecialStep(pid, -1);
-    } else if (boosts.includes(pos)) {
-        alert("🚀 火箭！前進 5 格");
-        prepareSpecialStep(pid, 5);
-    } else if (dinosaurs.includes(pos)) {
-        alert("🦖 恐龍！後退 3 格");
-        prepareSpecialStep(pid, -3);
-    }
-}
-
-function prepareSpecialStep(pid, steps) {
-    waitingForClick = true;
-    specialEventActive = true;
-    pendingSteps = steps;
-    document.getElementById('p' + (pid + 1)).classList.add('can-move');
-}
-
-async function moveSteps(pid, steps) {
-    moving = true;
-    const dir = steps > 0;
-    for (let i = 0; i < Math.abs(steps); i++) {
-        if (dir) players[pid].pos = Math.min(109, players[pid].pos + 1);
-        else players[pid].pos = Math.max(0, players[pid].pos - 1);
-        updateDisplay();
-        await new Promise(r => setTimeout(r, 300));
-    }
-    moving = false;
-}
-
-function checkEndOrModal(pid) {
-    if (players[pid].pos === 109) {
-        playSound('win');
-        document.getElementById('win-modal').style.display = 'flex';
-        document.getElementById('win-player').innerText = `玩家 ${pid + 1} 獲勝！`;
-        return;
-    }
-
-    const pos = players[pid].pos;
-    if (traps.includes(pos) || boosts.includes(pos) || dinosaurs.includes(pos) || pos === 0) {
-        finishTurn();
-        return;
-    }
-    showModal();
-}
-
-// ===============================
-// ========== 題目視窗 ============
-// ===============================
-function showModal() {
-    const task = allTasks[Math.floor(Math.random() * allTasks.length)];
-    displaySpecificTask(task);
-    document.getElementById('modal-overlay').style.display = 'block';
-    document.getElementById('modal').style.display = 'block';
-}
-
-function displaySpecificTask(task) {
-    attempts = 3;
-    const content = document.getElementById('modal-content');
-    const actions = document.getElementById('modal-actions');
-    content.innerHTML = "";
-    actions.innerHTML = "";
-
-    let html = `<div class="challenge-container">`;
-    if (task.gif) html += `<img src="images/${task.gif}" class="task-img">`;
-    if (task.sentence) html += `<div class="sentence-box">${task.sentence}</div>`;
-    html += `<p class="question-text">${task.question}</p><div id="feedback-msg" style="height:24px;margin:8px 0;"></div></div>`;
-    content.innerHTML = html;
-
-    if (task.type === "reorder") {
-        const ansZone = document.createElement('div');
-        ansZone.id = "reorder-answer-zone";
-        ansZone.innerText = "點擊下方詞語加入這裡";
-        content.querySelector('.challenge-container').appendChild(ansZone);
-
-        const pool = document.createElement('div');
-        pool.id = "reorder-options-pool";
-        task.words.forEach(w => {
-            const b = document.createElement('button');
-            b.className = "opt-btn";
-            b.innerText = w;
-            b.onclick = () => {
-                if (b.classList.contains('used')) return;
-                b.classList.add('used');
-                const s = document.createElement('span');
-                s.className = "word-span";
-                s.innerText = w;
-                ansZone.appendChild(s);
-            };
-            pool.appendChild(b);
-        });
-        content.querySelector('.challenge-container').appendChild(pool);
-
-        const sub = document.createElement('button');
-        sub.className = "submit-btn";
-        sub.innerText = "提交";
-        sub.onclick = () => {
-            const user = Array.from(document.querySelectorAll('.word-span')).map(n => n.innerText).join('');
-            checkUserAnswer(user, task.answer);
-        };
-
-        const reset = document.createElement('button');
-        reset.className = "submit-btn";
-        reset.innerText = "重新再來";
-        reset.style.background = "#ed8936";
-        reset.onclick = () => {
-            ansZone.innerText = "點擊下方詞語加入這裡";
-            pool.querySelectorAll('.opt-btn').forEach(b => b.classList.remove('used'));
-        };
-
-        actions.appendChild(sub);
-        actions.appendChild(reset);
-        return;
-    }
-
-    task.options.forEach(opt => {
-        const b = document.createElement('button');
-        b.className = "opt-btn";
-        b.innerText = opt;
-        b.onclick = () => checkUserAnswer(opt, task.answer);
-        content.appendChild(b);
-    });
-}
-
-function checkUserAnswer(sel, ans) {
-    const fb = document.getElementById('feedback-msg');
-    if (sel === ans) {
-        fb.innerText = "🎉 答對了！";
-        fb.style.color = "#38a169";
-        document.getElementById('modal-actions').innerHTML = `<button onclick="closeModal()" class="finish-btn">完成</button>`;
-    } else {
-        attempts--;
-        if (attempts > 0) {
-            fb.innerText = `還有 ${attempts} 次機會！`;
-            fb.style.color = "#e53e3e";
-        } else {
-            fb.innerText = "💔 正確答案：" + ans;
-            fb.style.color = "#744210";
-            setTimeout(closeModal, 1600);
-        }
-    }
-}
-
-function closeModal() {
-    document.getElementById('modal-overlay').style.display = 'none';
-    document.getElementById('modal').style.display = 'none';
-    finishTurn();
-}
-
-function finishTurn() {
-    turn = 1 - turn;
-    const name = document.getElementById('player-turn-name');
-    name.innerText = `玩家 ${turn + 1}`;
-    name.style.color = turn === 0 ? "#3182ce" : "#d53f8c";
-    document.getElementById('btn-roll').disabled = false;
-}
-
-// ===============================
-// ========== 測試與重置 ==========
-// ===============================
-function testModal(type) {
-    const map = { fill: fillTasks, reorder: reorderTasks, match: matchTasks, radical: radicalTasks, punc: puncTasks, continue: continueTasks, stroke: strokeTasks, understand: understandTasks };
-    if (map[type]) displaySpecificTask(map[type][0]);
-}
-
-function restartGame() {
-    location.reload();
-}
-
-// 開始遊戲按鈕：切換頁面 + 顯示骰子
-function startGame() {
-    document.getElementById("start-screen").style.display = "none";
-    document.getElementById("game-container").style.display = "block";
-    document.getElementById("controls").style.display = "flex";
-    document.body.classList.add("game-active");
-}
-
-window.onload = init;
