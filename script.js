@@ -79,14 +79,14 @@ const continueTasks = [
     { type: "continue", question: "春天到了，美麗的蝴蝶在花朵上______________。", options: ["跳啊跳", "讀啊讀", "飛啊飛"], answer: "飛啊飛" }
 ];
 const strokeTasks = [
-    { type: "stroke", question: "哪一個字是依照「先中央後對稱」的筆順規則來寫的？", options: ["湖", "思", "小"], answer: "小" },
-    { type: "stroke", question: "哪一個字是依照「先中央後對稱」的筆順規則來寫的？", options: ["凹", "山", "凸"], answer: "山" },
-    { type: "stroke", question: "哪一個字是依照「中間主橫最後寫」的筆順規則來寫的？", options: ["日", "木", "子"], answer: "子" },
-    { type: "stroke", question: "哪一個字是依照「中間主橫最後寫」的筆順規則來寫的？", options: ["月", "母", "田"], answer: "母" },
-    { type: "stroke", question: "哪一個字是依照「中間主直最後寫」的筆順規則來寫的？", options: ["休", "中", "女"], answer: "中" },
-    { type: "stroke", question: "哪一個字是依照「中間主橫最後寫」的筆順規則來寫的？", options: ["車", "下", "主"], answer: "車" },
-    { type: "stroke", question: "哪一個字是依照「先進入後關門」的筆順規則來寫的？", options: ["甲", "口", "內"], answer: "口" },
-    { type: "stroke", question: "哪一個字是依照「先進入後關門」的筆順規則來寫的？", options: ["趣", "區", "固"], answer: "固" }];
+    { type: "stroke", question: "請選出「先中央後對稱」的字。", options: ["湖", "思", "小"], answer: "小" },
+    { type: "stroke", question: "請選出「先中央後對稱」的字。", options: ["凹", "山", "凸"], answer: "山" },
+    { type: "stroke", question: "請選出「中間主橫最後寫」的字。", options: ["日", "木", "子"], answer: "子" },
+    { type: "stroke", question: "請選出「中間主橫最後寫」的字。", options: ["月", "母", "田"], answer: "母" },
+    { type: "stroke", question: "請選出「中間主直最後寫」的字。", options: ["休", "中", "女"], answer: "中" },
+    { type: "stroke", question: "請選出「中間主橫最後寫」的字。", options: ["車", "下", "主"], answer: "車" },
+    { type: "stroke", question: "請選出「先進入後關門」的字。", options: ["甲", "口", "內"], answer: "口" },
+    { type: "stroke", question: "請選出「先進入後關門」的字。", options: ["趣", "區", "固"], answer: "固" }];
 const understandTasks = [
     { type: "understand", sentence: "「暑假，爸爸帶我坐飛機去北京遊玩，我們一起登上了長城。」", question: "我和爸爸去了哪裡？", options: ["香港", "上海", "北京"], answer: "北京" },
     { type: "understand", sentence: "「早上，媽媽去了理髮店。中午，媽媽去了麵包店。晚上，媽媽去了餐廳。」", question: "媽媽在中午的時候去了哪裡？", options: ["理髮店", "麵包店", "餐廳"], answer: "麵包店" },
