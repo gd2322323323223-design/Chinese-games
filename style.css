@@ -860,13 +860,27 @@ body:not(:has(#start-screen:not([style*="display: none"]))) #controls {
     border: 3px solid #fbc02d;
     border-radius: 12px;
     display: flex;
-    justify-content: center;
+    justify-content: flex-start;
     align-items: center;
-    flex-wrap: wrap; /* 只在必要時換行 */
-    gap: 6px;
-    padding: 10px;
+    flex-wrap: wrap;
+    gap: 2px; /* 詞語之間只有極小空隙 */
+    padding: 15px 20px;
     box-shadow: 0 4px 0 #f9a825;
+    font-size: 24px;
+    font-weight: bold;
+    color: #333;
 }
+#reorder-answer-zone .word-span {
+    display: inline-block;
+    padding: 0 2px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+#reorder-answer-zone .word-span:hover {
+    color: #d32f2f;
+    transform: scale(1.05);
+}
+
 #reorder-answer-zone .opt-btn {
     background: #fff;
     border: 2px solid #fbc02d;
