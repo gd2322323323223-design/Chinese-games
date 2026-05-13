@@ -36,12 +36,12 @@ body {
     min-height: 100vh;
 }
 
-/* ========== 關鍵修復：首頁強制顯示、置頂不被遮擋 ========== */
+/* ========== 修復 1：白膜變薄，背景透出 ========== */
 #start-screen {
     display: block !important;
     position: relative !important;
     z-index: 2000 !important;
-    background: rgba(255, 255, 255, 0.92) !important;
+    background: rgba(255, 255, 255, 0.3) !important; /* 這裡變透明 */
     min-height: 100vh !important;
     padding: 30px 20px !important;
 }
@@ -108,7 +108,7 @@ body {
     gap: 140px 15px !important; 
     padding: 40px 40px 150px 40px !important; 
     border-radius: 40px; 
-    background: rgba226, 210, 180, 0.7 !important; 
+    background: rgba(226, 210, 180, 0.7) !important; 
     backdrop-filter: none !important; 
     -webkit-backdrop-filter: none !important;
     border: 12px solid var(--wood-brown);
@@ -227,8 +227,6 @@ body {
     font-size: 55px !important;
     display: inline-block;
     filter: drop-shadow(2px 4px 10px rgba(0,0,0,0.6));
-    position: relative;
-    z-index: 5;
     animation: dino-breath 2s infinite ease-in-out;
 }
 .dino-cell:hover {
@@ -335,7 +333,9 @@ body {
     filter: drop-shadow(0 0 15px #48bb78) brightness(1.2) !important; 
 }
 
+/* ========== 修復 2 + 3：首頁隱藏控制區，遊戲才顯示 ========== */
 #controls {
+    display: none !important; /* 預設隱藏 */
     position: fixed;
     bottom: 20px;
     right: 20px;
@@ -346,17 +346,12 @@ body {
     border-radius: 50px !important;
     padding: 10px 25px !important;
     box-shadow: 0 4px 15px rgba(0,0,0,0.2) !important;
-    display: flex;
     align-items: center;
     gap: 15px;
     z-index: 1000;
 }
 body.game-active #controls {
     display: flex !important;
-}
-body:not(:has(#start-screen:not([style*="display: none"]))) #controls {
-    display: flex !important;
-    z-index: 9999 !important;
 }
 
 #dice-box {
