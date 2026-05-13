@@ -698,23 +698,22 @@ body:not(:has(#start-screen:not([style*="display: none"]))) #controls {
     cursor: pointer;
 }
 
-#modal.type-reorder {
+modal.type-reorder {
     width: 90% !important;
     max-width: 700px !important;
     max-height: 90vh !important;
     overflow-y: auto !important;
     padding: 15px !important;
 }
-
 #modal.type-reorder .challenge-container {
     display: flex;
     flex-direction: column;
-    gap: 10px; /* 縮小答題區與標題之間的空白 */
+    gap: 10px !important;
     width: 100%;
     align-items: center;
 }
 
-/* 答案方格（上方） */
+/* 答案區 */
 #reorder-answer-zone {
     width: 90%;
     min-height: 60px;
@@ -732,14 +731,14 @@ body:not(:has(#start-screen:not([style*="display: none"]))) #controls {
     font-weight: bold;
     color: #333;
 }
+
 #reorder-answer-zone .word-span {
     display: inline-block;
     padding: 0 2px;
-    /* 取消點擊移除的功能，所以去掉 hover 效果 */
-    cursor: default;
+    cursor: default; /* 不可點刪 */
 }
 
-/* 四素方格（下方選項池） */
+/* 選項池 */
 #reorder-options-pool {
     width: 90%;
     background: #e3f2fd;
@@ -763,7 +762,7 @@ body:not(:has(#start-screen:not([style*="display: none"]))) #controls {
     padding: 0 12px;
 }
 
-/* 讓提交/重來按鈕橫向排列 */
+/* 按鈕橫排 */
 #modal.type-reorder #modal-actions {
     display: flex !important;
     flex-direction: row !important;
