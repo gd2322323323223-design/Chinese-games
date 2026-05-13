@@ -170,7 +170,6 @@ function startGame() {
     if (gameContainer) { gameContainer.style.display = 'block'; gameContainer.style.visibility = 'visible'; }
     const ctrl = document.getElementById('controls');
     if (ctrl) ctrl.style.setProperty('display', 'flex', 'important');
-    const rollBtn = document.getElementById('btn-roll');
     setTimeout(updateDisplay, 100);
 }
 
@@ -263,7 +262,7 @@ async function roll() {
 }
 
 // ======================
-// 【核心行動邏輯 - 修正完成】
+// 【核心行動邏輯】
 // ======================
 async function handlePlayerClick(pid) {
     if (!waitingForClick || pid !== turn || moving) return;
@@ -431,13 +430,6 @@ function addToReorder(btn) {
     answerZone.appendChild(newSpan);
 }
 
-    // 移除提示文字
-    if (answerZone.querySelector('span[style]')) {
-        answerZone.innerHTML = "";
-    }
-    answerZone.appendChild(newSpan);
-}
-
 function checkUserAnswer(userSelect, correctAnswer) {
     const feedback = document.getElementById('feedback-msg');
     if (userSelect === correctAnswer) {
@@ -471,10 +463,27 @@ function finishTurn() {
     document.getElementById('btn-roll').disabled = false;
 }
 
+// 測試面板專用
+function testModal(type) {
+    let task;
+    switch(type) {
+        case 'fill': task = fillTasks[0]; break;
+        case 'reorder': task = reorderTasks[0]; break;
+        case 'match': task = matchTasks[0]; break;
+        case 'radical': task = radicalTasks[0]; break;
+        case 'punc': task = puncTasks[0]; break;
+        case 'continue': task = continueTasks[0]; break;
+        case 'stroke': task = strokeTasks[0]; break;
+        case 'understand': task = understandTasks[0]; break;
+        default: return;
+    }
+    displaySpecificTask(task);
+}
+
 function restartGame() { location.reload(); }
 window.onload = init;
 
-// 🔥 強制顯示骰子按鈕（終極修復）
+// 強制顯示骰子按鈕
 window.addEventListener('load', () => {
   const controls = document.getElementById('controls');
   if (controls) controls.style.display = 'flex';
