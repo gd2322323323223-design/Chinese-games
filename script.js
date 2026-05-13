@@ -3,7 +3,7 @@ let selectedP1 = "";
 let selectedP2 = "";
 let currentSelectingPlayer = 1; 
 let pendingSteps = 0; 
-let turn = 0, dice = 0, moving = false, timerInterval;
+let turn = 0, dice = 0, moving = false;
 let waitingForClick = false; 
 let specialEventActive = false;
 let attempts = 3; 
@@ -11,9 +11,9 @@ let attempts = 3;
 // 取消計分制，只比誰先到終點
 const players = [{pos: 0}, {pos: 0}];
 
-const traps = [1, 16, 39, 48, 61, 76, 96];
-const boosts = [8, 20, 32, 51, 68, 80, 90];
-const dinosaurs = [5, 12, 27, 43, 55, 70, 86, 103]; 
+const traps = [1, 16, 39, 48, 61, 76, 96];     // 香蕉 倒退1
+const boosts = [8, 20, 32, 51, 68, 80, 90];   // 火箭 前進5
+const dinosaurs = [5, 12, 27, 43, 55, 70, 86, 103]; // 恐龍 倒退3
 let words = []; 
 
 // --- 2. 完整題庫完全保留 ---
@@ -95,7 +95,7 @@ const strokeTasks = [
 
 const understandTasks = [
     { type: "understand", sentence: "「暑假，爸爸帶我坐飛機去北京遊玩，我們一起登上了長城。」", question: "我和爸爸去了哪裡？", options: ["香港", "上海", "北京"], answer: "北京" },
-    { type: "understand", sentence: "「早上，媽媽去了理髮店。中午，媽媽去了麵包店。晚上，媽媽去了餐廳。」", question: "媽媽在中午的時候去了哪裏？", options: ["理髮店", "麵包店", "餐廳"], answer: "麵包店" },
+    { type: "understand", sentence: "「早上，媽媽去了理髮店。中午，媽媽去了麵包店。晚上，媽媽去了餐廳。」", question: "媽媽在中午的時候去了哪裡？", options: ["理髮店", "麵包店", "餐廳"], answer: "麵包店" },
     { type: "understand", sentence: "「今天是小明七歲的生日。小方送了帽子，小美送了文具。」", question: "今天是誰的生日？", options: ["小明", "小方", "小美"], answer: "小明" },
     { type: "understand", sentence: "「夏天的晚上，池塘裏有兩隻青蛙坐在荷葉上呱呱地叫着。」", question: "池塘裏是誰在叫？", options: ["荷葉", "魚", "青蛙"], answer: "青蛙" },
     { type: "understand", sentence: "「弟弟喜歡吃雪糕。哥哥喜歡吃糖果。我喜歡吃餅乾。」", question: "弟弟喜歡吃甚麼？", options: ["餅乾", "糖果", "雪糕"], answer: "雪糕" },
@@ -116,7 +116,7 @@ function selectChar(element, imgPath) {
         selectedP1 = imgPath;
         const p1Preview = document.getElementById('p1-big-preview');
         if(p1Preview) {
-            p1Preview.style.background = "linear-gradient(135deg, rgba49, 130, 206, 0.4), rgba(255, 255, 255, 0.3))";
+            p1Preview.style.background = "linear-gradient(135deg, rgba(49, 130, 206, 0.4), rgba(255, 255, 255, 0.3))";
             p1Preview.innerHTML = `<img src="${imgPath}" class="pop-effect" style="width: 85%; height: 85%; object-fit: contain;">`;
         }
         currentSelectingPlayer = 2;
@@ -193,7 +193,7 @@ function startGame() {
     setTimeout(updateDisplay, 100);
 }
 
-// --- 4. 音效系統（保留你三個音效 + 背景音樂全程）---
+// --- 4. 音效系統 ---
 const audio = {
     bgm: new Audio('sounds/bgm.mp3'),
     dice: new Audio('sounds/sounds_dice.mp3'),
@@ -224,7 +224,7 @@ function playSound(name) {
     }
 }
 
-// --- 5. 棋盤移動 ---
+// --- 5. 棋盤初始化 ---
 function init() {
     const gameContainer = document.getElementById('game-container');
     if (gameContainer) gameContainer.style.display = 'none'; 
@@ -299,12 +299,14 @@ async function handlePlayerClick(pid) {
     document.getElementById('p' + (turn + 1)).classList.remove('can-move');
 
     if (specialEventActive) {
-        let steps = pendingSteps; specialEventActive = false; pendingSteps = 0;
+        let steps = pendingSteps; 
+        specialEventActive = false; 
+        pendingSteps = 0;
         await moveSteps(pid, steps);
-        checkEndOrModal(pid);
+        // 移動完直接檢查新位置
+        checkEndAndQuestion(pid);
     } else {
         await move(pid);
-        if (!specialEventActive) checkEndOrModal(pid);
     }
 }
 
@@ -312,50 +314,78 @@ async function move(pid) {
     moving = true;
     for(let i=0; i<dice; i++) {
         if (players[pid].pos < words.length - 1) {
-            players[pid].pos++; updateDisplay();
+            players[pid].pos++; 
+            updateDisplay();
             await new Promise(r => setTimeout(r, 300));
         }
     }
     moving = false;
-    const pos = players[pid].pos;
-    if(traps.includes(pos)) { alert("🍌 哎呀！踩到香蕉滑倒了。後退 1 格"); prepareSpecialStep(pid, -1); }
-    else if(boosts.includes(pos)) { alert("🚀 哈哈！坐上火箭衝刺！前進 5 格"); prepareSpecialStep(pid, 5); }
-    else if(dinosaurs.includes(pos)) { alert("🦖 哇！是大恐龍！後退 3 格"); prepareSpecialStep(pid, -3); }
-}
 
-function prepareSpecialStep(pid, steps) {
-    waitingForClick = true; specialEventActive = true; pendingSteps = steps;
-    document.getElementById('p' + (pid + 1)).classList.add('can-move');
+    let pos = players[pid].pos;
+
+    // 終點直接獲勝
+    if (pos === words.length - 1) {
+        playSound('win');
+        document.getElementById('win-modal').style.display = 'flex';
+        document.getElementById('win-player').textContent = `玩家 ${pid + 1}`;
+        return;
+    }
+
+    // 香蕉：倒退1格
+    if(traps.includes(pos)) {
+        alert("🍌 踩到香蕉，倒退 1 格");
+        await moveSteps(pid, -1);
+        return;
+    }
+    // 火箭：前進5格
+    if(boosts.includes(pos)) {
+        alert("🚀 踩到火箭，前進 5 格");
+        await moveSteps(pid, 5);
+        return;
+    }
+    // 恐龍：倒退3格
+    if(dinosaurs.includes(pos)) {
+        alert("🦖 踩到恐龍，倒退 3 格");
+        await moveSteps(pid, -3);
+        return;
+    }
+
+    // 普通格子 → 答題
+    showModal();
 }
 
 async function moveSteps(pid, steps) {
     moving = true;
     const isForward = steps > 0;
     for (let i = 0; i < Math.abs(steps); i++) {
-        if (isForward) { if (players[pid].pos < words.length - 1) players[pid].pos++; }
-        else { if (players[pid].pos > 0) players[pid].pos--; }
+        if (isForward) { 
+            if (players[pid].pos < words.length - 1) players[pid].pos++; 
+        } else { 
+            if (players[pid].pos > 0) players[pid].pos--; 
+        }
         updateDisplay();
         await new Promise(r => setTimeout(r, 300));
     }
     moving = false;
+
+    // 移動完檢查終點 / 普通格子答題
+    checkEndAndQuestion(pid);
 }
 
-async function checkEndOrModal(pid) {
-    const pos = players[pid].pos;
-    if (pos === words.length - 1) { 
-        playSound('win'); 
+// 統一檢查：是否終點，不是就強制彈題
+function checkEndAndQuestion(pid) {
+    let pos = players[pid].pos;
+    if (pos === words.length - 1) {
+        playSound('win');
         document.getElementById('win-modal').style.display = 'flex';
         document.getElementById('win-player').textContent = `玩家 ${pid + 1}`;
         return;
     }
-    else if (traps.includes(pos) || boosts.includes(pos) || dinosaurs.includes(pos) || pos === 0) {
-        finishTurn();
-    } else {
-        showModal();
-    }
+    // 只要不是終點，一律彈題目
+    showModal();
 }
 
-// --- 6. 題目彈窗 ---
+// --- 題目彈窗 ---
 function displaySpecificTask(task) {
     attempts = 3; 
     const modal = document.getElementById('modal');
@@ -409,22 +439,14 @@ function displaySpecificTask(task) {
             btn.onclick = () => checkUserAnswer(opt, task.answer);
             actions.appendChild(btn);
         });
-        document.getElementById('modal-overlay').style.display = 'block';
-        document.getElementById('modal').style.display = 'flex';
     }
+    document.getElementById('modal-overlay').style.display = 'block';
+    document.getElementById('modal').style.display = 'flex';
 }
 
 function showModal() {
     const task = allTasks[Math.floor(Math.random() * allTasks.length)];
     if (task) displaySpecificTask(task);
-}
-
-function testModal(targetType) {
-    const filteredTasks = allTasks.filter(t => t.type === targetType);
-    if (filteredTasks.length > 0) {
-        const task = filteredTasks[Math.floor(Math.random() * filteredTasks.length)];
-        displaySpecificTask(task);
-    }
 }
 
 function addToReorder(btn) {
@@ -462,16 +484,14 @@ function closeModal() {
     finishTurn();
 }
 
-// --- 關鍵修正：正常輪流回合制 ---
+// 回合輪流切換
 function finishTurn() {
-    // 換下一位玩家
     turn = 1 - turn;
     const tn = document.getElementById('player-turn-name');
     if (tn) {
         tn.innerText = "玩家 " + (turn + 1);
         tn.style.color = turn === 0 ? "#3182ce" : "#d53f8c";
     }
-    // 解鎖擲骰子按鈕，繼續下一輪
     document.getElementById('btn-roll').disabled = false;
 }
 
