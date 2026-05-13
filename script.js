@@ -347,10 +347,14 @@ function checkEndOrModal(pid) {
 function displaySpecificTask(task) {
     attempts = 3;
     const modal = document.getElementById('modal');
-    modal.className = ""; modal.classList.add('type-' + task.type);
+    modal.className = "";
+    modal.classList.add('type-' + task.type);
+
     const content = document.getElementById('modal-content');
     const actions = document.getElementById('modal-actions');
-    content.innerHTML = ""; actions.innerHTML = "";
+    content.innerHTML = "";
+    actions.innerHTML = "";
+
     let html = `<div class="challenge-container">`;
     if (task.gif) html += `<img src="images/${task.gif}" class="task-image">`;
     if (task.sentence) html += `<div class="task-sentence-box">${task.sentence}</div>`;
@@ -358,42 +362,42 @@ function displaySpecificTask(task) {
     content.innerHTML = html;
 
     if (task.type === "reorder") {
-        // 👉 生成「答案方格」（對應你圖片的上方）
         const answerZone = document.createElement('div');
         answerZone.id = "reorder-answer-zone";
-        answerZone.innerHTML = `<span style="color:#888; font-size:20px;">（點擊下方詞語加入這裡）</span>`;
+        answerZone.innerHTML = `<span style="color:#888; font-size:18px;">（點擊下方詞語加入這裡）</span>`;
         content.querySelector('.challenge-container').appendChild(answerZone);
 
-        // 👉 生成「四素方格」（對應你圖片的下方選項池）
         const optionsPool = document.createElement('div');
         optionsPool.id = "reorder-options-pool";
         task.words.forEach(w => {
             const btn = document.createElement('button');
-            btn.className = "opt-btn"; btn.innerText = w;
+            btn.className = "opt-btn";
+            btn.innerText = w;
             btn.onclick = () => addToReorder(btn);
             optionsPool.appendChild(btn);
         });
         content.querySelector('.challenge-container').appendChild(optionsPool);
 
-        // 提交按鈕
         const submitBtn = document.createElement('button');
-        submitBtn.className = "submit-btn"; submitBtn.innerText = "提交";
-        // 提交按鈕部分改成這樣
-submitBtn.onclick = () => {
-    const user = Array.from(document.getElementById('reorder-answer-zone').children)
-        .filter(el => el.classList.contains('word-span'))
-        .map(n => n.innerText).join("");
-    checkUserAnswer(user, task.answer);
-};
+        submitBtn.className = "submit-btn";
+        submitBtn.innerText = "提交";
+        submitBtn.onclick = () => {
+            const user = Array.from(document.getElementById('reorder-answer-zone').children)
+                .filter(el => el.classList.contains('word-span'))
+                .map(n => n.innerText).join("");
+            checkUserAnswer(user, task.answer);
+        };
         actions.appendChild(submitBtn);
     } else {
         task.options.forEach(opt => {
             const btn = document.createElement('button');
-            btn.className = "opt-btn"; btn.innerText = opt;
+            btn.className = "opt-btn";
+            btn.innerText = opt;
             btn.onclick = () => checkUserAnswer(opt, task.answer);
             actions.appendChild(btn);
         });
     }
+
     document.getElementById('modal-overlay').style.display = 'block';
     document.getElementById('modal').style.display = 'flex';
 }
@@ -406,22 +410,26 @@ function showModal() {
 function addToReorder(btn) {
     const answerZone = document.getElementById('reorder-answer-zone');
     if (!answerZone || btn.classList.contains('used')) return;
-    btn.classList.add('used');
 
-    // 創建 span 元素，而不是按鈕
+    btn.classList.add('used');
     const newSpan = document.createElement('span');
     newSpan.className = "word-span";
     newSpan.innerText = btn.innerText;
 
-    // 點擊可以移除
     newSpan.onclick = function () {
         this.remove();
         btn.classList.remove('used');
-        // 如果答案區空了，恢復提示文字
         if (answerZone.children.length === 0) {
             answerZone.innerHTML = `<span style="color:#888; font-size:18px;">（點擊下方詞語加入這裡）</span>`;
         }
     };
+
+    if (answerZone.querySelector('span[style]')) {
+        answerZone.innerHTML = "";
+    }
+
+    answerZone.appendChild(newSpan);
+}
 
     // 移除提示文字
     if (answerZone.querySelector('span[style]')) {
