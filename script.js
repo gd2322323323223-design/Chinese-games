@@ -406,17 +406,26 @@ function addToReorder(btn) {
     const answerZone = document.getElementById('reorder-answer-zone');
     if (!answerZone || btn.classList.contains('used')) return;
     btn.classList.add('used');
+
+    // 創建答案區的按鈕，樣式自動適應
     const newBtn = document.createElement('button');
-    newBtn.className = "opt-btn"; newBtn.innerText = btn.innerText;
+    newBtn.className = "opt-btn";
+    newBtn.innerText = btn.innerText;
+    newBtn.style.minWidth = "auto";
+    newBtn.style.padding = "0 12px";
+    newBtn.style.height = "45px";
+    newBtn.style.fontSize = "20px";
+
     // 點擊答案區的詞語，可以移除
     newBtn.onclick = function () {
-        this.remove(); 
+        this.remove();
         btn.classList.remove('used');
-        // 如果答案區空了，顯示提示文字
+        // 如果答案區空了，恢復提示文字
         if (answerZone.children.length === 0) {
-            answerZone.innerHTML = `<span style="color:#888; font-size:20px;">（點擊下方詞語加入這裡）</span>`;
+            answerZone.innerHTML = `<span style="color:#888; font-size:18px;">（點擊下方詞語加入這裡）</span>`;
         }
     };
+
     // 移除提示文字
     if (answerZone.querySelector('span')) {
         answerZone.innerHTML = "";
