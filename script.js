@@ -438,3 +438,12 @@ function finishTurn() {
 
 function restartGame() { location.reload(); }
 window.onload = init;
+
+// 🔥 強制顯示骰子按鈕（終極修復）
+window.addEventListener('load', () => {
+  const controls = document.getElementById('controls');
+  if (controls) controls.style.display = 'flex';
+  
+  const btn = document.getElementById('btn-roll');
+  if (btn) btn.disabled = false;
+});
