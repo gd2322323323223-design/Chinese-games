@@ -343,6 +343,13 @@ function checkEndOrModal(pid) {
 }
 
 // 題目系統
+function showModal() {
+    const task = allTasks[Math.floor(Math.random() * allTasks.length)];
+    displaySpecificTask(task);
+    document.getElementById('modal-overlay').style.display = 'block';
+    document.getElementById('modal').style.display = 'flex';
+}
+
 function displaySpecificTask(task) {
     attempts = 3;
     const modal = document.getElementById('modal');
@@ -360,48 +367,76 @@ function displaySpecificTask(task) {
     html += `<p class="task-question">${task.question}</p><div id="feedback-msg" style="min-height:30px;"></div></div>`;
     content.innerHTML = html;
 
+    // --------------------------
+    // ✅ 重組句子（你要求的 3 個優化）
+    // --------------------------
     if (task.type === "reorder") {
-    const answerZone = document.createElement('div');
-    answerZone.id = "reorder-answer-zone";
-    answerZone.innerHTML = `<span style="color:#888; font-size:18px;">（點擊下方詞語加入這裡）</span>`;
-    content.querySelector('.challenge-container').appendChild(answerZone);
+        const answerZone = document.createElement('div');
+        answerZone.id = "reorder-answer-zone";
+        answerZone.innerHTML = `<span style="color:#888; font-size:18px;">點擊下方詞語加入這裡</span>`;
+        content.querySelector('.challenge-container').appendChild(answerZone);
 
-    const optionsPool = document.createElement('div');
-    optionsPool.id = "reorder-options-pool";
-    task.words.forEach(w => {
-        const btn = document.createElement('button');
-        btn.className = "opt-btn";
-        btn.innerText = w;
-        btn.onclick = () => addToReorder(btn);
-        optionsPool.appendChild(btn);
-    });
-    content.querySelector('.challenge-container').appendChild(optionsPool);
-
-    // 橫向的提交 + 重來按鈕
-    const submitBtn = document.createElement('button');
-    submitBtn.className = "submit-btn";
-    submitBtn.innerText = "提交";
-    submitBtn.onclick = () => {
-        const user = Array.from(document.getElementById('reorder-answer-zone').children)
-            .filter(el => el.classList.contains('word-span'))
-            .map(n => n.innerText).join("");
-        checkUserAnswer(user, task.answer);
-    };
-
-    const resetBtn = document.createElement('button');
-    resetBtn.className = "submit-btn";
-    resetBtn.style.background = "linear-gradient(135deg, #ed8936 0%, #dd6b20 100%) !important";
-    resetBtn.innerText = "重新再來";
-    resetBtn.onclick = () => {
-        // 清空答案區 + 恢復所有選項按鈕
-        answerZone.innerHTML = `<span style="color:#888; font-size:18px;">（點擊下方詞語加入這裡）</span>`;
-        optionsPool.querySelectorAll('.opt-btn').forEach(btn => {
-            btn.classList.remove('used');
+        const optionsPool = document.createElement('div');
+        optionsPool.id = "reorder-options-pool";
+        task.words.forEach(w => {
+            const btn = document.createElement('button');
+            btn.className = "opt-btn";
+            btn.innerText = w;
+            btn.onclick = () => addToReorder(btn);
+            optionsPool.appendChild(btn);
         });
-    };
+        content.querySelector('.challenge-container').appendChild(optionsPool);
 
-    actions.appendChild(submitBtn);
-    actions.appendChild(resetBtn);
+        // 提交按鈕
+        const submitBtn = document.createElement('button');
+        submitBtn.className = "submit-btn";
+        submitBtn.innerText = "提交";
+        submitBtn.onclick = () => {
+            const user = Array.from(document.getElementById('reorder-answer-zone').children)
+                .filter(el => el.classList.contains('word-span'))
+                .map(n => n.innerText).join("");
+            checkUserAnswer(user, task.answer);
+        };
+
+        // 重新再來按鈕
+        const resetBtn = document.createElement('button');
+        resetBtn.className = "submit-btn";
+        resetBtn.style.background = "linear-gradient(135deg, #ed8936 0%, #dd6b20 100%)";
+        resetBtn.innerText = "重新再來";
+        resetBtn.onclick = () => {
+            answerZone.innerHTML = `<span style="color:#888; font-size:18px;">點擊下方詞語加入這裡</span>`;
+            optionsPool.querySelectorAll('.opt-btn').forEach(b => b.classList.remove('used'));
+        };
+
+        actions.appendChild(submitBtn);
+        actions.appendChild(resetBtn);
+        return;
+    }
+
+    // 其他題型
+    if (task.options) {
+        task.options.forEach((opt, i) => {
+            const btn = document.createElement('button');
+            btn.className = "opt-btn";
+            btn.innerText = opt;
+            btn.onclick = () => checkUserAnswer(opt, task.answer);
+            content.appendChild(btn);
+        });
+    }
+}
+
+// --------------------------
+// ✅ 重組句子加入詞語（已修復）
+// --------------------------
+function addToReorder(btn) {
+    const answerZone = document.getElementById('reorder-answer-zone');
+    if (!answerZone || btn.classList.contains('used')) return;
+
+    btn.classList.add('used');
+    const newSpan = document.createElement('span');
+    newSpan.className = "word-span";
+    newSpan.innerText = btn.innerText;
+    answerZone.appendChild(newSpan);
 }
 
 function checkUserAnswer(userSelect, correctAnswer) {
