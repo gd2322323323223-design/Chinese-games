@@ -171,7 +171,6 @@ function startGame() {
     const ctrl = document.getElementById('controls');
     if (ctrl) ctrl.style.setProperty('display', 'flex', 'important');
     const rollBtn = document.getElementById('btn-roll');
-    if (rollBtn) { rollBtn.disabled = false; }
     setTimeout(updateDisplay, 100);
 }
 
