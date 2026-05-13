@@ -527,13 +527,34 @@ body:not(:has(#start-screen:not([style*="display: none"]))) #controls {
     background: #f8fbff;
 }
 
+/* 左上角的「答題區」標題 */
+#reorder-answer-zone::before {
+    content: "答題區";
+    position: absolute;
+    top: -25px;
+    left: 0;
+    font-size: 16px; /* 和「剩餘時間」字體大小一致 */
+    color: #333;
+    font-weight: bold;
+}
+
+/* 隱藏「點擊下方詞語加入這裡」的預設文字 */
+#reorder-answer-zone:empty::after {
+    content: "";
+}
+
+/* 選項按鈕 - 縮短長度、調整間距 */
+#reorder-options-pool .opt-btn {
+    min-width: auto; /* 取消固定寬度，讓按鈕自動適應內容 */
+    width: auto;
+    padding: 10px 20px; /* 減少左右內邊距，縮短按鈕長度 */
+    font-size: 22px; /* 保持字體大小不變 */
+}
+
+/* 調整選項之間的間距 */
 #reorder-options-pool {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 12px;
-    margin: 20px 0;
-    padding: 0 10px;
+    gap: 10px; /* 減少按鈕之間的空隙 */
+    margin: 15px 0;
 }
 
 .word-span {
