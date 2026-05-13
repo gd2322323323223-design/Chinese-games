@@ -101,6 +101,21 @@
         <button onclick="document.getElementById('test-panel').remove()" style="background:#f56565; color:white; border:none; margin-top:5px; cursor:pointer;">❌ 關閉測試面板</button>
     </div>
 
+    <!-- 測試面板 -->
+<div id="test-panel" style="position:fixed;top:10px;right:10px;z-index:9999;background:#fff;padding:15px;border:3px solid #3182ce;border-radius:12px;">
+  <p style="margin:0 0 10px 0;font-weight:bold;">快速測試題型</p>
+  <button onclick="testModal('fill')" style="margin:3px;padding:6px 10px;">填充題</button>
+  <button onclick="testModal('reorder')" style="margin:3px;padding:6px 10px;">重組句</button>
+  <button onclick="testModal('match')" style="margin:3px;padding:6px 10px;">圖詞配對</button>
+  <button onclick="testModal('radical')" style="margin:3px;padding:6px 10px;">偏旁部首</button>
+  <button onclick="testModal('punc')" style="margin:3px;padding:6px 10px;">標點符號</button>
+  <button onclick="testModal('continue')" style="margin:3px;padding:6px 10px;">句子延續</button>
+  <button onclick="testModal('stroke')" style="margin:3px;padding:6px 10px;">筆順結構</button>
+  <button onclick="testModal('understand')" style="margin:3px;padding:6px 10px;">閱讀理解</button>
+  <br>
+  <button onclick="restartGame()" style="margin-top:8px;padding:6px 10px;background:#e53e3e;color:#fff;border:none;border-radius:6px;">重新開始遊戲</button>
+</div>
+
     <script src="script.js"></script>
 </body>
 </html>
