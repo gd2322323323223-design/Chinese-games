@@ -870,3 +870,12 @@ body:not(:has(#start-screen:not([style*="display: none"]))) #controls {
         font-size: 32px;
     }
 }
+
+/* 修復：測試面板 & 彈窗 優先級最高，不被首頁擋住 */
+#test-panel {
+  z-index: 99999 !important;
+}
+#modal-overlay,
+#modal {
+  z-index: 999999 !important;
+}
