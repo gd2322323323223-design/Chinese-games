@@ -99,81 +99,87 @@ const understandTasks = [
 ];
 const allTasks = [...fillTasks, ...reorderTasks, ...matchTasks, ...radicalTasks, ...puncTasks, ...continueTasks, ...strokeTasks, ...understandTasks];
 
-// --- 角色選擇 ---
+// ===============================
+// ========= 角色選擇系統 =========
+// ===============================
 function selectChar(element, imgPath) {
-    if (currentSelectingPlayer === 1 && selectedP1 === imgPath) { resetSelection(1); return; }
-    if (currentSelectingPlayer === 2 && selectedP2 === imgPath) { resetSelection(2); return; }
-    if (imgPath === selectedP1 || imgPath === selectedP2) { alert("這個角色已經被選走囉！"); return; }
+    // 防止重覆選擇同一個角色
+    if (selectedP1 === imgPath || selectedP2 === imgPath) {
+        alert("這個角色已經被選走囉！");
+        return;
+    }
+
     if (currentSelectingPlayer === 1) {
         selectedP1 = imgPath;
-        const p1Preview = document.getElementById('p1-big-preview');
-        if (p1Preview) {
-            p1Preview.style.background = "linear-gradient(135deg, rgba(49,130,206,0.4), rgba(255,255,255,0.3))";
-            p1Preview.innerHTML = `<img src="${imgPath}" class="pop-effect" style="width:85%;height:85%;object-fit:contain;">`;
-        }
+        const preview = document.getElementById('p1-big-preview');
+        preview.innerHTML = `<img src="${imgPath}" style="width:90%;height:90%;object-fit:contain;">`;
         currentSelectingPlayer = 2;
-        updateHint("請 玩家 2 選擇一個角色", "#d53f8c");
+        updateHint("請 玩家 2 選擇角色", "#d53f8c");
     } else {
         selectedP2 = imgPath;
-        const p2Preview = document.getElementById('p2-big-preview');
-        if (p2Preview) {
-            p2Preview.style.background = "linear-gradient(135deg, rgba(213,63,140,0.4), rgba(255,255,255,0.3))";
-            p2Preview.innerHTML = `<img src="${imgPath}" class="pop-effect" style="width:85%;height:85%;object-fit:contain;">`;
-        }
-        updateHint("選擇完成！可以點擊下方按鈕開始遊戲。", "#48bb78");
+        const preview = document.getElementById('p2-big-preview');
+        preview.innerHTML = `<img src="${imgPath}" style="width:90%;height:90%;object-fit:contain;">`;
+        updateHint("選擇完成！點擊開始遊戲", "#48bb78");
     }
     updateHighlight();
 }
+
 function resetSelection(playerNum) {
     if (playerNum === 1) {
-        selectedP1 = ""; currentSelectingPlayer = 1;
-        const p1Preview = document.getElementById('p1-big-preview');
-        if (p1Preview) {
-            p1Preview.style.background = "rgba(255,255,255,0.3)";
-            p1Preview.innerHTML = `<span style="color:#fff;font-weight:bold;">P1 棋子</span>`;
-        }
+        selectedP1 = "";
+        currentSelectingPlayer = 1;
+        document.getElementById('p1-big-preview').innerHTML = `<span class="placeholder-text">P1 棋子</span>`;
         updateHint("請 玩家 1 重新選擇角色", "#3182ce");
     } else {
-        selectedP2 = ""; currentSelectingPlayer = 2;
-        const p2Preview = document.getElementById('p2-big-preview');
-        if (p2Preview) {
-            p2Preview.style.background = "rgba(255,255,255,0.3)";
-            p2Preview.innerHTML = `<span style="color:#fff;font-weight:bold;">P2 棋子</span>`;
-        }
+        selectedP2 = "";
+        currentSelectingPlayer = 2;
+        document.getElementById('p2-big-preview').innerHTML = `<span class="placeholder-text">P2 棋子</span>`;
         updateHint("請 玩家 2 重新選擇角色", "#d53f8c");
     }
     updateHighlight();
 }
+
 function updateHint(text, color) {
-    const hint = document.getElementById('selection-hint');
-    if (hint) { hint.innerText = text; hint.style.color = color; }
-}
-function updateHighlight() {
-    const opts = document.querySelectorAll('.char-opt');
-    opts.forEach(opt => {
-        const path = opt.getAttribute('src');
-        opt.classList.remove('selected-p1', 'selected-p2');
-        opt.style.opacity = (path === selectedP2 && selectedP2) ? "0.6" : "1";
-        if (path === selectedP1) opt.classList.add('selected-p1');
-        if (path === selectedP2) opt.classList.add('selected-p2');
-    });
-}
-function startGame() {
-    if (!selectedP1 || !selectedP2) { alert("兩位玩家都必須選擇角色喔！"); return; }
-    const p1 = document.getElementById('p1'), p2 = document.getElementById('p2');
-    p1.style.backgroundImage = `url('${selectedP1}')`;
-    p1.style.backgroundSize = "contain"; p1.style.backgroundRepeat = "no-repeat";
-    p2.style.backgroundImage = `url('${selectedP2}')`;
-    p2.style.backgroundSize = "contain"; p2.style.backgroundRepeat = "no-repeat";
-    document.getElementById('start-screen').style.display = 'none';
-    const gameContainer = document.getElementById('game-container');
-    if (gameContainer) { gameContainer.style.display = 'block'; gameContainer.style.visibility = 'visible'; }
-    const ctrl = document.getElementById('controls');
-    if (ctrl) ctrl.style.setProperty('display', 'flex', 'important');
-    setTimeout(updateDisplay, 100);
+    const el = document.getElementById('selection-hint');
+    if (el) {
+        el.innerText = text;
+        el.style.color = color;
+    }
 }
 
-// 音效
+function updateHighlight() {
+    document.querySelectorAll('.char-opt').forEach(img => {
+        const path = img.getAttribute('src');
+        img.style.opacity = (path === selectedP1 || path === selectedP2) ? "0.5" : "1";
+        img.style.border = (path === selectedP1 || path === selectedP2) ? "3px solid red" : "2px solid white";
+    });
+}
+
+function startGame() {
+    if (!selectedP1 || !selectedP2) {
+        alert("兩位玩家都要選擇角色才能開始喔！");
+        return;
+    }
+
+    document.getElementById('start-screen').style.display = 'none';
+    document.getElementById('game-container').style.display = 'block';
+
+    const p1 = document.getElementById('p1');
+    const p2 = document.getElementById('p2');
+    p1.style.backgroundImage = `url('${selectedP1}')`;
+    p1.style.backgroundSize = "contain";
+    p1.style.backgroundRepeat = "no-repeat";
+
+    p2.style.backgroundImage = `url('${selectedP2}')`;
+    p2.style.backgroundSize = "contain";
+    p2.style.backgroundRepeat = "no-repeat";
+
+    updateDisplay();
+}
+
+// ===============================
+// ========== 音效與遊戲 ==========
+// ===============================
 const audio = {
     bgm: new Audio('sounds/bgm.mp3'),
     dice: new Audio('sounds/sounds_dice.mp3'),
@@ -181,89 +187,104 @@ const audio = {
 };
 audio.bgm.loop = true;
 audio.bgm.volume = 0.4;
-window.addEventListener('load', () => audio.bgm.play().catch(() => { }));
+
 function toggleBGM() {
     const btn = document.getElementById('music-ctrl');
-    if (audio.bgm.paused) { audio.bgm.play(); btn.innerText = "🎵"; }
-    else { audio.bgm.pause(); btn.innerText = "🔇"; }
-}
-function playSound(name) {
-    if (audio[name]) { audio[name].currentTime = 0; audio[name].play().catch(() => { }); }
+    if (audio.bgm.paused) {
+        audio.bgm.play();
+        btn.innerText = "🎵";
+    } else {
+        audio.bgm.pause();
+        btn.innerText = "🔇";
+    }
 }
 
-// 棋盤
+function playSound(name) {
+    if (audio[name]) {
+        audio[name].currentTime = 0;
+        audio[name].play().catch(() => {});
+    }
+}
+
+// ===============================
+// ========== 棋盤初始化 ==========
+// ===============================
 function init() {
     const board = document.getElementById('board');
     if (!board) return;
-    board.innerHTML = ""; let displayIndex = 1; words = [];
+    board.innerHTML = "";
+    let displayIndex = 1;
+    words = [];
+
     for (let i = 0; i < 110; i++) {
         if (i === 0) words.push("起點");
         else if (i === 109) words.push("終點 🏆");
         else if (traps.includes(i) || boosts.includes(i) || dinosaurs.includes(i)) words.push("");
         else words.push("語文挑戰");
     }
+
     words.forEach((w, i) => {
         const cell = document.createElement('div');
-        cell.className = 'cell'; cell.id = 'c' + i;
-        if (i === words.length - 1) {
+        cell.className = 'cell';
+        cell.id = 'c' + i;
+
+        if (i === 109) {
             cell.classList.add('goal-cell');
             cell.innerHTML = `<div class="event-icon">🏆</div><div class="cell-text">終點</div>`;
         } else {
-            let iconText = "";
-            if (traps.includes(i)) { iconText = "🍌"; cell.classList.add('trap-cell'); }
-            else if (boosts.includes(i)) { iconText = "🚀"; cell.classList.add('boost-cell'); }
-            else if (dinosaurs.includes(i)) { iconText = "🦖"; cell.classList.add('dino-cell'); }
-            let numberHtml = (!i || iconText) ? "" : `<span class="cell-index">${displayIndex++}</span>`;
-            cell.innerHTML = `${numberHtml}${w ? "<div class='cell-text'>" + w + "</div>" : ""}<span class="event-icon" style="${w ? 'position:absolute;bottom:5px;right:8px;font-size:24px;' : 'font-size:50px;'}">${iconText}</span>`;
+            let icon = "";
+            if (traps.includes(i)) { icon = "🍌"; cell.classList.add("trap-cell"); }
+            else if (boosts.includes(i)) { icon = "🚀"; cell.classList.add("boost-cell"); }
+            else if (dinosaurs.includes(i)) { icon = "🦖"; cell.classList.add("dino-cell"); }
+
+            let numHtml = i === 0 ? "" : `<span class="cell-index">${displayIndex++}</span>`;
+            cell.innerHTML = `${numHtml}${w ? "<div class='cell-text'>" + w + "</div>" : ""}
+                <span class='event-icon' style='${w ? "position:absolute;bottom:5px;right:8px;font-size:22px;" : "font-size:46px;"}'>${icon}</span>`;
         }
         board.appendChild(cell);
     });
-    setTimeout(updateDisplay, 100);
+    updateDisplay();
 }
+
 function updateDisplay() {
     players.forEach((p, i) => {
         const cell = document.getElementById('c' + p.pos);
         const pEl = document.getElementById('p' + (i + 1));
         if (!cell || !pEl) return;
-        const centerX = cell.offsetLeft + cell.offsetWidth / 2 - pEl.offsetWidth / 2;
-        pEl.style.left = centerX + 'px';
+
+        const x = cell.offsetLeft + cell.offsetWidth / 2 - pEl.offsetWidth / 2;
+        pEl.style.left = x + "px";
+
         if (cell.classList.contains('goal-cell')) {
-            pEl.style.top = (cell.offsetTop + cell.offsetHeight / 2 + (i === 0 ? -40 : 20)) + 'px';
+            pEl.style.top = cell.offsetTop + cell.offsetHeight / 2 - 20 + (i * 40) + "px";
         } else {
-            const roadAreaTop = cell.offsetTop + cell.offsetHeight + 15;
-            pEl.style.top = (i === 0 ? roadAreaTop - 10 : roadAreaTop + 35) + 'px';
+            const base = cell.offsetTop + cell.offsetHeight + 10;
+            pEl.style.top = base + (i === 0 ? 0 : 40) + "px";
         }
     });
 }
 
-// 擲骰子
+// ===============================
+// ========== 擲骰子與移動 =========
+// ===============================
 async function roll() {
     if (moving || waitingForClick) return;
     playSound('dice');
-    const rollBtn = document.getElementById('btn-roll');
-    if (rollBtn) rollBtn.disabled = true;
+    document.getElementById('btn-roll').disabled = true;
+
+    dice = Math.floor(Math.random() * 6) + 1;
     const diceBox = document.getElementById('dice-box');
-    const num = Math.floor(Math.random() * 6) + 1;
-    const rotations = {
-        1: 'rotateX(0deg) rotateY(0deg)',
-        2: 'rotateX(0deg) rotateY(180deg)',
-        3: 'rotateX(0deg) rotateY(-90deg)',
-        4: 'rotateX(0deg) rotateY(90deg)',
-        5: 'rotateX(-90deg) rotateY(0deg)',
-        6: 'rotateX(90deg) rotateY(0deg)'
-    };
-    diceBox.style.transform = `rotateX(${Math.random() * 360 + 720}deg) rotateY(${Math.random() * 360 + 720}deg)`;
+    diceBox.classList.add('rolling');
+
     await new Promise(r => setTimeout(r, 600));
-    diceBox.style.transform = rotations[num];
-    await new Promise(r => setTimeout(r, 400));
-    dice = num;
+    diceBox.classList.remove('rolling');
+    diceBox.className = '';
+    diceBox.classList.add('show-' + dice);
+
     waitingForClick = true;
     document.getElementById('p' + (turn + 1)).classList.add('can-move');
 }
 
-// ======================
-// 【核心行動邏輯】
-// ======================
 async function handlePlayerClick(pid) {
     if (!waitingForClick || pid !== turn || moving) return;
     waitingForClick = false;
@@ -284,7 +305,7 @@ async function handlePlayerClick(pid) {
 async function move(pid) {
     moving = true;
     for (let i = 0; i < dice; i++) {
-        if (players[pid].pos < words.length - 1) {
+        if (players[pid].pos < 109) {
             players[pid].pos++;
             updateDisplay();
             await new Promise(r => setTimeout(r, 300));
@@ -294,13 +315,13 @@ async function move(pid) {
 
     const pos = players[pid].pos;
     if (traps.includes(pos)) {
-        alert("🍌 踩到香蕉！請再點擊棋子後退 1 格");
+        alert("🍌 踩到香蕉！後退 1 格");
         prepareSpecialStep(pid, -1);
     } else if (boosts.includes(pos)) {
-        alert("🚀 踩到火箭！請再點擊棋子前進 5 格");
+        alert("🚀 火箭！前進 5 格");
         prepareSpecialStep(pid, 5);
     } else if (dinosaurs.includes(pos)) {
-        alert("🦖 踩到恐龍！請再點擊棋子後退 3 格");
+        alert("🦖 恐龍！後退 3 格");
         prepareSpecialStep(pid, -3);
     }
 }
@@ -314,13 +335,10 @@ function prepareSpecialStep(pid, steps) {
 
 async function moveSteps(pid, steps) {
     moving = true;
-    const isForward = steps > 0;
+    const dir = steps > 0;
     for (let i = 0; i < Math.abs(steps); i++) {
-        if (isForward) {
-            if (players[pid].pos < words.length - 1) players[pid].pos++;
-        } else {
-            if (players[pid].pos > 0) players[pid].pos--;
-        }
+        if (dir) players[pid].pos = Math.min(109, players[pid].pos + 1);
+        else players[pid].pos = Math.max(0, players[pid].pos - 1);
         updateDisplay();
         await new Promise(r => setTimeout(r, 300));
     }
@@ -328,13 +346,14 @@ async function moveSteps(pid, steps) {
 }
 
 function checkEndOrModal(pid) {
-    const pos = players[pid].pos;
-    if (pos === words.length - 1) {
+    if (players[pid].pos === 109) {
         playSound('win');
         document.getElementById('win-modal').style.display = 'flex';
-        document.getElementById('win-player').textContent = `玩家 ${pid + 1}`;
+        document.getElementById('win-player').innerText = `玩家 ${pid + 1} 獲勝！`;
         return;
     }
+
+    const pos = players[pid].pos;
     if (traps.includes(pos) || boosts.includes(pos) || dinosaurs.includes(pos) || pos === 0) {
         finishTurn();
         return;
@@ -342,115 +361,99 @@ function checkEndOrModal(pid) {
     showModal();
 }
 
-// 題目系統
+// ===============================
+// ========== 題目視窗 ============
+// ===============================
 function showModal() {
     const task = allTasks[Math.floor(Math.random() * allTasks.length)];
     displaySpecificTask(task);
     document.getElementById('modal-overlay').style.display = 'block';
-    document.getElementById('modal').style.display = 'flex';
+    document.getElementById('modal').style.display = 'block';
 }
 
 function displaySpecificTask(task) {
     attempts = 3;
-    const modal = document.getElementById('modal');
-    modal.className = "";
-    modal.classList.add('type-' + task.type);
-
     const content = document.getElementById('modal-content');
     const actions = document.getElementById('modal-actions');
     content.innerHTML = "";
     actions.innerHTML = "";
 
     let html = `<div class="challenge-container">`;
-    if (task.gif) html += `<img src="images/${task.gif}" class="task-image">`;
-    if (task.sentence) html += `<div class="task-sentence-box">${task.sentence}</div>`;
-    html += `<p class="task-question">${task.question}</p><div id="feedback-msg" style="min-height:30px;"></div></div>`;
+    if (task.gif) html += `<img src="images/${task.gif}" class="task-img">`;
+    if (task.sentence) html += `<div class="sentence-box">${task.sentence}</div>`;
+    html += `<p class="question-text">${task.question}</p><div id="feedback-msg" style="height:24px;margin:8px 0;"></div></div>`;
     content.innerHTML = html;
 
-    // --------------------------
-    // ✅ 重組句子（你要求的 3 個優化）
-    // --------------------------
     if (task.type === "reorder") {
-        const answerZone = document.createElement('div');
-        answerZone.id = "reorder-answer-zone";
-        answerZone.innerHTML = `<span style="color:#888; font-size:18px;">點擊下方詞語加入這裡</span>`;
-        content.querySelector('.challenge-container').appendChild(answerZone);
+        const ansZone = document.createElement('div');
+        ansZone.id = "reorder-answer-zone";
+        ansZone.innerText = "點擊下方詞語加入這裡";
+        content.querySelector('.challenge-container').appendChild(ansZone);
 
-        const optionsPool = document.createElement('div');
-        optionsPool.id = "reorder-options-pool";
+        const pool = document.createElement('div');
+        pool.id = "reorder-options-pool";
         task.words.forEach(w => {
-            const btn = document.createElement('button');
-            btn.className = "opt-btn";
-            btn.innerText = w;
-            btn.onclick = () => addToReorder(btn);
-            optionsPool.appendChild(btn);
+            const b = document.createElement('button');
+            b.className = "opt-btn";
+            b.innerText = w;
+            b.onclick = () => {
+                if (b.classList.contains('used')) return;
+                b.classList.add('used');
+                const s = document.createElement('span');
+                s.className = "word-span";
+                s.innerText = w;
+                ansZone.appendChild(s);
+            };
+            pool.appendChild(b);
         });
-        content.querySelector('.challenge-container').appendChild(optionsPool);
+        content.querySelector('.challenge-container').appendChild(pool);
 
-        // 提交按鈕
-        const submitBtn = document.createElement('button');
-        submitBtn.className = "submit-btn";
-        submitBtn.innerText = "提交";
-        submitBtn.onclick = () => {
-            const user = Array.from(document.getElementById('reorder-answer-zone').children)
-                .filter(el => el.classList.contains('word-span'))
-                .map(n => n.innerText).join("");
+        const sub = document.createElement('button');
+        sub.className = "submit-btn";
+        sub.innerText = "提交";
+        sub.onclick = () => {
+            const user = Array.from(document.querySelectorAll('.word-span')).map(n => n.innerText).join('');
             checkUserAnswer(user, task.answer);
         };
 
-        // 重新再來按鈕
-        const resetBtn = document.createElement('button');
-        resetBtn.className = "submit-btn";
-        resetBtn.style.background = "linear-gradient(135deg, #ed8936 0%, #dd6b20 100%)";
-        resetBtn.innerText = "重新再來";
-        resetBtn.onclick = () => {
-            answerZone.innerHTML = `<span style="color:#888; font-size:18px;">點擊下方詞語加入這裡</span>`;
-            optionsPool.querySelectorAll('.opt-btn').forEach(b => b.classList.remove('used'));
+        const reset = document.createElement('button');
+        reset.className = "submit-btn";
+        reset.innerText = "重新再來";
+        reset.style.background = "#ed8936";
+        reset.onclick = () => {
+            ansZone.innerText = "點擊下方詞語加入這裡";
+            pool.querySelectorAll('.opt-btn').forEach(b => b.classList.remove('used'));
         };
 
-        actions.appendChild(submitBtn);
-        actions.appendChild(resetBtn);
+        actions.appendChild(sub);
+        actions.appendChild(reset);
         return;
     }
 
-    // 其他題型
-    if (task.options) {
-        task.options.forEach((opt, i) => {
-            const btn = document.createElement('button');
-            btn.className = "opt-btn";
-            btn.innerText = opt;
-            btn.onclick = () => checkUserAnswer(opt, task.answer);
-            content.appendChild(btn);
-        });
-    }
+    task.options.forEach(opt => {
+        const b = document.createElement('button');
+        b.className = "opt-btn";
+        b.innerText = opt;
+        b.onclick = () => checkUserAnswer(opt, task.answer);
+        content.appendChild(b);
+    });
 }
 
-// --------------------------
-// ✅ 重組句子加入詞語（已修復）
-// --------------------------
-function addToReorder(btn) {
-    const answerZone = document.getElementById('reorder-answer-zone');
-    if (!answerZone || btn.classList.contains('used')) return;
-
-    btn.classList.add('used');
-    const newSpan = document.createElement('span');
-    newSpan.className = "word-span";
-    newSpan.innerText = btn.innerText;
-    answerZone.appendChild(newSpan);
-}
-
-function checkUserAnswer(userSelect, correctAnswer) {
-    const feedback = document.getElementById('feedback-msg');
-    if (userSelect === correctAnswer) {
-        feedback.innerHTML = "🎉 答對了！"; feedback.style.color = "#48bb78";
-        document.getElementById('modal-actions').innerHTML = `<button onclick="closeModal()" class="finish-btn">完成 🏆</button>`;
+function checkUserAnswer(sel, ans) {
+    const fb = document.getElementById('feedback-msg');
+    if (sel === ans) {
+        fb.innerText = "🎉 答對了！";
+        fb.style.color = "#38a169";
+        document.getElementById('modal-actions').innerHTML = `<button onclick="closeModal()" class="finish-btn">完成</button>`;
     } else {
         attempts--;
         if (attempts > 0) {
-            feedback.innerHTML = `還有 ${attempts} 次機會！`; feedback.style.color = "#f56565";
+            fb.innerText = `還有 ${attempts} 次機會！`;
+            fb.style.color = "#e53e3e";
         } else {
-            feedback.innerHTML = "💔 正確答案：" + correctAnswer; feedback.style.color = "#5d4037";
-            setTimeout(closeModal, 1500);
+            fb.innerText = "💔 正確答案：" + ans;
+            fb.style.color = "#744210";
+            setTimeout(closeModal, 1600);
         }
     }
 }
@@ -461,42 +464,24 @@ function closeModal() {
     finishTurn();
 }
 
-// 換回合
 function finishTurn() {
     turn = 1 - turn;
-    const tn = document.getElementById('player-turn-name');
-    if (tn) {
-        tn.innerText = "玩家 " + (turn + 1);
-        tn.style.color = turn === 0 ? "#3182ce" : "#d53f8c";
-    }
+    const name = document.getElementById('player-turn-name');
+    name.innerText = `玩家 ${turn + 1}`;
+    name.style.color = turn === 0 ? "#3182ce" : "#d53f8c";
     document.getElementById('btn-roll').disabled = false;
 }
 
-// 測試面板專用
+// ===============================
+// ========== 測試與重置 ==========
+// ===============================
 function testModal(type) {
-    let task;
-    switch(type) {
-        case 'fill': task = fillTasks[0]; break;
-        case 'reorder': task = reorderTasks[0]; break;
-        case 'match': task = matchTasks[0]; break;
-        case 'radical': task = radicalTasks[0]; break;
-        case 'punc': task = puncTasks[0]; break;
-        case 'continue': task = continueTasks[0]; break;
-        case 'stroke': task = strokeTasks[0]; break;
-        case 'understand': task = understandTasks[0]; break;
-        default: return;
-    }
-    displaySpecificTask(task);
+    const map = { fill: fillTasks, reorder: reorderTasks, match: matchTasks, radical: radicalTasks, punc: puncTasks, continue: continueTasks, stroke: strokeTasks, understand: understandTasks };
+    if (map[type]) displaySpecificTask(map[type][0]);
 }
 
-function restartGame() { location.reload(); }
-window.onload = init;
+function restartGame() {
+    location.reload();
+}
 
-// 強制顯示骰子按鈕
-window.addEventListener('load', () => {
-  const controls = document.getElementById('controls');
-  if (controls) controls.style.display = 'flex';
-  
-  const btn = document.getElementById('btn-roll');
-  if (btn) btn.disabled = false;
-});
+window.onload = init;
