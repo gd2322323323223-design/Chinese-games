@@ -10,6 +10,7 @@
     --green-main: #48bb78;
 }
 
+/* 背景圖降層級，不擋內容 */
 body::before {
     content: "";
     position: fixed; 
@@ -23,7 +24,7 @@ body::before {
     background-repeat: no-repeat;
     filter: none; 
     -webkit-filter: none;
-    z-index: 1;
+    z-index: 0;
 }
 
 body {
@@ -33,6 +34,27 @@ body {
     position: relative;
     overflow-x: hidden;
     min-height: 100vh;
+}
+
+/* ========== 關鍵修復：首頁強制顯示、置頂不被遮擋 ========== */
+#start-screen {
+    display: block !important;
+    position: relative !important;
+    z-index: 2000 !important;
+    background: rgba(255, 255, 255, 0.92) !important;
+    min-height: 100vh !important;
+    padding: 30px 20px !important;
+}
+
+/* 遊戲畫面預設隱藏 */
+#game-container { 
+    display: none !important;
+    position: relative; 
+    z-index: 10 !important; 
+    width: 95%; 
+    max-width: 1400px; 
+    margin: 20px auto; 
+    background: transparent !important;
 }
 
 #score-board {
@@ -51,11 +73,6 @@ body {
 }
 .score-item:nth-child(1) { color: var(--p1-color); }
 .score-item:nth-child(2) { color: var(--p2-color); }
-
-#start-screen {
-    z-index: 1000;
-    background: rgba(255, 255, 255, 0.1);
-}
 
 .char-opt[style*="var(--p1-color)"] {
     outline: 5px solid var(--p1-color);
@@ -85,21 +102,13 @@ body {
     object-fit: contain;
 }
 
-#game-container { 
-    position: relative; 
-    z-index: 10 !important; 
-    width: 95%; 
-    max-width: 1400px; 
-    margin: 20px auto; 
-    background: transparent !important;
-}
 #board { 
     display: grid !important; 
     grid-template-columns: repeat(10, 1fr) !important; 
     gap: 140px 15px !important; 
     padding: 40px 40px 150px 40px !important; 
     border-radius: 40px; 
-    background: rgba(226, 210, 180, 0.7) !important; 
+    background: rgba226, 210, 180, 0.7 !important; 
     backdrop-filter: none !important; 
     -webkit-backdrop-filter: none !important;
     border: 12px solid var(--wood-brown);
@@ -480,7 +489,7 @@ body:not(:has(#start-screen:not([style*="display: none"]))) #controls {
 .opt-btn.used {
     background: #eeeeee !important;
     color: #bdbdbd !important;
-    border-color: #d1d1d1 !important;
+    border-color: d1d1d1 !important;
     box-shadow: none;
     opacity: 0.5;
     pointer-events: none;
@@ -666,7 +675,6 @@ body:not(:has(#start-screen:not([style*="display: none"]))) #controls {
     height: 100%;
     background: rgba(0,0,0,0.85);
     z-index: 9999;
-    display: flex;
     align-items: center;
     justify-content: center;
 }
@@ -713,7 +721,6 @@ modal.type-reorder {
     align-items: center;
 }
 
-/* 答案區 */
 #reorder-answer-zone {
     width: 90%;
     min-height: 60px;
@@ -735,10 +742,9 @@ modal.type-reorder {
 #reorder-answer-zone .word-span {
     display: inline-block;
     padding: 0 2px;
-    cursor: default; /* 不可點刪 */
+    cursor: default;
 }
 
-/* 選項池 */
 #reorder-options-pool {
     width: 90%;
     background: #e3f2fd;
@@ -762,7 +768,6 @@ modal.type-reorder {
     padding: 0 12px;
 }
 
-/* 按鈕橫排 */
 #modal.type-reorder #modal-actions {
     display: flex !important;
     flex-direction: row !important;
