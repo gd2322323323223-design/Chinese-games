@@ -474,7 +474,16 @@ function finishTurn() {
 
 // ========== 測試與重置 ==========
 function testModal(type) {
-    const map = { fill: fillTasks, reorder: reorderTasks, match: matchTasks, radical: radicalTasks, punc: puncTasks, continue: continueTasks, stroke: strokeTasks, understand: understandTasks };
+    const map = { 
+        fill: fillTasks, 
+        reorder: reorderTasks, 
+        match: matchTasks, 
+        radical: radicalTasks, 
+        punc: puncTasks, 
+        continue: continueTasks, 
+        stroke: strokeTasks, 
+        understand: understandTasks 
+    };
     if (map[type]) displaySpecificTask(map[type][0]);
 }
 
