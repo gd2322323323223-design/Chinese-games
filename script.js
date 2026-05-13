@@ -484,4 +484,12 @@ function restartGame() {
     location.reload();
 }
 
+// 開始遊戲按鈕：切換頁面 + 顯示骰子
+function startGame() {
+    document.getElementById("start-screen").style.display = "none";
+    document.getElementById("game-container").style.display = "block";
+    document.getElementById("controls").style.display = "flex";
+    document.body.classList.add("game-active");
+}
+
 window.onload = init;
