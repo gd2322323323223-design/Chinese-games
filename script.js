@@ -407,17 +407,13 @@ function addToReorder(btn) {
     if (!answerZone || btn.classList.contains('used')) return;
     btn.classList.add('used');
 
-    // 創建答案區的按鈕，樣式自動適應
-    const newBtn = document.createElement('button');
-    newBtn.className = "opt-btn";
-    newBtn.innerText = btn.innerText;
-    newBtn.style.minWidth = "auto";
-    newBtn.style.padding = "0 12px";
-    newBtn.style.height = "45px";
-    newBtn.style.fontSize = "20px";
+    // 創建 span 元素，而不是按鈕
+    const newSpan = document.createElement('span');
+    newSpan.className = "word-span";
+    newSpan.innerText = btn.innerText;
 
-    // 點擊答案區的詞語，可以移除
-    newBtn.onclick = function () {
+    // 點擊可以移除
+    newSpan.onclick = function () {
         this.remove();
         btn.classList.remove('used');
         // 如果答案區空了，恢復提示文字
@@ -427,10 +423,10 @@ function addToReorder(btn) {
     };
 
     // 移除提示文字
-    if (answerZone.querySelector('span')) {
+    if (answerZone.querySelector('span[style]')) {
         answerZone.innerHTML = "";
     }
-    answerZone.appendChild(newBtn);
+    answerZone.appendChild(newSpan);
 }
 
 function checkUserAnswer(userSelect, correctAnswer) {
