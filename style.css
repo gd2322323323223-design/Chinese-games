@@ -400,7 +400,7 @@ body:not(:has(#start-screen:not([style*="display: none"]))) #controls {
     border: none !important; 
     border-radius: 50px !important; 
     cursor: pointer !important; 
-    display: none; 
+    display: block; 
     visibility: visible !important;
 }
 #btn-roll:hover { background: #38a169; transform: scale(1.05); }
