@@ -919,13 +919,12 @@ body:not(:has(#start-screen:not([style*="display: none"]))) #controls {
   z-index: 999999 !important;
 }
 
-/* 正確位置：標題底下 → 時間底下 → 提示文字 */
-#modal-content::before {
-  content: "時間 > 人物 > 地點 > 事情" !important;
-  display: block !important;
-  text-align: center !important;
-  font-size: 14px !important;
-  color: red !important;
-  font-weight: bold !important;
-  margin: 5px 0 !important;
+#timer::after {
+    content: "時間 > 人物 > 地點 > 事情" !important;
+    display: block !important;
+    text-align: center !important;
+    font-size: 14px !important;
+    color: red !important;
+    font-weight: bold !important;
+    margin: 5px 0 !important;
 }
