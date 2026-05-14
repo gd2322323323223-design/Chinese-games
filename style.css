@@ -557,32 +557,35 @@ body:not(:has(#start-screen:not([style*="display: none"]))) #controls {
     font-size: 22px; /* 保持字體大小不變 */
 }
 
-/* 選項區容器 - 完全還原PPT的圓角外框 */
+/* 選項區容器 - 橫向3列、縮小背景框、不超出畫面 */
 #reorder-options-pool {
     display: flex;
     flex-wrap: wrap;
-    justify-content: flex-start;
+    justify-content: center;
     align-items: center;
-    gap: 20px 30px; /* 上下間距20px，左右間距30px，對應你縮小後的空位 */
-    margin: 20px auto;
-    padding: 25px;
+    gap: 15px 20px; /* 上下間距縮小為15px，左右間距20px */
+    margin: 15px auto;
+    padding: 20px;
     border: 2px solid #333;
-    border-radius: 30px; /* 大圓角，和PPT一致 */
+    border-radius: 30px;
     background: #fff;
-    max-width: 90%; /* 縮窄背景方框的兩邊 */
+    max-width: 80%; /* 縮窄背景框，避免超出畫面 */
 }
 
-/* 選項按鈕 - 剛好包住文字，不浪費空間 */
+/* 強制按鈕橫向3列 */
 #reorder-options-pool .opt-btn {
+    flex: 1 1 calc(33.333% - 20px); /* 每列3個，自動分配寬度 */
+    max-width: 200px; /* 限制按鈕最大寬度，避免過長 */
     min-width: auto;
     width: auto;
-    padding: 12px 28px; /* 左右內邊距，留一點呼吸感 */
-    font-size: 24px; /* 保持字體大小不變 */
+    padding: 12px 20px;
+    font-size: 22px;
     border: none;
-    border-radius: 0; /* 去掉按鈕圓角，和PPT的直角按鈕一致 */
-    box-shadow: none; /* 去掉立體陰影，還原純色效果 */
-    background: #ffcc00; /* 和PPT一致的純黃色 */
+    border-radius: 8px;
+    box-shadow: 0 3px 0 #c4521c;
+    background: #ffb300;
     color: #000;
+    text-align: center;
 }
 
 /* 重組句子專用按鈕區 */
