@@ -557,35 +557,31 @@ body:not(:has(#start-screen:not([style*="display: none"]))) #controls {
     font-size: 22px; /* 保持字體大小不變 */
 }
 
-/* 選項區容器 - Grid 布局 + 固定3列 + 自動收縮 */
+/* 選項區外框 —— 固定3列 + 不超出畫面 */
 #reorder-options-pool {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr); /* 強制3列 */
-    gap: 15px 20px; /* 上下間距15px，左右間距20px */
-    margin: 15px auto;
-    padding: 20px;
-    border: 2px solid #333;
-    border-radius: 30px;
-    background: #fff;
-    max-width: 700px; /* 限制容器最大寬度，避免超出畫面 */
-    width: 90%;
-    justify-items: center; /* 每列內容居中 */
+  display: grid !important;
+  grid-template-columns: repeat(3, auto) !important;
+  justify-content: center !important;
+  gap: 12px !important;
+  padding: 20px !important;
+  border: 2px solid #333 !important;
+  border-radius: 25px !important;
+  background: #fff !important;
+  max-width: 85% !important;
+  margin: 15px auto !important;
+  width: fit-content !important;
 }
 
-/* 選項按鈕 - 完全自動適應文字長度 */
+/* 選項按鈕 —— 自動適應文字大小 */
 #reorder-options-pool .opt-btn {
-    width: auto !important; /* 強制取消固定寬度 */
-    min-width: auto;
-    max-width: none;
-    padding: 12px 20px; /* 左右內邊距固定，只留少量呼吸感 */
-    font-size: 22px;
-    border: none;
-    border-radius: 8px;
-    box-shadow: 0 3px 0 #c4521c;
-    background: #ffb300;
-    color: #000;
-    text-align: center;
-    white-space: nowrap; /* 強制文字不換行，讓按鈕只根據文字長度自動調整 */
+  width: auto !important;
+  min-width: unset !important;
+  max-width: none !important;
+  flex: unset !important;
+  padding: 10px 16px !important;
+  font-size: 22px !important;
+  white-space: nowrap !important;
+  display: inline-block !important;
 }
 
 /* 重組句子專用按鈕區 */
