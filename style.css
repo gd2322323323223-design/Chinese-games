@@ -515,8 +515,7 @@ body:not(:has(#start-screen:not([style*="display: none"]))) #controls {
     font-weight: bold;
 }
 
-/* 重組句子專用版面 原版完整設計 */
-/* 答題區 - 替換原本的 #reorder-answer-zone 樣式 */
+/* 答題區 - 完整修復 */
 #reorder-answer-zone {
     border: 3px dashed #3182ce;
     border-radius: 12px;
@@ -529,38 +528,45 @@ body:not(:has(#start-screen:not([style*="display: none"]))) #controls {
     display: flex;
     align-items: center;
     flex-wrap: wrap;
-    gap: 4px; /* 讓詞語之間緊密相連 */
+    gap: 4px; /* 詞語之間緊密貼近 */
     position: relative;
 }
 
-/* 左上角的「答題區」標題 */
+/* 左上角「答題區」標題 */
 #reorder-answer-zone::before {
     content: "答題區";
     position: absolute;
     top: -25px;
     left: 0;
-    font-size: 16px; /* 和「剩餘時間」字體大小一致 */
+    font-size: 16px;
     color: #333;
     font-weight: bold;
 }
 
-/* 隱藏「點擊下方詞語加入這裡」的預設文字 */
-#reorder-answer-zone:empty::after {
-    content: "";
+/* 徹底隱藏「點擊下方詞語加入這裡」文字 */
+#reorder-answer-zone {
+    color: transparent; /* 把預設文字變透明 */
+}
+#reorder-answer-zone .word-span {
+    color: #000; /* 只顯示你選的詞語文字 */
 }
 
-/* 選項按鈕 - 縮短長度、調整間距 */
+/* 選項按鈕 - 縮短長度，不變字體 */
 #reorder-options-pool .opt-btn {
-    min-width: auto; /* 取消固定寬度，讓按鈕自動適應內容 */
+    min-width: auto;
     width: auto;
-    padding: 10px 20px; /* 減少左右內邊距，縮短按鈕長度 */
+    padding: 10px 20px; /* 縮短按鈕左右長度 */
     font-size: 22px; /* 保持字體大小不變 */
 }
 
-/* 調整選項之間的間距 */
+/* 選項區 - 改成橫向自動換行 */
 #reorder-options-pool {
-    gap: 10px; /* 減少按鈕之間的空隙 */
+    display: flex;
+    flex-wrap: wrap; /* 關鍵：讓按鈕自動換行，不會一直往下排 */
+    justify-content: center;
+    gap: 10px; /* 按鈕之間的間距 */
     margin: 15px 0;
+    padding: 0 10px;
 }
 
 .word-span {
