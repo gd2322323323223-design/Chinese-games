@@ -74,16 +74,15 @@
     </div>
 
 <div id="modal" style="display:none;">
-    <!-- 1. 標題：重組句子 -->
-    <div id="modal-content"></div>
-    <!-- 2. 剩餘時間 -->
+  <div id="modal-content">
+    <!-- 計時器 + 提示 直接寫在這裡 → 就會出現在標題下方！！-->
     <div id="timer" style="text-align:center; margin:10px 0;">⏳ 剩餘時間: 120s</div>
-    <!-- 3. 提示文字 -->
     <div style="text-align:center; font-size:14px; color:red; font-weight:bold; margin:5px 0 15px 0;">
         時間 > 人物 > 地點 > 事情
     </div>
-    <!-- 4. 答題區和選項區（JS 會動態生成在這裡） -->
-    <div id="modal-actions"></div>
+  </div>
+
+  <div id="modal-actions"></div>
 </div>
 
     <div id="win-modal" style="display:none;">
