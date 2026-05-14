@@ -558,28 +558,25 @@ body:not(:has(#start-screen:not([style*="display: none"]))) #controls {
 }
 
 /* 選項區容器 - 橫向3列、背景框自動收縮 */
+/* 選項區容器 - 強制3列布局 */
 #reorder-options-pool {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center; /* 讓內容在容器內居中 */
-    align-items: center;
-    gap: 15px 20px; /* 上下間距15px，左右間距20px */
+    display: grid; /* 改用Grid布局，比flex更穩定控制列數 */
+    grid-template-columns: repeat(3, 1fr); /* 固定3列 */
+    gap: 15px 20px; /* 上下15px，左右20px間距 */
     margin: 15px auto;
     padding: 20px;
     border: 2px solid #333;
     border-radius: 30px;
     background: #fff;
-    max-width: 80%; /* 限制背景框最大寬度，避免超出畫面 */
-    width: fit-content; /* 關鍵：讓背景框自動適應內容寬度 */
+    max-width: 700px; /* 限制背景框最大寬度，避免超出畫面 */
+    width: 90%;
+    justify-items: center; /* 列內居中 */
 }
 
-/* 選項按鈕 - 強制3列，自動換行 */
+/* 選項按鈕 - 剛好包住文字 */
 #reorder-options-pool .opt-btn {
-    flex: 0 1 auto; /* 取消強制分配寬度，改用內容寬度 */
     width: auto;
-    min-width: 120px; /* 設置最小寬度，避免太窄 */
-    max-width: 200px; /* 設置最大寬度，避免太寬 */
-    padding: 12px 25px; /* 左右內邊距，剛好包住文字 */
+    padding: 12px 25px;
     font-size: 22px;
     border: none;
     border-radius: 8px;
@@ -587,6 +584,7 @@ body:not(:has(#start-screen:not([style*="display: none"]))) #controls {
     background: #ffb300;
     color: #000;
     text-align: center;
+    white-space: nowrap; /* 防止文字換行 */
 }
 
 /* 重組句子專用按鈕區 */
