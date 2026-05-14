@@ -530,8 +530,8 @@ body:not(:has(#start-screen:not([style*="display: none"]))) #controls {
 }
 
 /* 四素句提示文字，醒目但不抢戏 */
-#modal:has(#reorder-answer-zone)::before {
-    content: "提示：四素句結構：時間 > 人物 > 地點 > 事情";
+#modal:has(#reorder-answer-zone)::after {
+    content: "時間 > 人物 > 地點 > 事情";
     display: block;
     text-align: center;
     font-size: 14px; /* 保持小字号 */
