@@ -529,15 +529,15 @@ body:not(:has(#start-screen:not([style*="display: none"]))) #controls {
     position: relative;
 }
 
-//* 四素句提示 - 固定在標題+計時器正下方，絕對不會跑位 */
-#modal .timer-container + #reorder-answer-zone::before {
-    content: "時間 > 人物 > 地點 > 事情";
-    display: block;
-    text-align: center;
-    font-size: 14px;
-    color: #e74c3c;
-    font-weight: bold;
-    margin: 0 0 8px 0;
+/* 提示：時間>人物>地點>事情 → 固定在剩餘時間下方 */
+.timer::after {
+  content: "時間 > 人物 > 地點 > 事情" !important;
+  display: block !important;
+  font-size: 14px !important;
+  color: #e74c3c !important;
+  font-weight: bold !important;
+  text-align: center !important;
+  margin-top: 4px !important;
 }
 
 /* 左上角「答題區」標題 */
