@@ -543,10 +543,6 @@ body:not(:has(#start-screen:not([style*="display: none"]))) #controls {
     font-weight: bold;
 }
 
-/* 徹底隱藏「點擊下方詞語加入這裡」文字 */
-#reorder-answer-zone {
-    color: transparent; /* 把預設文字變透明 */
-}
 #reorder-answer-zone .word-span {
     color: #000; /* 只顯示你選的詞語文字 */
 }
