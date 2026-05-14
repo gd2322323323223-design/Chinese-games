@@ -420,7 +420,6 @@ function displaySpecificTask(task) {
         reset.innerText = "重新再來";
         reset.style.background = "#ed8936";
         reset.onclick = () => {
-            ansZone.innerText = "點擊下方詞語加入這裡";
             pool.querySelectorAll('.opt-btn').forEach(b => b.classList.remove('used'));
         };
 
