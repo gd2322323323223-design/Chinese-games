@@ -387,7 +387,6 @@ function displaySpecificTask(task) {
     if (task.type === "reorder") {
         const ansZone = document.createElement('div');
         ansZone.id = "reorder-answer-zone";
-        ansZone.innerText = "點擊下方詞語加入這裡";
         content.querySelector('.challenge-container').appendChild(ansZone);
 
         const pool = document.createElement('div');
