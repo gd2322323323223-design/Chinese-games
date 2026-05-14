@@ -557,28 +557,29 @@ body:not(:has(#start-screen:not([style*="display: none"]))) #controls {
     font-size: 22px; /* 保持字體大小不變 */
 }
 
-/* 選項區容器 - 橫向3列、縮小背景框、不超出畫面 */
+/* 選項區容器 - 橫向3列、背景框自動收縮 */
 #reorder-options-pool {
     display: flex;
     flex-wrap: wrap;
-    justify-content: center;
+    justify-content: center; /* 讓內容在容器內居中 */
     align-items: center;
-    gap: 15px 20px; /* 上下間距縮小為15px，左右間距20px */
+    gap: 15px 20px; /* 上下間距15px，左右間距20px */
     margin: 15px auto;
     padding: 20px;
     border: 2px solid #333;
     border-radius: 30px;
     background: #fff;
-    max-width: 80%; /* 縮窄背景框，避免超出畫面 */
+    max-width: 80%; /* 限制背景框最大寬度，避免超出畫面 */
+    width: fit-content; /* 關鍵：讓背景框自動適應內容寬度 */
 }
 
-/* 強制按鈕橫向3列 */
+/* 選項按鈕 - 強制3列，自動換行 */
 #reorder-options-pool .opt-btn {
-    flex: 1 1 calc(33.333% - 20px); /* 每列3個，自動分配寬度 */
-    max-width: 200px; /* 限制按鈕最大寬度，避免過長 */
-    min-width: auto;
+    flex: 0 1 auto; /* 取消強制分配寬度，改用內容寬度 */
     width: auto;
-    padding: 12px 20px;
+    min-width: 120px; /* 設置最小寬度，避免太窄 */
+    max-width: 200px; /* 設置最大寬度，避免太寬 */
+    padding: 12px 25px; /* 左右內邊距，剛好包住文字 */
     font-size: 22px;
     border: none;
     border-radius: 8px;
