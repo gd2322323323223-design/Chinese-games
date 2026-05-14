@@ -557,26 +557,27 @@ body:not(:has(#start-screen:not([style*="display: none"]))) #controls {
     font-size: 22px; /* 保持字體大小不變 */
 }
 
-/* 選項區容器 - 橫向3列、背景框自動收縮 */
-/* 選項區容器 - 強制3列布局 */
+/* 選項區容器 - Grid 布局 + 固定3列 + 自動收縮 */
 #reorder-options-pool {
-    display: grid; /* 改用Grid布局，比flex更穩定控制列數 */
-    grid-template-columns: repeat(3, 1fr); /* 固定3列 */
-    gap: 15px 20px; /* 上下15px，左右20px間距 */
+    display: grid;
+    grid-template-columns: repeat(3, 1fr); /* 強制3列 */
+    gap: 15px 20px; /* 上下間距15px，左右間距20px */
     margin: 15px auto;
     padding: 20px;
     border: 2px solid #333;
     border-radius: 30px;
     background: #fff;
-    max-width: 700px; /* 限制背景框最大寬度，避免超出畫面 */
+    max-width: 700px; /* 限制容器最大寬度，避免超出畫面 */
     width: 90%;
-    justify-items: center; /* 列內居中 */
+    justify-items: center; /* 每列內容居中 */
 }
 
-/* 選項按鈕 - 剛好包住文字 */
+/* 選項按鈕 - 完全自動適應文字長度 */
 #reorder-options-pool .opt-btn {
-    width: auto;
-    padding: 12px 25px;
+    width: auto !important; /* 強制取消固定寬度 */
+    min-width: auto;
+    max-width: none;
+    padding: 12px 20px; /* 左右內邊距固定，只留少量呼吸感 */
     font-size: 22px;
     border: none;
     border-radius: 8px;
@@ -584,7 +585,7 @@ body:not(:has(#start-screen:not([style*="display: none"]))) #controls {
     background: #ffb300;
     color: #000;
     text-align: center;
-    white-space: nowrap; /* 防止文字換行 */
+    white-space: nowrap; /* 強制文字不換行，讓按鈕只根據文字長度自動調整 */
 }
 
 /* 重組句子專用按鈕區 */
