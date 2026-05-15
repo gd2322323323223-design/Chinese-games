@@ -73,13 +73,14 @@
         <button id="btn-roll" onclick="roll()">擲骰子</button>
     </div>
 
-<div id="modal" style="display:none;">
+<div id="modal" style="display:none; flex-direction:column;">
+    <div id="reorder-meta-header" class="reorder-only" aria-hidden="true">
+        <h2 class="reorder-main-title">【 重組句子 】</h2>
+    </div>
     <div id="modal-content"></div>
-    <div id="timer" style="text-align:center; margin:10px 0;">⏳ 剩餘時間: 120s</div>
+    <div id="timer" class="modal-timer">⏳ 剩餘時間: 120s</div>
+    <p id="reorder-structure-hint" class="reorder-only reorder-structure-hint" aria-hidden="true">時間 &gt; 人物 &gt; 地點 &gt; 事情</p>
     <div id="modal-actions"></div>
-</div>
-
-  <div id="modal-actions"></div>
 </div>
 
     <div id="win-modal" style="display:none;">

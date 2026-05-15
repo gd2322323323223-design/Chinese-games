@@ -368,11 +368,19 @@ function showModal() {
     const task = allTasks[Math.floor(Math.random() * allTasks.length)];
     displaySpecificTask(task);
     document.getElementById('modal-overlay').style.display = 'block';
-    document.getElementById('modal').style.display = 'block';
+    document.getElementById('modal').style.display = 'flex';
 }
 
 function displaySpecificTask(task) {
     attempts = 3;
+    document.getElementById('modal').className = 'type-' + task.type;
+    const reorderMeta = document.getElementById('reorder-meta-header');
+    const reorderHint = document.getElementById('reorder-structure-hint');
+    if (reorderMeta && reorderHint) {
+        const ro = task.type === 'reorder';
+        reorderMeta.setAttribute('aria-hidden', ro ? 'false' : 'true');
+        reorderHint.setAttribute('aria-hidden', ro ? 'false' : 'true');
+    }
     const content = document.getElementById('modal-content');
     const actions = document.getElementById('modal-actions');
     content.innerHTML = "";
@@ -386,7 +394,7 @@ function displaySpecificTask(task) {
 
     if (task.type === "reorder") {
         const ansZone = document.createElement('div');
-        ansZone.id = "reorder-answer-zone";
+        ansZone.id = "reorder-zone";
         content.querySelector('.challenge-container').appendChild(ansZone);
 
         const pool = document.createElement('div');
@@ -421,6 +429,7 @@ function displaySpecificTask(task) {
         reset.style.background = "#ed8936";
         reset.onclick = () => {
             pool.querySelectorAll('.opt-btn').forEach(b => b.classList.remove('used'));
+            ansZone.querySelectorAll('.word-span').forEach(s => s.remove());
         };
 
         actions.appendChild(sub);
@@ -459,6 +468,11 @@ function checkUserAnswer(sel, ans) {
 function closeModal() {
     document.getElementById('modal-overlay').style.display = 'none';
     document.getElementById('modal').style.display = 'none';
+    document.getElementById('modal').className = '';
+    const reorderMeta = document.getElementById('reorder-meta-header');
+    const reorderHint = document.getElementById('reorder-structure-hint');
+    if (reorderMeta) reorderMeta.setAttribute('aria-hidden', 'true');
+    if (reorderHint) reorderHint.setAttribute('aria-hidden', 'true');
     finishTurn();
 }
 
@@ -476,7 +490,7 @@ function testModal(type) {
     if (map[type]) {
         // 強制顯示彈窗 ← 就是少了這行才沒反應
         document.getElementById('modal-overlay').style.display = 'block';
-        document.getElementById('modal').style.display = 'block';
+        document.getElementById('modal').style.display = 'flex';
         
         displaySpecificTask(map[type][0]);
     }
