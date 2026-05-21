@@ -462,7 +462,7 @@ body:has(#start-screen:not([style*="display: none"])) #game-container {
 .boost-cell::after,
 .dino-cell::before,
 .dino-cell::after,
-.cell.goal-cell::after {
+.cell.goal-cell:not(#cell-finish)::after {
     display: none !important;
     content: none !important;
     background: none !important;
@@ -579,44 +579,111 @@ body:has(#start-screen:not([style*="display: none"])) #game-container {
     animation: dino-roar 0.3s infinite;
 }
 
-/* 終點格：棋盤 Grid 內 3×3 透明框 + end box 圖 */
-#cell-finish.goal-cell,
-.cell.goal-cell.cell-finish {
-    grid-column: 4 / span 3 !important;
-    grid-row: span 3 !important;
-    justify-self: center !important;
-    align-self: end !important;
-    width: 100% !important;
-    max-width: 100% !important;
-    margin: 12px auto 0 !important;
-    height: auto;
-    min-height: calc(var(--cell-size) * 3 + 24px);
-    padding: 0 !important;
-    box-sizing: border-box;
+/* ==========================================
+   終點格 (#cell-finish) 最終完美還原版代碼
+   基於 images/end-box.png 利用 CSS 刻出圖片 2 效果
+   ========================================== */
+#cell-finish {
+    grid-column: span 3;
+    grid-row: span 3;
+    justify-self: center;
+    align-self: end;
+
+    width: 100%;
+    max-width: 300px;
+    aspect-ratio: 1 / 1;
     position: relative;
-    display: block !important;
-    overflow: hidden;
-    border: 3px solid transparent !important;
-    border-radius: 20px !important;
-    background-color: transparent !important;
-    background-image: url('images/end box.png') !important;
-    background-repeat: no-repeat !important;
-    background-position: center center !important;
+    margin-bottom: 50px;
+
+    background: url('images/end-box.png') no-repeat center center !important;
     background-size: contain !important;
-    box-shadow: none !important;
-    z-index: 12;
+    animation: trophyFloat 4s ease-in-out infinite alternate;
+
+    border: 3px solid transparent !important;
+    background-clip: padding-box, border-box !important;
+    background-origin: padding-box, border-box !important;
+    border-radius: 28px !important;
+    box-shadow: 0 0 35px rgba(255, 215, 0, 0.5),
+                inset 0 0 20px rgba(255, 215, 0, 0.2) !important;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: visible;
+    z-index: 10;
 }
 
-#cell-finish.goal-cell::before,
-#cell-finish.goal-cell::after,
-.cell.goal-cell.cell-finish::before,
-.cell.goal-cell.cell-finish::after {
+#cell-finish::before {
+    content: "";
+    position: absolute;
+    bottom: -45px;
+    left: -8%;
+    width: 116%;
+    height: 50px;
+
+    background: linear-gradient(to bottom,
+        #ffe891 0%,
+        #fcd04c 15%,
+        #e3a324 40%,
+        #9c6b0f 85%,
+        #6e4805 100%
+    );
+
+    border-radius: 8px 8px 12px 12px;
+    border-top: 2px solid #fffdf0;
+
+    box-shadow:
+        0 4px 0 #523502,
+        0 12px 25px rgba(0, 0, 0, 0.45),
+        inset 0 2px 4px rgba(255, 255, 255, 0.6);
+    z-index: -1;
+}
+
+#cell-finish::after {
+    content: "";
+    position: absolute;
+    top: 45%;
+    left: 50%;
+    width: 420px;
+    height: 420px;
+    transform: translate(-50%, -50%);
+
+    background:
+        radial-gradient(circle, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0) 65%),
+        conic-gradient(from 0deg,
+            transparent, rgba(255, 215, 0, 0.3) 10deg, transparent 25deg,
+            rgba(0, 191, 255, 0.3) 40deg, transparent 60deg,
+            rgba(238, 130, 238, 0.3) 85deg, transparent 110deg,
+            rgba(255, 215, 0, 0.3) 140deg, transparent 170deg,
+            rgba(0, 191, 255, 0.3) 210deg, transparent 240deg,
+            rgba(238, 130, 238, 0.3) 280deg, transparent 310deg,
+            rgba(255, 215, 0, 0.3) 340deg, transparent 360deg
+        );
+
+    mix-blend-mode: screen;
+    pointer-events: none;
+    z-index: -2;
+
+    animation: stageLaser 8s linear infinite;
+}
+
+@keyframes trophyFloat {
+    0% { transform: translateY(2px); filter: drop-shadow(0 5px 15px rgba(255, 215, 0, 0.4)); }
+    100% { transform: translateY(-8px); filter: drop-shadow(0 20px 30px rgba(255, 215, 0, 0.7)); }
+}
+
+@keyframes stageLaser {
+    0% { transform: translate(-50%, -50%) rotate(0deg) scale(0.92); opacity: 0.8; }
+    50% { transform: translate(-50%, -50%) rotate(180deg) scale(1.05); opacity: 1; }
+    100% { transform: translate(-50%, -50%) rotate(360deg) scale(0.92); opacity: 0.8; }
+}
+
+#cell-finish * {
     display: none !important;
-    content: none !important;
 }
 
 /* 道路線條 */
-.cell::after {
+.cell:not(#cell-finish)::after {
     content: "";
     position: absolute;
     bottom: -110px;
@@ -631,7 +698,7 @@ body:has(#start-screen:not([style*="display: none"])) #game-container {
     border-radius: 12px;
     box-shadow: 0 4px 10px rgba(0,0,0,0.1);
 }
-.cell::before {
+.cell:not(#cell-finish)::before {
     content: "";
     position: absolute;
     bottom: calc(-110px + (var(--road-height) / 2));
@@ -677,6 +744,9 @@ body:has(#start-screen:not([style*="display: none"])) #game-container {
 }
 
 /* 控制列 & 骰子 & 按鈕（最高層級懸浮，不被舞台遮擋） */
+.control-panel,
+#control-panel,
+.dice-container,
 #controls {
     position: fixed;
     bottom: 20px;
@@ -692,7 +762,7 @@ body:has(#start-screen:not([style*="display: none"])) #game-container {
     display: none;
     align-items: center;
     gap: 15px;
-    z-index: 999;
+    z-index: 999 !important;
     pointer-events: auto;
 }
 
@@ -1546,9 +1616,13 @@ body.game-active #btn-roll {
         gap: 80px 8px !important;
         padding: 20px 10px 80px 10px !important;
     }
-    #cell-finish.goal-cell,
-    .cell.goal-cell.cell-finish {
-        min-height: calc(var(--cell-size) * 3 + 16px);
+    #cell-finish {
+        max-width: min(260px, 88vw);
+        margin-bottom: 40px;
+    }
+    #cell-finish::after {
+        width: min(320px, 95vw);
+        height: min(320px, 95vw);
     }
     .cell {
         --cell-size: 60px;
