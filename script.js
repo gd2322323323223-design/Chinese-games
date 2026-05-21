@@ -519,10 +519,7 @@ function init() {
     finishCell.className = 'cell goal-cell cell-finish';
     finishCell.id = 'cell-finish';
     finishCell.setAttribute('aria-label', '終點');
-    finishCell.innerHTML = `
-        <div class="stage-light" aria-hidden="true"></div>
-        <div class="stage-trophy" aria-hidden="true"></div>
-        <div class="stage-podium" aria-hidden="true"></div>`;
+    finishCell.innerHTML = '';
     board.appendChild(finishCell);
     bindTeacherSpecialCellPreviews();
     const diceBox = document.getElementById('dice-box');
