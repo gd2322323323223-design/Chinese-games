@@ -219,6 +219,7 @@ function startGame() {
     if (diceBox) diceBox.style.transform = 'rotateX(0deg) rotateY(0deg)';
 
     syncBgmUiFromAudio();
+    preloadFreesoundEffects();
     updateDisplay();
 }
 
@@ -291,6 +292,118 @@ function playSound(name) {
         audio[name].currentTime = 0;
         audio[name].play().catch(() => {});
     }
+}
+
+// ===============================
+// ====== Freesound 聯網音效 ======
+// ===============================
+const FREESOUND_API_BASE = 'https://freesound.org/apiv2/search/';
+const FREESOUND_TOKEN = (typeof window !== 'undefined' && window.FREESOUND_API_KEY) || '';
+
+const FREESOUND_EFFECTS = {
+    banana: {
+        query: 'slip fall cartoon',
+        filter: 'tag:cartoon tag:slip tag:fall duration:[0 TO 6]',
+        sort: 'rating_desc',
+        volume: 0.85
+    },
+    dino: {
+        query: 'dinosaur roar',
+        filter: 'tag:dinosaur tag:roar duration:[0 TO 8]',
+        sort: 'rating_desc',
+        volume: 0.9
+    },
+    rocket: {
+        query: 'rocket launch space',
+        filter: 'tag:rocket tag:space tag:launch duration:[0 TO 12]',
+        sort: 'rating_desc',
+        volume: 0.85
+    },
+    cheer: {
+        query: 'applause cheer short',
+        filter: 'tag:applause tag:cheer duration:[0 TO 4]',
+        sort: 'duration_asc',
+        volume: 0.75
+    }
+};
+
+const freesoundUrlCache = {};
+const freesoundFetchPromises = {};
+let activeFreesoundPlayer = null;
+
+async function fetchFreesoundPreviewUrl(effectKey) {
+    if (!FREESOUND_TOKEN) return null;
+    if (freesoundUrlCache[effectKey]) return freesoundUrlCache[effectKey];
+    if (freesoundFetchPromises[effectKey]) return freesoundFetchPromises[effectKey];
+
+    const spec = FREESOUND_EFFECTS[effectKey];
+    if (!spec) return null;
+
+    freesoundFetchPromises[effectKey] = (async () => {
+        try {
+            const params = new URLSearchParams({
+                query: spec.query,
+                filter: spec.filter,
+                token: FREESOUND_TOKEN,
+                fields: 'id,name,previews',
+                page_size: '8',
+                sort: spec.sort || 'rating_desc'
+            });
+            const res = await fetch(`${FREESOUND_API_BASE}?${params.toString()}`);
+            if (!res.ok) throw new Error(`Freesound HTTP ${res.status}`);
+
+            const data = await res.json();
+            const results = Array.isArray(data.results) ? data.results : [];
+
+            for (const sound of results) {
+                const previews = sound && sound.previews;
+                const url = previews && (previews['preview-hq-mp3'] || previews['preview-lq-mp3']);
+                if (url) {
+                    freesoundUrlCache[effectKey] = url;
+                    return url;
+                }
+            }
+            throw new Error('No preview URL in search results');
+        } catch (err) {
+            console.warn('[Freesound] 搜尋失敗:', effectKey, err);
+            return null;
+        } finally {
+            delete freesoundFetchPromises[effectKey];
+        }
+    })();
+
+    return freesoundFetchPromises[effectKey];
+}
+
+async function playFreesoundEffect(effectKey) {
+    try {
+        const spec = FREESOUND_EFFECTS[effectKey];
+        if (!spec || !FREESOUND_TOKEN) return;
+
+        const url = await fetchFreesoundPreviewUrl(effectKey);
+        if (!url) return;
+
+        if (activeFreesoundPlayer) {
+            try {
+                activeFreesoundPlayer.pause();
+            } catch (_) { /* ignore */ }
+            activeFreesoundPlayer = null;
+        }
+
+        const player = new Audio(url);
+        player.volume = spec.volume ?? 0.8;
+        activeFreesoundPlayer = player;
+        await player.play();
+    } catch (err) {
+        console.warn('[Freesound] 播放失敗:', effectKey, err);
+    }
+}
+
+function preloadFreesoundEffects() {
+    if (!FREESOUND_TOKEN) return;
+    Object.keys(FREESOUND_EFFECTS).forEach((key) => {
+        fetchFreesoundPreviewUrl(key).catch(() => {});
+    });
 }
 
 // ===============================
@@ -379,14 +492,6 @@ function buildFinishCellHtml() {
         </div>`;
 }
 
-function speakNoticeText(text) {
-    if (!text || !window.speechSynthesis) return;
-    window.speechSynthesis.cancel();
-    const utterance = new SpeechSynthesisUtterance(text);
-    utterance.lang = 'zh-HK';
-    window.speechSynthesis.speak(utterance);
-}
-
 function showSpecialGridNotice(type) {
     const configs = {
         banana: {
@@ -395,7 +500,6 @@ function showSpecialGridNotice(type) {
             message: '哎喲！腳底一滑，後退 <strong>1</strong> 格！',
             btnText: '好痛！',
             btnClass: 'notice-btn notice-btn-banana',
-            speech: '踩到香蕉皮，後退一格',
             anim: 'popup-shake 0.5s ease-in-out'
         },
         dino: {
@@ -404,7 +508,6 @@ function showSpecialGridNotice(type) {
             message: '🦖 大地震動！後退 <strong>3</strong> 格！',
             btnText: '快跑！',
             btnClass: 'notice-btn notice-btn-dino',
-            speech: '恐龍來襲，後退三格',
             anim: 'popup-earthquake 0.6s ease-out'
         },
         rocket: {
@@ -413,7 +516,6 @@ function showSpecialGridNotice(type) {
             message: '點擊棋子，向前衝刺 <strong>5</strong> 格！',
             btnText: '出發！',
             btnClass: 'notice-btn notice-btn-rocket',
-            speech: '火箭推進，前進五格',
             iconAnim: 'rocket-fly 1.5s ease-in-out infinite alternate'
         },
         finish: {
@@ -422,7 +524,6 @@ function showSpecialGridNotice(type) {
             message: '教師預覽：僅供外觀展示，<strong>不會</strong>改變棋子位置或回合。',
             btnText: '知道了',
             btnClass: 'notice-btn notice-btn-banana',
-            speech: '終點格預覽',
             anim: 'popup-shake 0.35s ease-in-out'
         }
     };
@@ -447,11 +548,14 @@ function showSpecialGridNotice(type) {
         if (cfg.anim) notice.style.animation = cfg.anim;
 
         document.body.appendChild(notice);
-        speakNoticeText(cfg.speech);
+
+        if (type === 'banana' || type === 'dino' || type === 'rocket') {
+            void playFreesoundEffect(type);
+        }
+
         requestAnimationFrame(() => notice.classList.add('show'));
 
         const close = () => {
-            if (window.speechSynthesis) window.speechSynthesis.cancel();
             notice.classList.remove('show');
             setTimeout(() => {
                 notice.remove();
@@ -953,6 +1057,7 @@ function displaySpecificTask(task) {
 function checkUserAnswer(sel, ans) {
     const fb = document.getElementById('feedback-msg');
     if (sel === ans) {
+        void playFreesoundEffect('cheer');
         stopModalTimer();
         showAnswerCelebration(ans);
     } else {
@@ -1061,6 +1166,7 @@ function boot() {
     initMusicCtrl();
     initTestPanel();
     initSecretFlower();
+    preloadFreesoundEffects();
 }
 
 window.onload = boot;
