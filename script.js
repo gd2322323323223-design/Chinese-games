@@ -85,7 +85,7 @@ const puncTasks = [
     { type: "punc", question: "小恩，你為甚麼不開心___", options: ["。", "？", "："], answer: "？" },
     { type: "punc", question: "下午三時___哥哥在公園跑步。", options: ["。", "，", "「"], answer: "，" },
     { type: "punc", question: "哥哥對弟弟說___「你的新書包真好看啊！」", options: ["。", "？", "："], answer: "：" },
-    { type: "punc", question: "你知道小貓去了哪裡嗎___", options: ["。", "？", "！"], answer: "？" },
+    { type: "punc", question: "你知道小貓去了哪裏嗎___", options: ["。", "？", "！"], answer: "？" },
     { type: "punc", question: "老師說：___今天沒有功課。」", options: ["「", "」", "，"], answer: "「" },
     { type: "punc", question: "老師說：「今天沒有功課。___", options: ["。」", "」", "。"], answer: "」" },
     { type: "punc", question: "今天，我會到商場買衣服___", options: ["。", "？", "！"], answer: "。" },
@@ -111,8 +111,8 @@ const strokeTasks = [
     { type: "stroke", question: "請選出「先進入後關門」的字。", options: ["甲", "口", "內"], answer: "口" },
     { type: "stroke", question: "請選出「先進入後關門」的字。", options: ["趣", "區", "固"], answer: "固" }];
 const understandTasks = [
-    { type: "understand", sentence: "「暑假，爸爸帶我坐飛機去北京遊玩，我們一起登上了長城。」", question: "我和爸爸去了哪裡？", options: ["香港", "上海", "北京"], answer: "北京" },
-    { type: "understand", sentence: "「早上，媽媽去了理髮店。中午，媽媽去了麵包店。晚上，媽媽去了餐廳。」", question: "媽媽在中午的時候去了哪裡？", options: ["理髮店", "麵包店", "餐廳"], answer: "麵包店" },
+    { type: "understand", sentence: "「暑假，爸爸帶我坐飛機去北京遊玩，我們一起登上了長城。」", question: "我和爸爸去了哪裏？", options: ["香港", "上海", "北京"], answer: "北京" },
+    { type: "understand", sentence: "「早上，媽媽去了理髮店。中午，媽媽去了麵包店。晚上，媽媽去了餐廳。」", question: "媽媽在中午的時候去了哪裏？", options: ["理髮店", "麵包店", "餐廳"], answer: "麵包店" },
     { type: "understand", sentence: "「今天是小明七歲的生日。小方送了帽子，小美送了文具。」", question: "今天是誰的生日？", options: ["小明", "小方", "小美"], answer: "小明" },
     { type: "understand", sentence: "「夏天的晚上，池塘裏有兩隻青蛙坐在荷葉上呱呱地叫着。」", question: "池塘裏是誰在叫？", options: ["荷葉", "魚", "青蛙"], answer: "青蛙" },
     { type: "understand", sentence: "「弟弟喜歡吃雪糕。哥哥喜歡吃糖果。我喜歡吃餅乾。」", question: "弟弟喜歡吃甚麼？", options: ["餅乾", "糖果", "雪糕"], answer: "雪糕" },
@@ -1012,11 +1012,22 @@ async function moveSteps(pid, steps) {
     moving = false;
 }
 
+function showWinModal(pid) {
+    playSound('win');
+    const modal = document.getElementById('win-modal');
+    const playerEl = document.getElementById('win-player');
+    if (playerEl) {
+        playerEl.innerHTML = `
+            <p class="win-player-line">玩家 ${pid + 1} 成功衝到終點！</p>
+            <p class="win-praise-line">你太厲害了，中文越來越棒！</p>
+            <p class="win-praise-line">老師為你感到驕傲，繼續加油！</p>`;
+    }
+    if (modal) modal.style.display = 'flex';
+}
+
 function checkEndOrModal(pid) {
     if (players[pid].pos === FINISH_POS) {
-        playSound('win');
-        document.getElementById('win-modal').style.display = 'flex';
-        document.getElementById('win-player').innerText = `玩家 ${pid + 1} 獲勝！`;
+        showWinModal(pid);
         return;
     }
 
@@ -1193,7 +1204,6 @@ function showAnswerCelebration(fullText) {
 function displaySpecificTask(task) {
     currentActiveTask = task;
     resetCelebrationUI();
-    clearAnswerHints();
     attempts = 3;
     document.getElementById('modal').className = 'type-' + task.type;
     const reorderMeta = document.getElementById('reorder-meta-header');
@@ -1289,102 +1299,6 @@ function displaySpecificTask(task) {
     content.appendChild(buildOptionsPool(task, useHorizontal));
 }
 
-function escapeHtml(text) {
-    return String(text)
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;');
-}
-
-function getHintKeywords(task) {
-    if (!task) return [];
-    const ans = String(task.answer || '').trim();
-    const keywords = [];
-
-    switch (task.type) {
-        case 'understand':
-            if (task.sentence && ans.length >= 2 && task.sentence.includes(ans)) {
-                keywords.push(ans);
-            }
-            break;
-        case 'fill': {
-            const beforeBlank = task.question && task.question.split('______')[0];
-            if (beforeBlank) {
-                const m = beforeBlank.match(/([\u4e00-\u9fff]{2,4})\s*$/);
-                if (m) keywords.push(m[1]);
-            }
-            break;
-        }
-        case 'reorder':
-            if (Array.isArray(task.words)) {
-                task.words.forEach((w) => {
-                    const word = String(w).trim();
-                    if (word.length >= 2 && ans.includes(word) && !/[，。、]/.test(word)) {
-                        keywords.push(word);
-                    }
-                });
-            }
-            break;
-        case 'continue': {
-            const stem = (task.question && task.question.split('______')[0]) || task.question || '';
-            const stemHint = stem.replace(/[，。：]/g, '').slice(-4);
-            if (stemHint.length >= 2) keywords.push(stemHint);
-            if (ans.length >= 2) keywords.push(ans.slice(0, Math.min(4, ans.length)));
-            break;
-        }
-        case 'punc':
-            if (task.question && task.question.includes('___')) keywords.push('___');
-            break;
-        case 'match':
-        case 'radical':
-        case 'stroke':
-            if (ans.length >= 1) keywords.push(ans);
-            break;
-        default:
-            break;
-    }
-
-    return [...new Set(keywords)].filter((k) => k && k.length >= 1);
-}
-
-function wrapKeywordsInText(text, keywords) {
-    let html = escapeHtml(text);
-    const sorted = [...keywords].sort((a, b) => b.length - a.length);
-    sorted.forEach((kw) => {
-        const esc = escapeHtml(kw);
-        if (esc) html = html.split(esc).join(`<mark class="answer-hint-mark">${esc}</mark>`);
-    });
-    return html;
-}
-
-function clearAnswerHints() {
-    document.querySelectorAll('.answer-hint-mark').forEach((mark) => {
-        const text = mark.textContent;
-        mark.replaceWith(document.createTextNode(text));
-    });
-    document.querySelectorAll('.hint-highlight-word').forEach((el) => {
-        el.classList.remove('hint-highlight-word');
-    });
-}
-
-function applyAnswerHints(task) {
-    const keywords = getHintKeywords(task);
-    if (!keywords.length) return;
-
-    document.querySelectorAll('.passage-text, .passage-question, .passage-question-only').forEach((el) => {
-        const plain = el.textContent;
-        if (plain) el.innerHTML = wrapKeywordsInText(plain, keywords);
-    });
-
-    if (task.type === 'reorder') {
-        document.querySelectorAll('#reorder-options-pool .opt-btn').forEach((btn) => {
-            if (keywords.includes(btn.innerText.trim())) {
-                btn.classList.add('hint-highlight-word');
-            }
-        });
-    }
-}
-
 function handleCorrectAnswer(correctAnswer) {
     playCorrectAnswerCheer();
     stopModalTimer();
@@ -1398,20 +1312,11 @@ function checkUserAnswer(sel, ans) {
     } else {
         attempts--;
         if (attempts > 0) {
+            fb.innerText = `還有 ${attempts} 次機會！`;
             fb.style.color = "#e53e3e";
-            if (attempts === 1 && currentActiveTask) {
-                applyAnswerHints(currentActiveTask);
-                fb.innerText = '💡 還有 1 次機會！看看句子裏橙色標出的關鍵詞。';
-                fb.className = 'hint-feedback-msg';
-            } else {
-                fb.innerText = `還有 ${attempts} 次機會！`;
-                fb.className = '';
-            }
         } else {
-            clearAnswerHints();
             fb.innerText = "💔 正確答案：" + ans;
             fb.style.color = "#744210";
-            fb.className = '';
             setTimeout(closeModal, 1600);
         }
     }
@@ -1420,7 +1325,6 @@ function checkUserAnswer(sel, ans) {
 function closeModal() {
     stopModalTimer();
     resetCelebrationUI();
-    clearAnswerHints();
     currentActiveTask = null;
     const timerDisplay = document.getElementById('timer');
     if (timerDisplay) timerDisplay.textContent = '⏳ 剩餘時間: ' + MODAL_TIME_SECONDS + 's';
