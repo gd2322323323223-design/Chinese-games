@@ -215,8 +215,6 @@ function startGame() {
     const rollBtn = document.getElementById('btn-roll');
     if (rollBtn) rollBtn.style.setProperty('display', 'inline-block', 'important');
 
-    if (audio.bgm.paused) toggleBGM();
-
     const diceBox = document.getElementById('dice-box');
     if (diceBox) diceBox.style.transform = 'rotateX(0deg) rotateY(0deg)';
 
@@ -233,20 +231,46 @@ const audio = {
 };
 audio.bgm.loop = true;
 audio.bgm.volume = 0.4;
+audio.bgm.pause();
+
+function setBgmMutedUi() {
+    const btn = document.getElementById('music-ctrl');
+    const icon = btn ? btn.querySelector('.music-ctrl-icon') : null;
+    if (icon) icon.textContent = '🔇';
+    if (btn) {
+        btn.classList.add('is-muted');
+        btn.title = '開啟背景音樂';
+        btn.setAttribute('aria-label', '開啟背景音樂');
+    }
+}
 
 function toggleBGM() {
     const btn = document.getElementById('music-ctrl');
     const icon = btn ? btn.querySelector('.music-ctrl-icon') : null;
     if (audio.bgm.paused) {
         audio.bgm.play().catch(() => {});
-        if (icon) icon.textContent = "🎶";
-        if (btn) btn.classList.remove('is-muted');
-        btn.title = "關閉背景音樂";
+        if (icon) icon.textContent = '🔊';
+        if (btn) {
+            btn.classList.remove('is-muted');
+            btn.title = '關閉背景音樂';
+            btn.setAttribute('aria-label', '關閉背景音樂');
+        }
     } else {
         audio.bgm.pause();
-        if (icon) icon.textContent = "🔇";
-        if (btn) btn.classList.add('is-muted');
-        btn.title = "開啟背景音樂";
+        if (icon) icon.textContent = '🔇';
+        if (btn) {
+            btn.classList.add('is-muted');
+            btn.title = '開啟背景音樂';
+            btn.setAttribute('aria-label', '開啟背景音樂');
+        }
+    }
+}
+
+function initMusicCtrl() {
+    setBgmMutedUi();
+    const musicBtn = document.getElementById('music-ctrl');
+    if (musicBtn) {
+        musicBtn.addEventListener('click', toggleBGM);
     }
 }
 
@@ -1003,10 +1027,6 @@ function initTestPanel() {
         });
     }
 
-    const musicBtn = document.getElementById('music-ctrl');
-    if (musicBtn) {
-        musicBtn.addEventListener('click', toggleBGM);
-    }
 }
 
 function restartGame() {
@@ -1022,6 +1042,7 @@ function boot() {
     } catch (err) {
         console.error('init failed:', err);
     }
+    initMusicCtrl();
     initTestPanel();
     initSecretFlower();
 }
