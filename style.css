@@ -580,7 +580,7 @@ body:has(#start-screen:not([style*="display: none"])) #game-container {
 }
 
 /* ==========================================
-   終點格 (#cell-finish)：end-box.png + 純 CSS 黃金講台與霓虹光束
+   終點格 (#cell-finish)：透明 end-box.png + 多重背景發光舞台
    ========================================== */
 #cell-finish {
     grid-column: 4 / span 3 !important;
@@ -591,14 +591,14 @@ body:has(#start-screen:not([style*="display: none"])) #game-container {
     max-width: 280px;
     aspect-ratio: 1 / 1;
     position: relative;
-    margin: 0 auto;
-    box-sizing: border-box;
-    background: url('images/end-box.png') no-repeat center center !important;
-    background-size: contain !important;
     border: none !important;
     background-color: transparent !important;
     box-shadow: none !important;
-    animation: trophyFloat 4s ease-in-out infinite alternate;
+    background:
+        url('images/end-box.png') no-repeat center center,
+        radial-gradient(circle, rgba(255, 255, 255, 0.9) 0%, rgba(255, 215, 0, 0.3) 35%, rgba(162, 217, 206, 0.1) 60%, transparent 70%) no-repeat center center !important;
+    background-size: 85% 85%, 100% 100% !important;
+    animation: stageGlowFloat 4s ease-in-out infinite alternate;
     overflow: visible;
     z-index: 10;
 }
@@ -607,54 +607,25 @@ body:has(#start-screen:not([style*="display: none"])) #game-container {
     content: "";
     position: absolute;
     bottom: -15px;
-    left: 5%;
-    width: 90%;
+    left: 10%;
+    width: 80%;
     height: 25px;
     background: linear-gradient(to bottom, #ffe891 0%, #fcd04c 30%, #e3a324 70%, #9c6b0f 100%);
     border-radius: 4px;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    border-top: 1px solid #fff;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
     z-index: -1;
     pointer-events: none;
 }
 
 #cell-finish::after {
-    content: "";
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 115%;
-    height: 115%;
-    max-width: 320px;
-    max-height: 320px;
-    transform: translate(-50%, -50%);
-    background:
-        radial-gradient(circle, rgba(255, 255, 255, 0.8) 0%, rgba(255, 215, 0, 0.2) 40%, transparent 70%),
-        conic-gradient(
-            from 0deg at 50% 50%,
-            transparent 0deg,
-            rgba(0, 191, 255, 0.22) 35deg,
-            transparent 70deg,
-            rgba(238, 130, 238, 0.22) 125deg,
-            transparent 160deg,
-            rgba(255, 215, 0, 0.28) 215deg,
-            transparent 250deg,
-            rgba(0, 191, 255, 0.18) 300deg,
-            transparent 360deg
-        );
-    mix-blend-mode: screen;
-    pointer-events: none;
-    z-index: -2;
-    animation: stageLaser 10s linear infinite;
+    display: none !important;
+    content: none !important;
 }
 
-@keyframes trophyFloat {
-    0% { transform: translateY(3px); }
-    100% { transform: translateY(-5px); }
-}
-
-@keyframes stageLaser {
-    0% { transform: translate(-50%, -50%) rotate(0deg) scale(0.95); }
-    100% { transform: translate(-50%, -50%) rotate(360deg) scale(1.05); }
+@keyframes stageGlowFloat {
+    0% { transform: translateY(2px); }
+    100% { transform: translateY(-6px); }
 }
 
 #cell-finish * {
@@ -1597,12 +1568,6 @@ body.game-active #btn-roll {
     }
     #cell-finish {
         max-width: min(240px, 88vw);
-    }
-    #cell-finish::after {
-        width: 110%;
-        height: 110%;
-        max-width: 260px;
-        max-height: 260px;
     }
     .cell {
         --cell-size: 60px;
