@@ -580,35 +580,25 @@ body:has(#start-screen:not([style*="display: none"])) #game-container {
 }
 
 /* ==========================================
-   終點格 (#cell-finish) 最終完美還原版代碼
-   基於 images/end-box.png 利用 CSS 刻出圖片 2 效果
+   終點格 (#cell-finish)：end-box.png + 純 CSS 黃金講台與霓虹光束
    ========================================== */
 #cell-finish {
-    grid-column: span 3;
-    grid-row: span 3;
+    grid-column: 4 / span 3 !important;
+    grid-row: span 3 !important;
     justify-self: center;
     align-self: end;
-
     width: 100%;
-    max-width: 300px;
+    max-width: 280px;
     aspect-ratio: 1 / 1;
     position: relative;
-    margin-bottom: 50px;
-
+    margin: 0 auto;
+    box-sizing: border-box;
     background: url('images/end-box.png') no-repeat center center !important;
     background-size: contain !important;
+    border: none !important;
+    background-color: transparent !important;
+    box-shadow: none !important;
     animation: trophyFloat 4s ease-in-out infinite alternate;
-
-    border: 3px solid transparent !important;
-    background-clip: padding-box, border-box !important;
-    background-origin: padding-box, border-box !important;
-    border-radius: 28px !important;
-    box-shadow: 0 0 35px rgba(255, 215, 0, 0.5),
-                inset 0 0 20px rgba(255, 215, 0, 0.2) !important;
-
-    display: flex;
-    justify-content: center;
-    align-items: center;
     overflow: visible;
     z-index: 10;
 }
@@ -616,66 +606,55 @@ body:has(#start-screen:not([style*="display: none"])) #game-container {
 #cell-finish::before {
     content: "";
     position: absolute;
-    bottom: -45px;
-    left: -8%;
-    width: 116%;
-    height: 50px;
-
-    background: linear-gradient(to bottom,
-        #ffe891 0%,
-        #fcd04c 15%,
-        #e3a324 40%,
-        #9c6b0f 85%,
-        #6e4805 100%
-    );
-
-    border-radius: 8px 8px 12px 12px;
-    border-top: 2px solid #fffdf0;
-
-    box-shadow:
-        0 4px 0 #523502,
-        0 12px 25px rgba(0, 0, 0, 0.45),
-        inset 0 2px 4px rgba(255, 255, 255, 0.6);
+    bottom: -15px;
+    left: 5%;
+    width: 90%;
+    height: 25px;
+    background: linear-gradient(to bottom, #ffe891 0%, #fcd04c 30%, #e3a324 70%, #9c6b0f 100%);
+    border-radius: 4px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
     z-index: -1;
+    pointer-events: none;
 }
 
 #cell-finish::after {
     content: "";
     position: absolute;
-    top: 45%;
+    top: 50%;
     left: 50%;
-    width: 420px;
-    height: 420px;
+    width: 115%;
+    height: 115%;
+    max-width: 320px;
+    max-height: 320px;
     transform: translate(-50%, -50%);
-
     background:
-        radial-gradient(circle, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0) 65%),
-        conic-gradient(from 0deg,
-            transparent, rgba(255, 215, 0, 0.3) 10deg, transparent 25deg,
-            rgba(0, 191, 255, 0.3) 40deg, transparent 60deg,
-            rgba(238, 130, 238, 0.3) 85deg, transparent 110deg,
-            rgba(255, 215, 0, 0.3) 140deg, transparent 170deg,
-            rgba(0, 191, 255, 0.3) 210deg, transparent 240deg,
-            rgba(238, 130, 238, 0.3) 280deg, transparent 310deg,
-            rgba(255, 215, 0, 0.3) 340deg, transparent 360deg
+        radial-gradient(circle, rgba(255, 255, 255, 0.8) 0%, rgba(255, 215, 0, 0.2) 40%, transparent 70%),
+        conic-gradient(
+            from 0deg at 50% 50%,
+            transparent 0deg,
+            rgba(0, 191, 255, 0.22) 35deg,
+            transparent 70deg,
+            rgba(238, 130, 238, 0.22) 125deg,
+            transparent 160deg,
+            rgba(255, 215, 0, 0.28) 215deg,
+            transparent 250deg,
+            rgba(0, 191, 255, 0.18) 300deg,
+            transparent 360deg
         );
-
     mix-blend-mode: screen;
     pointer-events: none;
     z-index: -2;
-
-    animation: stageLaser 8s linear infinite;
+    animation: stageLaser 10s linear infinite;
 }
 
 @keyframes trophyFloat {
-    0% { transform: translateY(2px); filter: drop-shadow(0 5px 15px rgba(255, 215, 0, 0.4)); }
-    100% { transform: translateY(-8px); filter: drop-shadow(0 20px 30px rgba(255, 215, 0, 0.7)); }
+    0% { transform: translateY(3px); }
+    100% { transform: translateY(-5px); }
 }
 
 @keyframes stageLaser {
-    0% { transform: translate(-50%, -50%) rotate(0deg) scale(0.92); opacity: 0.8; }
-    50% { transform: translate(-50%, -50%) rotate(180deg) scale(1.05); opacity: 1; }
-    100% { transform: translate(-50%, -50%) rotate(360deg) scale(0.92); opacity: 0.8; }
+    0% { transform: translate(-50%, -50%) rotate(0deg) scale(0.95); }
+    100% { transform: translate(-50%, -50%) rotate(360deg) scale(1.05); }
 }
 
 #cell-finish * {
@@ -1617,12 +1596,13 @@ body.game-active #btn-roll {
         padding: 20px 10px 80px 10px !important;
     }
     #cell-finish {
-        max-width: min(260px, 88vw);
-        margin-bottom: 40px;
+        max-width: min(240px, 88vw);
     }
     #cell-finish::after {
-        width: min(320px, 95vw);
-        height: min(320px, 95vw);
+        width: 110%;
+        height: 110%;
+        max-width: 260px;
+        max-height: 260px;
     }
     .cell {
         --cell-size: 60px;
