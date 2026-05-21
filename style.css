@@ -580,7 +580,7 @@ body:has(#start-screen:not([style*="display: none"])) #game-container {
 }
 
 /* ==========================================
-   終點格 (#cell-finish)：透明 end-box.png + 多重背景發光舞台
+   終點格 (#cell-finish) 獨立分層完美重構
    ========================================== */
 #cell-finish {
     grid-column: 4 / span 3 !important;
@@ -591,45 +591,81 @@ body:has(#start-screen:not([style*="display: none"])) #game-container {
     max-width: 280px;
     aspect-ratio: 1 / 1;
     position: relative;
+    margin-bottom: 30px;
+    background: transparent !important;
     border: none !important;
-    background-color: transparent !important;
     box-shadow: none !important;
-    background:
-        url('images/end-box.png') no-repeat center center,
-        radial-gradient(circle, rgba(255, 255, 255, 0.9) 0%, rgba(255, 215, 0, 0.3) 35%, rgba(162, 217, 206, 0.1) 60%, transparent 70%) no-repeat center center !important;
-    background-size: 85% 85%, 100% 100% !important;
-    animation: stageGlowFloat 4s ease-in-out infinite alternate;
     overflow: visible;
     z-index: 10;
 }
 
-#cell-finish::before {
-    content: "";
-    position: absolute;
-    bottom: -15px;
-    left: 10%;
-    width: 80%;
-    height: 25px;
-    background: linear-gradient(to bottom, #ffe891 0%, #fcd04c 30%, #e3a324 70%, #9c6b0f 100%);
-    border-radius: 4px;
-    border-top: 1px solid #fff;
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
-    z-index: -1;
-    pointer-events: none;
-}
-
+#cell-finish::before,
 #cell-finish::after {
     display: none !important;
     content: none !important;
 }
 
-@keyframes stageGlowFloat {
-    0% { transform: translateY(2px); }
-    100% { transform: translateY(-6px); }
+#cell-finish .stage-light {
+    position: absolute;
+    top: 45%;
+    left: 50%;
+    width: min(380px, 130%);
+    height: min(380px, 130%);
+    transform: translate(-50%, -50%);
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.9) 0%, rgba(255, 223, 86, 0.3) 40%, rgba(186, 134, 255, 0.15) 60%, transparent 70%);
+    mix-blend-mode: screen;
+    pointer-events: none;
+    z-index: 1;
+    animation: lightRotate 10s linear infinite;
+}
+
+#cell-finish .stage-trophy {
+    position: absolute;
+    top: 5%;
+    left: 10%;
+    width: 80%;
+    height: 80%;
+    background: url('images/end-box.png') no-repeat center center;
+    background-size: contain;
+    z-index: 2;
+    animation: trophyFloat 4s ease-in-out infinite alternate;
+}
+
+#cell-finish .stage-podium {
+    position: absolute;
+    bottom: -15px;
+    left: 10%;
+    width: 80%;
+    height: 30px;
+    background: linear-gradient(to bottom, #ffe891 0%, #fcd04c 25%, #e3a324 70%, #8c5f0b 100%);
+    border-radius: 6px;
+    border-top: 2px solid #fff;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4),
+                inset 0 2px 4px rgba(255, 255, 255, 0.5);
+    z-index: 3;
+    pointer-events: none;
+}
+
+@keyframes lightRotate {
+    0% { transform: translate(-50%, -50%) rotate(0deg) scale(0.95); }
+    50% { transform: translate(-50%, -50%) rotate(180deg) scale(1.05); }
+    100% { transform: translate(-50%, -50%) rotate(360deg) scale(0.95); }
+}
+
+@keyframes trophyFloat {
+    0% { transform: translateY(3px); }
+    100% { transform: translateY(-7px); }
 }
 
 #cell-finish * {
-    display: none !important;
+    text-indent: -9999px;
+}
+
+#cell-finish .stage-light,
+#cell-finish .stage-trophy,
+#cell-finish .stage-podium {
+    text-indent: 0;
+    display: block;
 }
 
 /* 道路線條 */
@@ -1568,6 +1604,11 @@ body.game-active #btn-roll {
     }
     #cell-finish {
         max-width: min(240px, 88vw);
+        margin-bottom: 24px;
+    }
+    #cell-finish .stage-light {
+        width: min(280px, 120%);
+        height: min(280px, 120%);
     }
     .cell {
         --cell-size: 60px;
