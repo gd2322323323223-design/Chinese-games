@@ -14,7 +14,7 @@ const MODAL_TIME_SECONDS = 120;
 let currentActiveTask = null;
 
 const CELEBRATION_PRAISES = [
-    '🌟 太厲害了！完美的句子！ 🏆',
+    '🌟 太厲害了！繼續進步！🏆',
     '🔥 語文大師就是你！ 🧠',
     '👏 答得太漂亮了！繼續衝刺！',
     '💫 妙筆生花！你真是天才！',
@@ -682,6 +682,17 @@ function getBoardCell(pos) {
     return document.getElementById(pos === FINISH_POS ? 'cell-finish' : 'c' + pos);
 }
 
+function buildStartCellHtml() {
+    return `
+        <div class="start-stage" aria-hidden="false">
+            <div class="start-flag-wrap" aria-hidden="true">
+                <span class="start-flag-pole"></span>
+                <span class="start-flag">🚩</span>
+            </div>
+            <div class="start-label">出發</div>
+        </div>`;
+}
+
 function buildFinishCellHtml() {
     return `
         <div class="finish-stage" aria-hidden="false">
@@ -851,7 +862,7 @@ function init() {
 
         if (i === 0) {
             cell.classList.add('cell-start');
-            cell.innerHTML = '<span class="cell-text cell-start-label">起點</span>';
+            cell.innerHTML = buildStartCellHtml();
         } else if (traps.includes(i)) {
             cell.classList.add('trap-cell');
             cell.innerHTML = '<span class="event-icon">🍌</span>';
@@ -1182,6 +1193,7 @@ function showAnswerCelebration(fullText) {
 function displaySpecificTask(task) {
     currentActiveTask = task;
     resetCelebrationUI();
+    clearAnswerHints();
     attempts = 3;
     document.getElementById('modal').className = 'type-' + task.type;
     const reorderMeta = document.getElementById('reorder-meta-header');
@@ -1277,6 +1289,102 @@ function displaySpecificTask(task) {
     content.appendChild(buildOptionsPool(task, useHorizontal));
 }
 
+function escapeHtml(text) {
+    return String(text)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;');
+}
+
+function getHintKeywords(task) {
+    if (!task) return [];
+    const ans = String(task.answer || '').trim();
+    const keywords = [];
+
+    switch (task.type) {
+        case 'understand':
+            if (task.sentence && ans.length >= 2 && task.sentence.includes(ans)) {
+                keywords.push(ans);
+            }
+            break;
+        case 'fill': {
+            const beforeBlank = task.question && task.question.split('______')[0];
+            if (beforeBlank) {
+                const m = beforeBlank.match(/([\u4e00-\u9fff]{2,4})\s*$/);
+                if (m) keywords.push(m[1]);
+            }
+            break;
+        }
+        case 'reorder':
+            if (Array.isArray(task.words)) {
+                task.words.forEach((w) => {
+                    const word = String(w).trim();
+                    if (word.length >= 2 && ans.includes(word) && !/[，。、]/.test(word)) {
+                        keywords.push(word);
+                    }
+                });
+            }
+            break;
+        case 'continue': {
+            const stem = (task.question && task.question.split('______')[0]) || task.question || '';
+            const stemHint = stem.replace(/[，。：]/g, '').slice(-4);
+            if (stemHint.length >= 2) keywords.push(stemHint);
+            if (ans.length >= 2) keywords.push(ans.slice(0, Math.min(4, ans.length)));
+            break;
+        }
+        case 'punc':
+            if (task.question && task.question.includes('___')) keywords.push('___');
+            break;
+        case 'match':
+        case 'radical':
+        case 'stroke':
+            if (ans.length >= 1) keywords.push(ans);
+            break;
+        default:
+            break;
+    }
+
+    return [...new Set(keywords)].filter((k) => k && k.length >= 1);
+}
+
+function wrapKeywordsInText(text, keywords) {
+    let html = escapeHtml(text);
+    const sorted = [...keywords].sort((a, b) => b.length - a.length);
+    sorted.forEach((kw) => {
+        const esc = escapeHtml(kw);
+        if (esc) html = html.split(esc).join(`<mark class="answer-hint-mark">${esc}</mark>`);
+    });
+    return html;
+}
+
+function clearAnswerHints() {
+    document.querySelectorAll('.answer-hint-mark').forEach((mark) => {
+        const text = mark.textContent;
+        mark.replaceWith(document.createTextNode(text));
+    });
+    document.querySelectorAll('.hint-highlight-word').forEach((el) => {
+        el.classList.remove('hint-highlight-word');
+    });
+}
+
+function applyAnswerHints(task) {
+    const keywords = getHintKeywords(task);
+    if (!keywords.length) return;
+
+    document.querySelectorAll('.passage-text, .passage-question, .passage-question-only').forEach((el) => {
+        const plain = el.textContent;
+        if (plain) el.innerHTML = wrapKeywordsInText(plain, keywords);
+    });
+
+    if (task.type === 'reorder') {
+        document.querySelectorAll('#reorder-options-pool .opt-btn').forEach((btn) => {
+            if (keywords.includes(btn.innerText.trim())) {
+                btn.classList.add('hint-highlight-word');
+            }
+        });
+    }
+}
+
 function handleCorrectAnswer(correctAnswer) {
     playCorrectAnswerCheer();
     stopModalTimer();
@@ -1290,11 +1398,20 @@ function checkUserAnswer(sel, ans) {
     } else {
         attempts--;
         if (attempts > 0) {
-            fb.innerText = `還有 ${attempts} 次機會！`;
             fb.style.color = "#e53e3e";
+            if (attempts === 1 && currentActiveTask) {
+                applyAnswerHints(currentActiveTask);
+                fb.innerText = '💡 還有 1 次機會！看看句子裏橙色標出的關鍵詞。';
+                fb.className = 'hint-feedback-msg';
+            } else {
+                fb.innerText = `還有 ${attempts} 次機會！`;
+                fb.className = '';
+            }
         } else {
+            clearAnswerHints();
             fb.innerText = "💔 正確答案：" + ans;
             fb.style.color = "#744210";
+            fb.className = '';
             setTimeout(closeModal, 1600);
         }
     }
@@ -1303,6 +1420,7 @@ function checkUserAnswer(sel, ans) {
 function closeModal() {
     stopModalTimer();
     resetCelebrationUI();
+    clearAnswerHints();
     currentActiveTask = null;
     const timerDisplay = document.getElementById('timer');
     if (timerDisplay) timerDisplay.textContent = '⏳ 剩餘時間: ' + MODAL_TIME_SECONDS + 's';
