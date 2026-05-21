@@ -34,7 +34,8 @@ const traps = [];
 const boosts = [];
 const dinosaurs = [];
 let cellTypes = {};
-let cellTasks = {};
+let availableQuestions = [];
+let usedQuestions = [];
 
 // 玩家位置
 const players = [{ pos: 0 }, { pos: 0 }];
@@ -120,6 +121,37 @@ const understandTasks = [
     { type: "understand", sentence: "「七時半，我來到了學校。十一時半，我在上中文課。一時半，我在上數學課。三時半，我回到了家裏。」", question: "我在甚麼時候上數學課？", options: ["十一時半", "一時半", "三時半"], answer: "一時半" }
 ];
 const allTasks = [...fillTasks, ...reorderTasks, ...matchTasks, ...radicalTasks, ...puncTasks, ...continueTasks, ...strokeTasks, ...understandTasks];
+
+// ===============================
+// ========== 動態題目池 ==========
+// ===============================
+function cloneTask(task) {
+    const copy = { ...task };
+    if (Array.isArray(task.words)) copy.words = task.words.slice();
+    if (Array.isArray(task.options)) copy.options = task.options.slice();
+    return copy;
+}
+
+function initQuestionPool() {
+    availableQuestions = allTasks.map(cloneTask);
+    usedQuestions = [];
+}
+
+function recycleQuestionPoolIfEmpty() {
+    if (availableQuestions.length > 0) return;
+    availableQuestions = usedQuestions.map(cloneTask);
+    usedQuestions = [];
+}
+
+function drawQuestionFromPool() {
+    recycleQuestionPoolIfEmpty();
+    if (availableQuestions.length === 0) return null;
+
+    const index = Math.floor(Math.random() * availableQuestions.length);
+    const task = availableQuestions.splice(index, 1)[0];
+    usedQuestions.push(task);
+    return task;
+}
 
 // ===============================
 // ========= 角色選擇系統 =========
@@ -616,11 +648,8 @@ function buildGameBoard() {
 
         if (!validateBoardLayout(layout)) continue;
 
-        const shuffledTasks = shuffleArray(allTasks);
         const themeBag = buildEvenThemeBag();
-        const tasks = {};
         const types = {};
-        let taskIdx = 0;
         let themeIdx = 0;
 
         traps.length = 0;
@@ -633,12 +662,11 @@ function buildGameBoard() {
             else if (cell.kind === 'rocket') boosts.push(pos);
             else if (cell.kind === 'dino') dinosaurs.push(pos);
             else if (cell.kind === 'question') {
-                tasks[pos] = shuffledTasks[taskIdx++];
                 types[pos] = themeBag[themeIdx++];
             }
         }
 
-        return { layout, cellTasks: tasks, cellTypes: types };
+        return { layout, cellTypes: types };
     }
 
     throw new Error('無法生成符合規則的棋盤，請重新整理頁面');
@@ -814,7 +842,6 @@ function init() {
     board.innerHTML = "";
     let displayIndex = 1;
     const built = buildGameBoard();
-    cellTasks = built.cellTasks;
     cellTypes = built.cellTypes;
 
     for (let i = 0; i < PATH_CELL_COUNT; i++) {
@@ -1090,11 +1117,17 @@ function buildOptionsPool(task, horizontal) {
 }
 
 function showModalAtCell(pos) {
-    const task = cellTasks[pos];
+    if (!cellTypes[pos]) {
+        finishTurn();
+        return;
+    }
+
+    const task = drawQuestionFromPool();
     if (!task) {
         finishTurn();
         return;
     }
+
     displaySpecificTask(task);
     document.getElementById('modal-overlay').style.display = 'block';
     document.getElementById('modal').style.display = 'flex';
@@ -1352,6 +1385,7 @@ function restartGame() {
 window.testModal = testModal;
 
 function boot() {
+    initQuestionPool();
     try {
         init();
     } catch (err) {
