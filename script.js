@@ -322,7 +322,7 @@ const FREESOUND_EFFECTS = {
         volume: 0.9
     },
     rocket: {
-        query: 'level up powerup win arcade cartoon',
+        query: 'level up powerup win',
         filter: 'duration:[0 TO 8]',
         fallbackFilters: [
             'tag:arcade duration:[0 TO 8]',
