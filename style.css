@@ -306,7 +306,7 @@ body:has(#start-screen:not([style*="display: none"])) #game-container {
     display: grid !important; 
     grid-template-columns: repeat(10, 1fr) !important; 
     gap: 140px 15px !important; 
-    padding: 40px 40px 150px 40px !important; 
+    padding: 40px 40px 220px 40px !important; 
     border-radius: 40px; 
     background: rgba(226, 210, 180, 0.7) !important; 
     backdrop-filter: none !important; 
@@ -509,31 +509,32 @@ body:has(#start-screen:not([style*="display: none"])) #game-container {
     animation: dino-roar 0.3s infinite;
 }
 
-/* 終點格：獨立底排橫跨置中（不與路格重疊）+ 半透明黃金 + 五色聖光 */
+/* 終點格：底部 3×3 大格、純淨黃金底、十字光束夾在中層 */
 #cell-finish.goal-cell,
 .cell.goal-cell.cell-finish {
-    grid-column: 1 / -1 !important;
-    grid-row: 12 !important;
+    grid-column: 4 / span 3 !important;
+    grid-row: span 3 !important;
     justify-self: center !important;
-    align-self: center !important;
-    width: 200px !important;
-    max-width: min(200px, 92vw) !important;
-    margin: 20px auto !important;
+    align-self: end !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 12px auto 0 !important;
     height: auto;
-    min-height: 168px;
-    background: transparent !important;
+    min-height: calc(var(--cell-size) * 3 + 24px);
+    background: rgba(255, 215, 0, 0.95) !important;
+    background-color: #ffd700 !important;
     border: 5px solid rgba(255, 255, 255, 0.95) !important;
     box-shadow:
         0 0 22px rgba(255, 215, 0, 0.55),
         0 10px 24px rgba(0, 0, 0, 0.18),
-        inset 0 0 14px rgba(255, 255, 255, 0.4) !important;
+        inset 0 0 14px rgba(255, 255, 255, 0.35) !important;
     z-index: 12;
     display: flex !important;
     flex-direction: column !important;
     justify-content: center !important;
     align-items: center !important;
     position: relative;
-    padding: 10px 8px;
+    padding: 14px 10px;
     transform-origin: center center;
     overflow: hidden;
     border-radius: 20px !important;
@@ -541,31 +542,18 @@ body:has(#start-screen:not([style*="display: none"])) #game-container {
     isolation: isolate;
 }
 
-/* 半透明黃金罩（透出下層十字聖光） */
-.cell.goal-cell::before {
-    content: "" !important;
-    display: block !important;
-    position: absolute !important;
-    inset: 0 !important;
-    bottom: auto !important;
-    left: 0 !important;
-    right: 0 !important;
-    height: auto !important;
-    width: auto !important;
-    border: none !important;
-    border-radius: inherit;
-    background: linear-gradient(135deg, rgba(255, 215, 0, 0.7), rgba(255, 165, 0, 0.7)) !important;
-    background-image: none !important;
-    z-index: 1;
-    pointer-events: none;
-    opacity: 1 !important;
+/* 終點格不使用偽元素遮罩，黃金背景由本體承載（z-index 堆疊最底層） */
+.cell.goal-cell.cell-finish::before,
+#cell-finish.goal-cell::before {
+    display: none !important;
+    content: none !important;
 }
 
-/* 背後十字聖光層（置於內容與黃金罩後方，五色呼吸，無旋轉） */
+/* 十字鐳射光束：緊貼黃金背景之上（中間層） */
 .goal-laser-cross {
     position: absolute;
     inset: -14%;
-    z-index: -1;
+    z-index: 2;
     pointer-events: none;
     overflow: visible;
     animation: neon-five-colors 4s ease-in-out infinite;
@@ -647,11 +635,11 @@ body:has(#start-screen:not([style*="display: none"])) #game-container {
     }
 }
 
-/* 四週慶祝 Emoji（放大、貼邊角，不遮中央） */
+/* 四週慶祝 Emoji（最頂層，高於光束） */
 .goal-edge-emoji {
     position: absolute;
     inset: 0;
-    z-index: 4;
+    z-index: 3;
     pointer-events: none;
 }
 
@@ -670,10 +658,10 @@ body:has(#start-screen:not([style*="display: none"])) #game-container {
     50% { opacity: 1; }
 }
 
-/* 中央獎盃 + 終點 — 絕對置中 */
+/* 中央獎盃 + 終點 — 絕對置中（最頂層） */
 .goal-center-stage {
     position: relative;
-    z-index: 5;
+    z-index: 3;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -719,14 +707,14 @@ body:has(#start-screen:not([style*="display: none"])) #game-container {
 
 @keyframes custom-pulse {
     0%, 100% {
-        transform: scale(1.12);
+        transform: scale(1.02);
         box-shadow:
             0 0 22px rgba(255, 215, 0, 0.7),
             0 10px 22px rgba(0, 0, 0, 0.2),
             inset 0 0 18px rgba(255, 255, 255, 0.75);
     }
     50% {
-        transform: scale(1.18);
+        transform: scale(1.05);
         box-shadow:
             0 0 38px rgba(255, 215, 0, 0.95),
             0 0 60px rgba(255, 165, 0, 0.45),
@@ -1714,12 +1702,13 @@ body.game-active #btn-roll {
     }
 }
 
-/* ========== 背景音樂按鈕（毛玻璃圓形） ========== */
+/* ========== 背景音樂按鈕（首頁／棋盤頁共用，僅點擊切換） ========== */
 #music-ctrl.music-ctrl-btn {
     position: fixed;
     top: 20px;
     right: 20px;
-    z-index: 10002;
+    z-index: 10050;
+    pointer-events: auto;
     width: 56px;
     height: 56px;
     margin: 0;

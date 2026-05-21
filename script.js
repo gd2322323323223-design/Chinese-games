@@ -218,6 +218,7 @@ function startGame() {
     const diceBox = document.getElementById('dice-box');
     if (diceBox) diceBox.style.transform = 'rotateX(0deg) rotateY(0deg)';
 
+    syncBgmUiFromAudio();
     updateDisplay();
 }
 
@@ -231,6 +232,8 @@ const audio = {
 };
 audio.bgm.loop = true;
 audio.bgm.volume = 0.4;
+audio.bgm.preload = 'none';
+audio.bgm.autoplay = false;
 audio.bgm.pause();
 
 function setBgmMutedUi() {
@@ -244,34 +247,43 @@ function setBgmMutedUi() {
     }
 }
 
-function toggleBGM() {
+function setBgmPlayingUi() {
     const btn = document.getElementById('music-ctrl');
     const icon = btn ? btn.querySelector('.music-ctrl-icon') : null;
+    if (icon) icon.textContent = '🔊';
+    if (btn) {
+        btn.classList.remove('is-muted');
+        btn.title = '關閉背景音樂';
+        btn.setAttribute('aria-label', '關閉背景音樂');
+    }
+}
+
+function syncBgmUiFromAudio() {
+    if (audio.bgm.paused) setBgmMutedUi();
+    else setBgmPlayingUi();
+}
+
+function toggleBGM() {
     if (audio.bgm.paused) {
         audio.bgm.play().catch(() => {});
-        if (icon) icon.textContent = '🔊';
-        if (btn) {
-            btn.classList.remove('is-muted');
-            btn.title = '關閉背景音樂';
-            btn.setAttribute('aria-label', '關閉背景音樂');
-        }
+        setBgmPlayingUi();
     } else {
         audio.bgm.pause();
-        if (icon) icon.textContent = '🔇';
-        if (btn) {
-            btn.classList.add('is-muted');
-            btn.title = '開啟背景音樂';
-            btn.setAttribute('aria-label', '開啟背景音樂');
-        }
+        setBgmMutedUi();
     }
 }
 
 function initMusicCtrl() {
-    setBgmMutedUi();
+    audio.bgm.pause();
+    syncBgmUiFromAudio();
     const musicBtn = document.getElementById('music-ctrl');
-    if (musicBtn) {
-        musicBtn.addEventListener('click', toggleBGM);
-    }
+    if (!musicBtn || musicBtn.dataset.bgmBound === '1') return;
+    musicBtn.dataset.bgmBound = '1';
+    musicBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        toggleBGM();
+    });
 }
 
 function playSound(name) {
