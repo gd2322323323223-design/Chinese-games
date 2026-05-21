@@ -529,7 +529,7 @@ body:has(#start-screen:not([style*="display: none"])) #game-container {
     border-radius: 20px !important;
     border: 3px solid rgba(255, 255, 255, 0.55) !important;
     background-color: rgba(255, 255, 255, 0.1) !important;
-    background-image: url('images/finish-panel-complete.jpg') !important;
+    background-image: url('images/finish-panel-complete.png') !important;
     background-repeat: no-repeat !important;
     background-position: center center !important;
     background-size: contain !important;
