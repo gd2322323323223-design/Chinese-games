@@ -22,11 +22,19 @@ const CELEBRATION_PRAISES = [
     '✨ 無懈可擊！老師都要鼓掌！'
 ];
 
-// 格子定義
-const traps = [1, 16, 39, 48, 61, 76, 96];
-const boosts = [8, 20, 32, 51, 68, 80, 90];
-const dinosaurs = [5, 12, 27, 43, 55, 70, 86, 103];
+// 棋盤：8 行 × 10 格，64 題 + 15 特殊格 + 起點，終點為第 81 格（index 80）
+const BOARD_COLS = 10;
+const BOARD_ROWS = 8;
+const QUESTIONS_PER_ROW = 8;
+const PATH_CELL_COUNT = 80;
+const FINISH_POS = 80;
+const ROW_SPECIAL_COUNTS = [1, 2, 2, 2, 2, 2, 2, 2];
+
+const traps = [];
+const boosts = [];
+const dinosaurs = [];
 let cellTypes = {};
+let cellTasks = {};
 
 // 玩家位置
 const players = [{ pos: 0 }, { pos: 0 }];
@@ -541,23 +549,94 @@ function shuffleArray(arr) {
     return a;
 }
 
-function buildShuffledCellTypes() {
-    const indices = [];
-    for (let i = 1; i < 109; i++) {
-        if (!traps.includes(i) && !boosts.includes(i) && !dinosaurs.includes(i)) {
-            indices.push(i);
+function buildEvenThemeBag() {
+    const bag = [];
+    CHALLENGE_TYPES.forEach((t) => {
+        for (let i = 0; i < 8; i++) bag.push(t);
+    });
+    return shuffleArray(bag);
+}
+
+function isQuestionCellKind(kind) {
+    return kind === 'question';
+}
+
+function validateBoardLayout(layout) {
+    for (let pos = 0; pos < PATH_CELL_COUNT; pos++) {
+        const kind = layout[pos].kind;
+        if (kind === 'banana') {
+            const land = pos - 1;
+            if (land < 1 || !isQuestionCellKind(layout[land].kind)) return false;
+        } else if (kind === 'dino') {
+            const land = pos - 3;
+            if (land < 1 || !isQuestionCellKind(layout[land].kind)) return false;
+        } else if (kind === 'rocket') {
+            const land = pos + 5;
+            if (land >= FINISH_POS || !isQuestionCellKind(layout[land].kind)) return false;
         }
     }
-    const bag = [];
-    while (bag.length < indices.length) {
-        bag.push(...shuffleArray(CHALLENGE_TYPES));
+    return true;
+}
+
+function buildGameBoard() {
+    const specialKinds = shuffleArray([
+        ...Array(5).fill('banana'),
+        ...Array(5).fill('rocket'),
+        ...Array(5).fill('dino')
+    ]);
+
+    for (let attempt = 0; attempt < 600; attempt++) {
+        const layout = new Array(PATH_CELL_COUNT);
+        layout[0] = { kind: 'start' };
+
+        let specialSlotIndex = 0;
+        for (let row = 0; row < BOARD_ROWS; row++) {
+            const rowStart = row * BOARD_COLS;
+            const specialCount = ROW_SPECIAL_COUNTS[row];
+            const slotRange = row === 0
+                ? Array.from({ length: 9 }, (_, i) => rowStart + 1 + i)
+                : Array.from({ length: BOARD_COLS }, (_, i) => rowStart + i);
+
+            const specialSlots = shuffleArray(slotRange).slice(0, specialCount);
+            const specialSet = new Set(specialSlots);
+
+            for (const pos of slotRange) {
+                if (specialSet.has(pos)) {
+                    layout[pos] = { kind: specialKinds[specialSlotIndex++] };
+                } else {
+                    layout[pos] = { kind: 'question' };
+                }
+            }
+        }
+
+        if (!validateBoardLayout(layout)) continue;
+
+        const shuffledTasks = shuffleArray(allTasks);
+        const themeBag = buildEvenThemeBag();
+        const tasks = {};
+        const types = {};
+        let taskIdx = 0;
+        let themeIdx = 0;
+
+        traps.length = 0;
+        boosts.length = 0;
+        dinosaurs.length = 0;
+
+        for (let pos = 0; pos < PATH_CELL_COUNT; pos++) {
+            const cell = layout[pos];
+            if (cell.kind === 'banana') traps.push(pos);
+            else if (cell.kind === 'rocket') boosts.push(pos);
+            else if (cell.kind === 'dino') dinosaurs.push(pos);
+            else if (cell.kind === 'question') {
+                tasks[pos] = shuffledTasks[taskIdx++];
+                types[pos] = themeBag[themeIdx++];
+            }
+        }
+
+        return { layout, cellTasks: tasks, cellTypes: types };
     }
-    const types = shuffleArray(bag.slice(0, indices.length));
-    const map = {};
-    indices.forEach((idx, n) => {
-        map[idx] = types[n];
-    });
-    return map;
+
+    throw new Error('無法生成符合規則的棋盤，請重新整理頁面');
 }
 
 function pickThemeEmoji(type) {
@@ -567,7 +646,7 @@ function pickThemeEmoji(type) {
 }
 
 function getBoardCell(pos) {
-    return document.getElementById(pos === 109 ? 'cell-finish' : 'c' + pos);
+    return document.getElementById(pos === FINISH_POS ? 'cell-finish' : 'c' + pos);
 }
 
 function buildFinishCellHtml() {
@@ -729,9 +808,11 @@ function init() {
     if (!board) return;
     board.innerHTML = "";
     let displayIndex = 1;
-    cellTypes = buildShuffledCellTypes();
+    const built = buildGameBoard();
+    cellTasks = built.cellTasks;
+    cellTypes = built.cellTypes;
 
-    for (let i = 0; i < 109; i++) {
+    for (let i = 0; i < PATH_CELL_COUNT; i++) {
         const cell = document.createElement('div');
         cell.className = 'cell';
         cell.id = 'c' + i;
@@ -848,7 +929,7 @@ async function handlePlayerClick(pid) {
 async function move(pid) {
     moving = true;
     for (let i = 0; i < dice; i++) {
-        if (players[pid].pos < 109) {
+        if (players[pid].pos < FINISH_POS) {
             players[pid].pos++;
             updateDisplay();
             await new Promise(r => setTimeout(r, 300));
@@ -880,7 +961,7 @@ async function moveSteps(pid, steps) {
     moving = true;
     const dir = steps > 0;
     for (let i = 0; i < Math.abs(steps); i++) {
-        if (dir) players[pid].pos = Math.min(109, players[pid].pos + 1);
+        if (dir) players[pid].pos = Math.min(FINISH_POS, players[pid].pos + 1);
         else players[pid].pos = Math.max(0, players[pid].pos - 1);
         updateDisplay();
         await new Promise(r => setTimeout(r, 300));
@@ -889,7 +970,7 @@ async function moveSteps(pid, steps) {
 }
 
 function checkEndOrModal(pid) {
-    if (players[pid].pos === 109) {
+    if (players[pid].pos === FINISH_POS) {
         playSound('win');
         document.getElementById('win-modal').style.display = 'flex';
         document.getElementById('win-player').innerText = `玩家 ${pid + 1} 獲勝！`;
@@ -1004,17 +1085,11 @@ function buildOptionsPool(task, horizontal) {
 }
 
 function showModalAtCell(pos) {
-    const type = cellTypes[pos];
-    if (!type) {
+    const task = cellTasks[pos];
+    if (!task) {
         finishTurn();
         return;
     }
-    const pool = TEST_TASK_MAP[type];
-    if (!pool || !pool.length) {
-        finishTurn();
-        return;
-    }
-    const task = pool[Math.floor(Math.random() * pool.length)];
     displaySpecificTask(task);
     document.getElementById('modal-overlay').style.display = 'block';
     document.getElementById('modal').style.display = 'flex';
