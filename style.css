@@ -580,7 +580,7 @@ body:has(#start-screen:not([style*="display: none"])) #game-container {
 }
 
 /* ==========================================
-   終點格 (#cell-finish)：3×3 置中、大獎盃、僅保留漂浮動畫
+   終點格 (#cell-finish)：透明 end-box.png + 多重背景發光舞台
    ========================================== */
 #cell-finish {
     grid-column: 4 / span 3 !important;
@@ -591,28 +591,45 @@ body:has(#start-screen:not([style*="display: none"])) #game-container {
     max-width: 280px;
     aspect-ratio: 1 / 1;
     position: relative;
-    margin: 0 auto;
-    padding: 0;
-    box-sizing: border-box;
-    background: transparent url('images/end-box.png') no-repeat center center !important;
-    background-size: contain !important;
     border: none !important;
+    background-color: transparent !important;
     box-shadow: none !important;
-    overflow: hidden;
-    animation: trophyFloat 4s ease-in-out infinite alternate;
-    z-index: 5;
-    pointer-events: auto;
+    background:
+        url('images/end-box.png') no-repeat center center,
+        radial-gradient(circle, rgba(255, 255, 255, 0.9) 0%, rgba(255, 215, 0, 0.3) 35%, rgba(162, 217, 206, 0.1) 60%, transparent 70%) no-repeat center center !important;
+    background-size: 85% 85%, 100% 100% !important;
+    animation: stageGlowFloat 4s ease-in-out infinite alternate;
+    overflow: visible;
+    z-index: 10;
 }
 
-#cell-finish::before,
+#cell-finish::before {
+    content: "";
+    position: absolute;
+    bottom: -15px;
+    left: 10%;
+    width: 80%;
+    height: 25px;
+    background: linear-gradient(to bottom, #ffe891 0%, #fcd04c 30%, #e3a324 70%, #9c6b0f 100%);
+    border-radius: 4px;
+    border-top: 1px solid #fff;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+    z-index: -1;
+    pointer-events: none;
+}
+
 #cell-finish::after {
     display: none !important;
     content: none !important;
 }
 
-@keyframes trophyFloat {
-    0% { transform: translateY(4px); }
+@keyframes stageGlowFloat {
+    0% { transform: translateY(2px); }
     100% { transform: translateY(-6px); }
+}
+
+#cell-finish * {
+    display: none !important;
 }
 
 /* 道路線條 */
@@ -1550,7 +1567,7 @@ body.game-active #btn-roll {
         padding: 20px 10px 80px 10px !important;
     }
     #cell-finish {
-        max-width: min(260px, 88vw);
+        max-width: min(240px, 88vw);
     }
     .cell {
         --cell-size: 60px;
