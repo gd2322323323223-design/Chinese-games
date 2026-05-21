@@ -509,7 +509,7 @@ body:has(#start-screen:not([style*="display: none"])) #game-container {
     animation: dino-roar 0.3s infinite;
 }
 
-/* 終點格：底部 3×3 大格、純淨黃金底、十字光束夾在中層 */
+/* 終點格：透明毛玻璃方框 + 終點圖（無 Emoji／獎盃／雷射／純色底） */
 #cell-finish.goal-cell,
 .cell.goal-cell.cell-finish {
     grid-column: 4 / span 3 !important;
@@ -521,206 +521,36 @@ body:has(#start-screen:not([style*="display: none"])) #game-container {
     margin: 12px auto 0 !important;
     height: auto;
     min-height: calc(var(--cell-size) * 3 + 24px);
-    background: #ffd700 url('images/finish-panel-complete.jpg') no-repeat center center !important;
-    background-size: cover !important;
-    border: 5px solid rgba(255, 255, 255, 0.95) !important;
-    box-shadow:
-        0 0 22px rgba(255, 215, 0, 0.55),
-        0 10px 24px rgba(0, 0, 0, 0.18),
-        inset 0 0 14px rgba(255, 255, 255, 0.35) !important;
-    z-index: 12;
-    display: flex !important;
-    flex-direction: column !important;
-    justify-content: center !important;
-    align-items: center !important;
+    padding: 8px;
+    box-sizing: border-box;
     position: relative;
-    padding: 14px 10px;
-    transform-origin: center center;
+    display: block !important;
     overflow: hidden;
     border-radius: 20px !important;
-    animation: custom-pulse 1.85s ease-in-out infinite;
-    isolation: isolate;
+    border: 3px solid rgba(255, 255, 255, 0.55) !important;
+    background-color: rgba(255, 255, 255, 0.1) !important;
+    background-image: url('images/finish-panel-complete.jpg') !important;
+    background-repeat: no-repeat !important;
+    background-position: center center !important;
+    background-size: contain !important;
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12) !important;
+    z-index: 12;
 }
 
-/* 終點格不使用偽元素遮罩，黃金背景由本體承載（z-index 堆疊最底層） */
 .cell.goal-cell.cell-finish::before,
-#cell-finish.goal-cell::before {
+#cell-finish.goal-cell::before,
+.cell.goal-cell.cell-finish::after,
+#cell-finish.goal-cell::after {
     display: none !important;
     content: none !important;
 }
 
-/* 十字鐳射光束：緊貼黃金背景之上（中間層） */
-.goal-laser-cross {
-    position: absolute;
-    inset: -14%;
-    z-index: 2;
-    pointer-events: none;
-    overflow: visible;
-    animation: neon-five-colors 4s ease-in-out infinite;
-}
-
-.goal-beam {
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    pointer-events: none;
-    border-radius: 999px;
-    opacity: 0.85;
-}
-
-.goal-beam-up {
-    width: clamp(18px, 5vw, 28px);
-    height: 110%;
-    margin-left: calc(clamp(18px, 5vw, 28px) / -2);
-    transform: translate(-50%, -100%);
-    transform-origin: center bottom;
-    background: linear-gradient(to top, transparent 0%, rgba(255, 255, 255, 0.2) 30%, currentColor 100%);
-    color: #ffd700;
-    filter: blur(5px) drop-shadow(0 0 18px currentColor);
-}
-
-.goal-beam-down {
-    width: clamp(18px, 5vw, 28px);
-    height: 110%;
-    margin-left: calc(clamp(18px, 5vw, 28px) / -2);
-    transform: translate(-50%, 0);
-    transform-origin: center top;
-    background: linear-gradient(to bottom, transparent 0%, rgba(255, 255, 255, 0.2) 30%, currentColor 100%);
-    color: #ffd700;
-    filter: blur(5px) drop-shadow(0 0 18px currentColor);
-}
-
-.goal-beam-left {
-    width: 110%;
-    height: clamp(18px, 5vw, 28px);
-    margin-top: calc(clamp(18px, 5vw, 28px) / -2);
-    transform: translate(-100%, -50%);
-    transform-origin: right center;
-    background: linear-gradient(to left, transparent 0%, rgba(255, 255, 255, 0.2) 30%, currentColor 100%);
-    color: #ffd700;
-    filter: blur(5px) drop-shadow(0 0 18px currentColor);
-}
-
-.goal-beam-right {
-    width: 110%;
-    height: clamp(18px, 5vw, 28px);
-    margin-top: calc(clamp(18px, 5vw, 28px) / -2);
-    transform: translate(0, -50%);
-    transform-origin: left center;
-    background: linear-gradient(to right, transparent 0%, rgba(255, 255, 255, 0.2) 30%, currentColor 100%);
-    color: #ffd700;
-    filter: blur(5px) drop-shadow(0 0 18px currentColor);
-}
-
-@keyframes neon-five-colors {
-    0%, 100% {
-        box-shadow: 0 0 30px #ffd700;
-        filter: drop-shadow(0 0 20px #ffd700);
-    }
-    20% {
-        box-shadow: 0 0 35px #00d2ff;
-        filter: drop-shadow(0 0 25px #00d2ff);
-    }
-    40% {
-        box-shadow: 0 0 35px #ff007f;
-        filter: drop-shadow(0 0 25px #ff007f);
-    }
-    60% {
-        box-shadow: 0 0 35px #00ff66;
-        filter: drop-shadow(0 0 25px #00ff66);
-    }
-    80% {
-        box-shadow: 0 0 35px #9900ff;
-        filter: drop-shadow(0 0 25px #9900ff);
-    }
-}
-
-/* 四週慶祝 Emoji（最頂層，高於光束） */
-.goal-edge-emoji {
-    position: absolute;
-    inset: 0;
-    z-index: 3;
-    pointer-events: none;
-}
-
-.goal-emoji-corner {
-    position: absolute;
-    font-size: clamp(22px, 2.8vw, 24px);
-    line-height: 1;
-    opacity: 0.95;
-    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.25));
-    animation: goal-emoji-twinkle 2.4s ease-in-out infinite;
-    pointer-events: none;
-}
-
-@keyframes goal-emoji-twinkle {
-    0%, 100% { opacity: 0.65; }
-    50% { opacity: 1; }
-}
-
-/* 中央獎盃 + 終點 — 絕對置中（最頂層） */
-.goal-center-stage {
-    position: relative;
-    z-index: 3;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    flex: 1 1 auto;
-    width: 100%;
-    min-height: 100%;
-    padding: 28px 14px 22px;
-    box-sizing: border-box;
-    text-align: center;
-}
-
-.goal-trophy-wrap {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin: 0;
-    line-height: 1;
-}
-
-#cell-finish .event-icon,
-.goal-cell .event-icon {
-    font-size: clamp(38px, 9vw, 52px) !important;
-    display: block;
-    filter: drop-shadow(0 3px 8px rgba(0, 0, 0, 0.25));
-}
-
-.goal-center-stage .cell-text {
-    font-size: clamp(22px, 5.5vw, 30px) !important;
-    font-weight: 800 !important;
-    color: #5c4a00 !important;
-    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.95);
-    margin: 6px 0 0;
-    padding: 0;
-    line-height: 1.12;
-    letter-spacing: 0.14em;
-}
-
 #cell-finish.goal-cell:hover,
 .cell.goal-cell.cell-finish:hover {
-    filter: brightness(1.07) saturate(1.05) !important;
-}
-
-@keyframes custom-pulse {
-    0%, 100% {
-        transform: scale(1.02);
-        box-shadow:
-            0 0 22px rgba(255, 215, 0, 0.7),
-            0 10px 22px rgba(0, 0, 0, 0.2),
-            inset 0 0 18px rgba(255, 255, 255, 0.75);
-    }
-    50% {
-        transform: scale(1.05);
-        box-shadow:
-            0 0 38px rgba(255, 215, 0, 0.95),
-            0 0 60px rgba(255, 165, 0, 0.45),
-            0 14px 26px rgba(0, 0, 0, 0.26),
-            inset 0 0 22px rgba(255, 255, 255, 0.88);
-    }
+    border-color: rgba(255, 255, 255, 0.75) !important;
+    box-shadow: 0 10px 28px rgba(0, 0, 0, 0.16) !important;
 }
 
 /* 道路線條 */
@@ -1610,11 +1440,6 @@ body.game-active #btn-roll {
     0% { background-position: 0% 50%; }
     50% { background-position: 100% 50%; }
     100% { background-position: 0% 50%; }
-}
-@keyframes goal-shine {
-    0% { transform: scale(1); }
-    50% { transform: scale(1.05); filter: brightness(1.2); }
-    100% { transform: scale(1); }
 }
 @keyframes shake {
     0%, 100% { transform: translateX(0); }

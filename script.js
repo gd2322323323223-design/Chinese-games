@@ -347,21 +347,6 @@ function getBoardCell(pos) {
     return document.getElementById(pos === 109 ? 'cell-finish' : 'c' + pos);
 }
 
-function buildGoalCelebrationHtml() {
-    const emojis = shuffleArray(['👏', '🌈', '🥳', '🎉', '✨', '🎊']);
-    const slots = [
-        { cls: 'goal-emoji-tl', style: 'top:2px;left:2px' },
-        { cls: 'goal-emoji-tr', style: 'top:2px;right:2px' },
-        { cls: 'goal-emoji-bl', style: 'bottom:2px;left:2px' },
-        { cls: 'goal-emoji-br', style: 'bottom:2px;right:2px' },
-        { cls: 'goal-emoji-ml', style: 'left:2px;top:50%;transform:translateY(-50%)' },
-        { cls: 'goal-emoji-mr', style: 'right:2px;top:50%;transform:translateY(-50%)' }
-    ];
-    return slots.map((slot, i) =>
-        `<span class="goal-emoji-corner ${slot.cls}" style="${slot.style}">${emojis[i]}</span>`
-    ).join('');
-}
-
 function speakNoticeText(text) {
     if (!text || !window.speechSynthesis) return;
     window.speechSynthesis.cancel();
@@ -533,20 +518,8 @@ function init() {
     const finishCell = document.createElement('div');
     finishCell.className = 'cell goal-cell cell-finish';
     finishCell.id = 'cell-finish';
-    finishCell.innerHTML = `
-                <div class="goal-laser-cross" aria-hidden="true">
-                    <span class="goal-beam goal-beam-up"></span>
-                    <span class="goal-beam goal-beam-down"></span>
-                    <span class="goal-beam goal-beam-left"></span>
-                    <span class="goal-beam goal-beam-right"></span>
-                </div>
-                <div class="goal-edge-emoji" aria-hidden="true">${buildGoalCelebrationHtml()}</div>
-                <div class="goal-center-stage">
-                    <div class="goal-trophy-wrap">
-                        <span class="event-icon">🏆</span>
-                    </div>
-                    <div class="cell-text">終點</div>
-                </div>`;
+    finishCell.setAttribute('aria-label', '終點');
+    finishCell.innerHTML = '';
     board.appendChild(finishCell);
     bindTeacherSpecialCellPreviews();
     const diceBox = document.getElementById('dice-box');
