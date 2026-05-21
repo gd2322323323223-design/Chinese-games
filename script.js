@@ -9,6 +9,7 @@ let attempts = 3;
 let pendingSteps = 0;
 let isDebugPreview = false;
 let isTeacherMode = false;
+let teacherPlacementPlayer = null;
 let timerInterval = null;
 const MODAL_TIME_SECONDS = 120;
 let currentActiveTask = null;
@@ -826,6 +827,83 @@ function bindTeacherSpecialCellPreviews() {
     }
 }
 
+function getCellPositionFromElement(cell) {
+    if (!cell || !cell.id) return null;
+    if (cell.id === 'cell-finish') return FINISH_POS;
+    if (cell.id.startsWith('c')) {
+        const pos = parseInt(cell.id.slice(1), 10);
+        return Number.isNaN(pos) ? null : pos;
+    }
+    return null;
+}
+
+function clearTeacherPlacementSelection() {
+    [1, 2].forEach((n) => {
+        const el = document.getElementById('p' + n);
+        if (el) el.classList.remove('teacher-piece-selected');
+    });
+}
+
+function setTeacherPlacementPlayer(pid) {
+    teacherPlacementPlayer = pid;
+    [0, 1].forEach((i) => {
+        const el = document.getElementById('p' + (i + 1));
+        if (el) el.classList.toggle('teacher-piece-selected', i === pid);
+    });
+}
+
+function setTeacherModeActive(active) {
+    isTeacherMode = active;
+    document.body.classList.toggle('teacher-mode', active);
+    if (active) {
+        setTeacherPlacementPlayer(teacherPlacementPlayer ?? turn);
+    } else {
+        teacherPlacementPlayer = null;
+        clearTeacherPlacementSelection();
+    }
+}
+
+function isTeacherPlacementAllowed() {
+    return isTeacherMode && document.body.classList.contains('game-active');
+}
+
+function placeTeacherPieceAt(pos, pid) {
+    const playerId = pid ?? teacherPlacementPlayer ?? turn;
+    players[playerId].pos = Math.max(0, Math.min(FINISH_POS, pos));
+
+    waitingForClick = false;
+    specialEventActive = false;
+    moving = false;
+    [1, 2].forEach((n) => {
+        const el = document.getElementById('p' + n);
+        if (el) el.classList.remove('can-move');
+    });
+
+    updateDisplay();
+}
+
+function initTeacherBoardPlacement() {
+    const container = document.getElementById('game-container');
+    if (!container || container.dataset.teacherPlacementBound === '1') return;
+    container.dataset.teacherPlacementBound = '1';
+
+    container.addEventListener('click', (e) => {
+        if (!isTeacherPlacementAllowed()) return;
+        if (e.target.closest('#test-panel')) return;
+
+        const cell = e.target.closest('.cell');
+        if (!cell) return;
+
+        const pos = getCellPositionFromElement(cell);
+        if (pos === null) return;
+
+        e.preventDefault();
+        e.stopPropagation();
+
+        placeTeacherPieceAt(pos);
+    });
+}
+
 function initSecretFlower() {
     const flower = document.getElementById('secret-flower');
     if (!flower) return;
@@ -838,8 +916,7 @@ function initSecretFlower() {
         taps.push(now);
         if (taps.length >= 2) {
             taps.length = 0;
-            isTeacherMode = !isTeacherMode;
-            document.body.classList.toggle('teacher-mode', isTeacherMode);
+            setTeacherModeActive(!isTeacherMode);
         }
     });
 }
@@ -953,6 +1030,10 @@ async function roll() {
 }
 
 async function handlePlayerClick(pid) {
+    if (isTeacherPlacementAllowed()) {
+        setTeacherPlacementPlayer(pid);
+        return;
+    }
     if (!waitingForClick || pid !== turn || moving) return;
     waitingForClick = false;
     document.getElementById('p' + (turn + 1)).classList.remove('can-move');
@@ -1381,9 +1462,64 @@ function testModal(type) {
     startModalTimer();
 }
 
+function initTestPanelDrag() {
+    const panel = document.getElementById('test-panel');
+    const handle = panel?.querySelector('.test-panel-drag-handle');
+    if (!panel || !handle || panel.dataset.dragBound === '1') return;
+    panel.dataset.dragBound = '1';
+
+    let drag = null;
+
+    const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
+
+    const onPointerDown = (e) => {
+        if (e.button !== 0) return;
+        const rect = panel.getBoundingClientRect();
+        drag = {
+            pointerId: e.pointerId,
+            offsetX: e.clientX - rect.left,
+            offsetY: e.clientY - rect.top,
+            width: rect.width,
+            height: rect.height
+        };
+        panel.style.position = 'fixed';
+        panel.style.left = `${rect.left}px`;
+        panel.style.top = `${rect.top}px`;
+        panel.style.right = 'auto';
+        panel.style.margin = '0';
+        handle.setPointerCapture(e.pointerId);
+        handle.classList.add('is-dragging');
+        e.preventDefault();
+    };
+
+    const onPointerMove = (e) => {
+        if (!drag || e.pointerId !== drag.pointerId) return;
+        const maxLeft = Math.max(8, window.innerWidth - drag.width - 8);
+        const maxTop = Math.max(8, window.innerHeight - drag.height - 8);
+        panel.style.left = `${clamp(e.clientX - drag.offsetX, 8, maxLeft)}px`;
+        panel.style.top = `${clamp(e.clientY - drag.offsetY, 8, maxTop)}px`;
+    };
+
+    const endDrag = (e) => {
+        if (!drag || e.pointerId !== drag.pointerId) return;
+        drag = null;
+        handle.classList.remove('is-dragging');
+        try {
+            handle.releasePointerCapture(e.pointerId);
+        } catch (_) { /* ignore */ }
+    };
+
+    handle.addEventListener('pointerdown', onPointerDown);
+    handle.addEventListener('pointermove', onPointerMove);
+    handle.addEventListener('pointerup', endDrag);
+    handle.addEventListener('pointercancel', endDrag);
+}
+
 function initTestPanel() {
     const panel = document.getElementById('test-panel');
     if (!panel) return;
+
+    initTestPanelDrag();
 
     panel.querySelectorAll('[data-test-type]').forEach(btn => {
         btn.addEventListener('click', () => testModal(btn.getAttribute('data-test-type')));
@@ -1392,8 +1528,7 @@ function initTestPanel() {
     const closeBtn = document.getElementById('test-panel-close');
     if (closeBtn) {
         closeBtn.addEventListener('click', () => {
-            isTeacherMode = false;
-            document.body.classList.remove('teacher-mode');
+            setTeacherModeActive(false);
         });
     }
 
@@ -1416,6 +1551,7 @@ function boot() {
     initMusicCtrl();
     initTestPanel();
     initSecretFlower();
+    initTeacherBoardPlacement();
     preloadFreesoundEffects();
 }
 

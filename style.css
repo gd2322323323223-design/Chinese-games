@@ -2012,8 +2012,9 @@ body.game-active #btn-roll {
 /* ========== 測試面板（預設隱藏；教師模式 body.teacher-mode 顯示） ========== */
 #test-panel {
     position: fixed;
-    top: 16px;
-    left: 16px;
+    top: 72px;
+    right: 16px;
+    left: auto;
     z-index: 10001 !important;
     display: none !important;
     flex-direction: column;
@@ -2021,7 +2022,7 @@ body.game-active #btn-roll {
     width: 168px;
     max-height: calc(100vh - 32px);
     overflow-y: auto;
-    padding: 12px 10px;
+    padding: 10px 10px 12px;
     box-sizing: border-box;
     background: rgba(255, 255, 255, 0.92);
     backdrop-filter: blur(10px);
@@ -2030,17 +2031,58 @@ body.game-active #btn-roll {
     border-radius: 16px;
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
     pointer-events: auto;
+    touch-action: none;
 }
 
 body.teacher-mode #test-panel {
     display: flex !important;
 }
 
-.test-panel-title {
+.test-panel-drag-handle {
+    margin: 0 0 6px;
+    padding: 8px 6px;
+    font-size: 13px;
+    font-weight: 800;
     color: #5d4037;
     text-align: center;
-    font-size: 14px;
-    margin: 0 0 4px 0;
+    background: rgba(255, 248, 225, 0.95);
+    border: 1px dashed #d4a574;
+    border-radius: 10px;
+    cursor: grab;
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: none;
+}
+
+.test-panel-drag-handle.is-dragging {
+    cursor: grabbing;
+    background: rgba(255, 236, 179, 0.98);
+}
+
+.test-panel-hint {
+    margin: 0 0 8px;
+    padding: 6px 8px;
+    font-size: 11px;
+    line-height: 1.35;
+    color: #553c9a;
+    text-align: center;
+    background: rgba(237, 227, 245, 0.9);
+    border-radius: 8px;
+}
+
+body.teacher-mode.game-active #board .cell {
+    cursor: pointer;
+}
+
+body.teacher-mode.game-active .player {
+    cursor: pointer;
+}
+
+.player.teacher-piece-selected {
+    outline: 4px dashed #805ad5;
+    outline-offset: 3px;
+    filter: drop-shadow(0 0 14px rgba(128, 90, 213, 0.85)) brightness(1.15);
+    z-index: 110;
 }
 
 .test-panel-btn {
