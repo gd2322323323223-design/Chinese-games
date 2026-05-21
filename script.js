@@ -321,15 +321,45 @@ const FREESOUND_EFFECTS = {
     },
     cheer: {
         query: 'applause cheer short',
-        filter: 'tag:applause tag:cheer duration:[0 TO 4]',
+        filter: 'tag:(applause OR cheer) duration:[0 TO 5]',
+        fallbackFilters: ['tag:applause duration:[0 TO 5]', 'duration:[0 TO 4]'],
         sort: 'duration_asc',
-        volume: 0.75
+        volume: 0.8
     }
 };
 
 const freesoundUrlCache = {};
 const freesoundFetchPromises = {};
+const freesoundPreloadedAudio = {};
 let activeFreesoundPlayer = null;
+/** 答對歡呼：頁面載入時預載，答對時直接 play */
+let cheerAudioPlayer = null;
+
+function pickPreviewUrlFromResults(results) {
+    if (!Array.isArray(results)) return null;
+    for (const sound of results) {
+        const previews = sound && sound.previews;
+        const url = previews && (previews['preview-hq-mp3'] || previews['preview-lq-mp3']);
+        if (url) return url;
+    }
+    return null;
+}
+
+async function searchFreesoundOnce(query, filter, sort) {
+    const params = new URLSearchParams({
+        query,
+        token: FREESOUND_TOKEN,
+        fields: 'id,name,previews',
+        page_size: '8',
+        sort: sort || 'rating_desc'
+    });
+    if (filter) params.set('filter', filter);
+
+    const res = await fetch(`${FREESOUND_API_BASE}?${params.toString()}`);
+    if (!res.ok) throw new Error(`Freesound HTTP ${res.status}`);
+    const data = await res.json();
+    return pickPreviewUrlFromResults(data.results);
+}
 
 async function fetchFreesoundPreviewUrl(effectKey) {
     if (!FREESOUND_TOKEN) return null;
@@ -339,25 +369,12 @@ async function fetchFreesoundPreviewUrl(effectKey) {
     const spec = FREESOUND_EFFECTS[effectKey];
     if (!spec) return null;
 
+    const filtersToTry = [spec.filter, ...(spec.fallbackFilters || [])].filter(Boolean);
+
     freesoundFetchPromises[effectKey] = (async () => {
         try {
-            const params = new URLSearchParams({
-                query: spec.query,
-                filter: spec.filter,
-                token: FREESOUND_TOKEN,
-                fields: 'id,name,previews',
-                page_size: '8',
-                sort: spec.sort || 'rating_desc'
-            });
-            const res = await fetch(`${FREESOUND_API_BASE}?${params.toString()}`);
-            if (!res.ok) throw new Error(`Freesound HTTP ${res.status}`);
-
-            const data = await res.json();
-            const results = Array.isArray(data.results) ? data.results : [];
-
-            for (const sound of results) {
-                const previews = sound && sound.previews;
-                const url = previews && (previews['preview-hq-mp3'] || previews['preview-lq-mp3']);
+            for (const filter of filtersToTry) {
+                const url = await searchFreesoundOnce(spec.query, filter, spec.sort);
                 if (url) {
                     freesoundUrlCache[effectKey] = url;
                     return url;
@@ -375,10 +392,101 @@ async function fetchFreesoundPreviewUrl(effectKey) {
     return freesoundFetchPromises[effectKey];
 }
 
+async function ensureFreesoundPreloaded(effectKey) {
+    if (!FREESOUND_TOKEN) return null;
+
+    try {
+        const spec = FREESOUND_EFFECTS[effectKey];
+        if (!spec) return null;
+
+        const existing = freesoundPreloadedAudio[effectKey];
+        if (existing && existing.dataset.ready === '1') return existing;
+
+        const url = await fetchFreesoundPreviewUrl(effectKey);
+        if (!url) return null;
+
+        const player = existing || new Audio();
+        player.preload = 'auto';
+        player.volume = spec.volume ?? 0.8;
+        freesoundPreloadedAudio[effectKey] = player;
+
+        if (player.src !== url) {
+            player.dataset.ready = '0';
+            player.src = url;
+            player.load();
+        }
+
+        await new Promise((resolve) => {
+            if (player.readyState >= 3) {
+                player.dataset.ready = '1';
+                resolve();
+                return;
+            }
+            const done = () => {
+                player.dataset.ready = '1';
+                resolve();
+            };
+            player.addEventListener('canplaythrough', done, { once: true });
+            player.addEventListener('error', resolve, { once: true });
+            setTimeout(resolve, 2500);
+        });
+
+        return player;
+    } catch (err) {
+        console.warn('[Freesound] 預載失敗:', effectKey, err);
+        return null;
+    }
+}
+
+async function preloadCheerSound() {
+    if (!FREESOUND_TOKEN) return;
+    try {
+        const player = await ensureFreesoundPreloaded('cheer');
+        if (player) cheerAudioPlayer = player;
+    } catch (err) {
+        console.warn('[Freesound] 答對歡呼預載失敗:', err);
+    }
+}
+
+function playCorrectAnswerCheer() {
+    try {
+        const spec = FREESOUND_EFFECTS.cheer;
+        if (!spec || !FREESOUND_TOKEN) return;
+
+        const player = cheerAudioPlayer || freesoundPreloadedAudio.cheer;
+        if (player && player.src) {
+            player.volume = spec.volume ?? 0.8;
+            player.currentTime = 0;
+            player.play().catch((err) => console.warn('[Freesound] 答對歡呼播放失敗:', err));
+            return;
+        }
+
+        void ensureFreesoundPreloaded('cheer').then((loaded) => {
+            if (!loaded) return;
+            cheerAudioPlayer = loaded;
+            loaded.currentTime = 0;
+            loaded.play().catch(() => {});
+        });
+    } catch (err) {
+        console.warn('[Freesound] 答對歡呼觸發失敗:', err);
+    }
+}
+
 async function playFreesoundEffect(effectKey) {
     try {
         const spec = FREESOUND_EFFECTS[effectKey];
         if (!spec || !FREESOUND_TOKEN) return;
+
+        const preloaded = freesoundPreloadedAudio[effectKey];
+        if (preloaded && preloaded.dataset.ready === '1' && preloaded.src) {
+            if (activeFreesoundPlayer && activeFreesoundPlayer !== preloaded) {
+                try { activeFreesoundPlayer.pause(); } catch (_) { /* ignore */ }
+            }
+            preloaded.currentTime = 0;
+            activeFreesoundPlayer = preloaded;
+            await preloaded.play();
+            return;
+        }
 
         const url = await fetchFreesoundPreviewUrl(effectKey);
         if (!url) return;
@@ -401,8 +509,10 @@ async function playFreesoundEffect(effectKey) {
 
 function preloadFreesoundEffects() {
     if (!FREESOUND_TOKEN) return;
+    void preloadCheerSound();
     Object.keys(FREESOUND_EFFECTS).forEach((key) => {
-        fetchFreesoundPreviewUrl(key).catch(() => {});
+        if (key === 'cheer') return;
+        ensureFreesoundPreloaded(key).catch(() => {});
     });
 }
 
@@ -1054,12 +1164,16 @@ function displaySpecificTask(task) {
     content.appendChild(buildOptionsPool(task, useHorizontal));
 }
 
+function handleCorrectAnswer(correctAnswer) {
+    playCorrectAnswerCheer();
+    stopModalTimer();
+    showAnswerCelebration(correctAnswer);
+}
+
 function checkUserAnswer(sel, ans) {
     const fb = document.getElementById('feedback-msg');
     if (sel === ans) {
-        void playFreesoundEffect('cheer');
-        stopModalTimer();
-        showAnswerCelebration(ans);
+        handleCorrectAnswer(ans);
     } else {
         attempts--;
         if (attempts > 0) {
