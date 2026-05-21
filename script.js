@@ -347,19 +347,36 @@ function getBoardCell(pos) {
     return document.getElementById(pos === 109 ? 'cell-finish' : 'c' + pos);
 }
 
-function buildGoalCelebrationHtml() {
-    const emojis = shuffleArray(['👏', '🌈', '🥳', '🎉', '✨', '🎊']);
-    const slots = [
-        { cls: 'goal-emoji-tl', style: 'top:2px;left:2px' },
-        { cls: 'goal-emoji-tr', style: 'top:2px;right:2px' },
-        { cls: 'goal-emoji-bl', style: 'bottom:2px;left:2px' },
-        { cls: 'goal-emoji-br', style: 'bottom:2px;right:2px' },
-        { cls: 'goal-emoji-ml', style: 'left:2px;top:50%;transform:translateY(-50%)' },
-        { cls: 'goal-emoji-mr', style: 'right:2px;top:50%;transform:translateY(-50%)' }
-    ];
-    return slots.map((slot, i) =>
-        `<span class="goal-emoji-corner ${slot.cls}" style="${slot.style}">${emojis[i]}</span>`
-    ).join('');
+function buildFinishCellHtml() {
+    return `
+        <div class="finish-stage" aria-hidden="false">
+            <div class="finish-aurora" aria-hidden="true"></div>
+            <div class="finish-rays" aria-hidden="true"></div>
+            <div class="finish-sparkles" aria-hidden="true">
+                <span class="finish-spark s1">✦</span>
+                <span class="finish-spark s2">★</span>
+                <span class="finish-spark s3">✦</span>
+                <span class="finish-spark s4">★</span>
+                <span class="finish-spark s5">✦</span>
+                <span class="finish-spark s6">★</span>
+            </div>
+            <div class="finish-trophy-float">
+                <div class="finish-trophy" role="img" aria-label="冠軍獎杯">
+                    <div class="trophy-star">★</div>
+                    <div class="trophy-cup">
+                        <div class="trophy-rim"></div>
+                        <div class="trophy-bowl"></div>
+                        <div class="trophy-handle trophy-handle-left"></div>
+                        <div class="trophy-handle trophy-handle-right"></div>
+                    </div>
+                    <div class="trophy-stem"></div>
+                    <div class="trophy-base">
+                        <div class="trophy-plaque">1</div>
+                    </div>
+                </div>
+            </div>
+            <div class="finish-label">終點</div>
+        </div>`;
 }
 
 function speakNoticeText(text) {
@@ -533,20 +550,7 @@ function init() {
     const finishCell = document.createElement('div');
     finishCell.className = 'cell goal-cell cell-finish';
     finishCell.id = 'cell-finish';
-    finishCell.innerHTML = `
-                <div class="goal-laser-cross" aria-hidden="true">
-                    <span class="goal-beam goal-beam-up"></span>
-                    <span class="goal-beam goal-beam-down"></span>
-                    <span class="goal-beam goal-beam-left"></span>
-                    <span class="goal-beam goal-beam-right"></span>
-                </div>
-                <div class="goal-edge-emoji" aria-hidden="true">${buildGoalCelebrationHtml()}</div>
-                <div class="goal-center-stage">
-                    <div class="goal-trophy-wrap">
-                        <span class="event-icon">🏆</span>
-                    </div>
-                    <div class="cell-text">終點</div>
-                </div>`;
+    finishCell.innerHTML = buildFinishCellHtml();
     board.appendChild(finishCell);
     bindTeacherSpecialCellPreviews();
     const diceBox = document.getElementById('dice-box');
