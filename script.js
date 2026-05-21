@@ -53,14 +53,14 @@ const reorderTasks = [
     { type: "reorder", question: "重組句子：", words: ["早上七時", "在", "做早操", "叔叔", "公園", "，", "。"], answer: "早上七時，叔叔在公園做早操。" }
 ];
 const matchTasks = [
-    { type: "match", question: "哪一個詞語最能形容這張圖？", gif: "images/swimming.png", options: ["跳繩", "游泳", "打球"], answer: "游泳" },
-    { type: "match", question: "哪一個詞語最能形容這張圖？", gif: "images/scared.png", options: ["生氣", "開心", "害怕"], answer: "害怕" },
-    { type: "match", question: "哪一個詞語最能形容這張圖？", gif: "images/boat.png", options: ["飛機", "船", "車"], answer: "船" },
-    { type: "match", question: "哪一個詞語最能形容這張圖？", gif: "images/sunshine.png", options: ["陽光", "彩虹", "雲朵"], answer: "陽光" },
-    { type: "match", question: "哪一個詞語最能形容這張圖？", gif: "images/like.png", options: ["討厭", "擔心", "喜歡"], answer: "喜歡" },
-    { type: "match", question: "哪一個詞語最能形容這張圖？", gif: "images/angry.png", options: ["快樂", "生氣", "緊張"], answer: "生氣" },
-    { type: "match", question: "哪一個詞語最能形容這張圖？", gif: "images/rainbow.png", options: ["太陽", "月亮", "彩虹"], answer: "彩虹" },
-    { type: "match", question: "哪一個詞語最能形容這張圖？", gif: "images/leaf.png", options: ["樹木", "樹葉", "花朵"], answer: "樹葉" }
+    { type: "match", question: "哪一個詞語最能形容這張圖？", gif: "swimming.png", options: ["跳繩", "游泳", "打球"], answer: "游泳" },
+    { type: "match", question: "哪一個詞語最能形容這張圖？", gif: "scared.png", options: ["生氣", "開心", "害怕"], answer: "害怕" },
+    { type: "match", question: "哪一個詞語最能形容這張圖？", gif: "boat.png", options: ["飛機", "船", "車"], answer: "船" },
+    { type: "match", question: "哪一個詞語最能形容這張圖？", gif: "sunshine.png", options: ["陽光", "彩虹", "雲朵"], answer: "陽光" },
+    { type: "match", question: "哪一個詞語最能形容這張圖？", gif: "like.png", options: ["討厭", "擔心", "喜歡"], answer: "喜歡" },
+    { type: "match", question: "哪一個詞語最能形容這張圖？", gif: "angry.png", options: ["快樂", "生氣", "緊張"], answer: "生氣" },
+    { type: "match", question: "哪一個詞語最能形容這張圖？", gif: "rainbow.png", options: ["太陽", "月亮", "彩虹"], answer: "彩虹" },
+    { type: "match", question: "哪一個詞語最能形容這張圖？", gif: "leaf.png", options: ["樹木", "樹葉", "花朵"], answer: "樹葉" }
 ];
 const radicalTasks = [
     { type: "radical", question: "下列哪一個字有「目」字部件？", options: ["清", "睛", "晴"], answer: "睛" },
@@ -347,6 +347,21 @@ function getBoardCell(pos) {
     return document.getElementById(pos === 109 ? 'cell-finish' : 'c' + pos);
 }
 
+function buildGoalCelebrationHtml() {
+    const emojis = shuffleArray(['👏', '🌈', '🥳', '🎉', '✨', '🎊']);
+    const slots = [
+        { cls: 'goal-emoji-tl', style: 'top:2px;left:2px' },
+        { cls: 'goal-emoji-tr', style: 'top:2px;right:2px' },
+        { cls: 'goal-emoji-bl', style: 'bottom:2px;left:2px' },
+        { cls: 'goal-emoji-br', style: 'bottom:2px;right:2px' },
+        { cls: 'goal-emoji-ml', style: 'left:2px;top:50%;transform:translateY(-50%)' },
+        { cls: 'goal-emoji-mr', style: 'right:2px;top:50%;transform:translateY(-50%)' }
+    ];
+    return slots.map((slot, i) =>
+        `<span class="goal-emoji-corner ${slot.cls}" style="${slot.style}">${emojis[i]}</span>`
+    ).join('');
+}
+
 function speakNoticeText(text) {
     if (!text || !window.speechSynthesis) return;
     window.speechSynthesis.cancel();
@@ -518,8 +533,20 @@ function init() {
     const finishCell = document.createElement('div');
     finishCell.className = 'cell goal-cell cell-finish';
     finishCell.id = 'cell-finish';
-    finishCell.setAttribute('aria-label', '終點');
-    finishCell.innerHTML = '';
+    finishCell.innerHTML = `
+                <div class="goal-laser-cross" aria-hidden="true">
+                    <span class="goal-beam goal-beam-up"></span>
+                    <span class="goal-beam goal-beam-down"></span>
+                    <span class="goal-beam goal-beam-left"></span>
+                    <span class="goal-beam goal-beam-right"></span>
+                </div>
+                <div class="goal-edge-emoji" aria-hidden="true">${buildGoalCelebrationHtml()}</div>
+                <div class="goal-center-stage">
+                    <div class="goal-trophy-wrap">
+                        <span class="event-icon">🏆</span>
+                    </div>
+                    <div class="cell-text">終點</div>
+                </div>`;
     board.appendChild(finishCell);
     bindTeacherSpecialCellPreviews();
     const diceBox = document.getElementById('dice-box');
@@ -849,7 +876,7 @@ function displaySpecificTask(task) {
         body.appendChild(createTaskPassageBox(null, task.question));
         if (task.gif) {
             const img = document.createElement('img');
-            img.src = task.gif.startsWith('images/') ? task.gif : 'images/' + task.gif;
+            img.src = 'images/' + task.gif;
             img.alt = '題目圖片';
             img.className = 'task-img match-question-image';
             body.appendChild(img);
