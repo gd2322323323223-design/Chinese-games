@@ -322,10 +322,15 @@ const FREESOUND_EFFECTS = {
         volume: 0.9
     },
     rocket: {
-        query: 'rocket launch space',
-        filter: 'tag:rocket tag:space tag:launch duration:[0 TO 12]',
+        query: 'sci-fi powerup happy cartoon arcade level-up',
+        filter: 'tag:retro duration:[0 TO 8]',
+        fallbackFilters: [
+            'tag:arcade duration:[0 TO 6]',
+            'tag:(space OR win OR jump) duration:[0 TO 6]',
+            'duration:[0 TO 5]'
+        ],
         sort: 'rating_desc',
-        volume: 0.85
+        volume: 0.92
     },
     cheer: {
         query: 'applause cheer short',

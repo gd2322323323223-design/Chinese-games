@@ -583,21 +583,25 @@ body:has(#start-screen:not([style*="display: none"])) #game-container {
    終點格 (#cell-finish)：輝煌浮動獎杯舞台
    ========================================== */
 #cell-finish {
-    grid-column: 4 / span 3 !important;
+    grid-column: 1 / -1 !important;
     grid-row: span 3 !important;
     justify-self: center;
     align-self: end;
-    width: 100%;
-    max-width: 280px;
-    min-height: calc(var(--cell-size) * 2.4);
-    aspect-ratio: 1 / 1;
+    width: min(360px, 38vw);
+    max-width: 360px;
+    min-height: calc(var(--cell-size) * 3.35);
+    height: auto;
+    margin-left: auto !important;
+    margin-right: auto !important;
+    left: auto;
     position: relative;
     border: none !important;
     background: transparent !important;
     box-shadow: none !important;
     overflow: visible;
     z-index: 12;
-    padding: 0 !important;
+    padding: 0 5% 12% 5% !important;
+    box-sizing: border-box;
     animation: finish-cell-float 4.5s ease-in-out infinite;
 }
 
@@ -608,18 +612,26 @@ body:has(#start-screen:not([style*="display: none"])) #game-container {
 }
 
 @keyframes finish-cell-float {
-    0%, 100% { transform: translateY(4px); }
-    50% { transform: translateY(-10px); }
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(8px); }
 }
 
 .finish-stage {
     position: absolute;
-    inset: 0;
+    top: 0;
+    left: 50%;
+    right: auto;
+    bottom: 10%;
+    width: 100%;
+    max-width: 100%;
+    transform: translateX(-50%);
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: flex-end;
-    padding-bottom: 8%;
+    padding-bottom: 0;
+    margin-left: 0;
+    margin-right: 0;
     box-sizing: border-box;
     pointer-events: none;
 }
@@ -718,8 +730,8 @@ body:has(#start-screen:not([style*="display: none"])) #game-container {
 
 .finish-trophy {
     position: relative;
-    width: clamp(72px, 11vw, 108px);
-    height: clamp(96px, 14vw, 140px);
+    width: clamp(92px, 13.5vw, 132px);
+    height: clamp(122px, 17.5vw, 172px);
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -727,10 +739,10 @@ body:has(#start-screen:not([style*="display: none"])) #game-container {
 
 .trophy-star {
     position: absolute;
-    top: -6px;
+    top: -8px;
     left: 50%;
     transform: translateX(-50%);
-    font-size: clamp(18px, 3vw, 28px);
+    font-size: clamp(22px, 3.4vw, 34px);
     color: #fff9c4;
     text-shadow: 0 0 12px rgba(255, 215, 0, 1);
     animation: trophy-star-twinkle 1.6s ease-in-out infinite;
@@ -832,7 +844,7 @@ body:has(#start-screen:not([style*="display: none"])) #game-container {
     border-radius: 6px;
     background: linear-gradient(135deg, #5d4037, #8d6e63);
     color: #ffecb3;
-    font-size: clamp(16px, 2.5vw, 24px);
+    font-size: clamp(18px, 2.8vw, 28px);
     font-weight: 900;
     display: flex;
     align-items: center;
@@ -844,9 +856,11 @@ body:has(#start-screen:not([style*="display: none"])) #game-container {
 .finish-label {
     position: relative;
     z-index: 5;
-    margin-top: 10px;
-    padding: 6px 22px;
-    font-size: clamp(22px, 3.2vw, 32px);
+    margin-top: 12px;
+    margin-left: auto;
+    margin-right: auto;
+    padding: 8px 28px;
+    font-size: clamp(26px, 3.8vw, 38px);
     font-weight: 900;
     letter-spacing: 0.12em;
     color: #fff8e1;
@@ -1801,7 +1815,17 @@ body.game-active #btn-roll {
         padding: 20px 10px 80px 10px !important;
     }
     #cell-finish {
-        max-width: min(240px, 88vw);
+        width: min(300px, 86vw);
+        max-width: 300px;
+        min-height: calc(var(--cell-size) * 3.1);
+        padding: 0 6% 10% 6% !important;
+    }
+    .finish-trophy {
+        width: clamp(80px, 22vw, 112px);
+        height: clamp(106px, 28vw, 148px);
+    }
+    .finish-label {
+        font-size: clamp(22px, 5.5vw, 32px);
     }
     .cell {
         --cell-size: 60px;
