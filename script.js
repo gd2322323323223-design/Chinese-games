@@ -7,12 +7,26 @@ let waitingForClick = false;
 let specialEventActive = false;
 let attempts = 3;
 let pendingSteps = 0;
+let isDebugPreview = false;
+let isTeacherMode = false;
+let timerInterval = null;
+const MODAL_TIME_SECONDS = 120;
+let currentActiveTask = null;
+
+const CELEBRATION_PRAISES = [
+    '🌟 太厲害了！完美的句子！ 🏆',
+    '🔥 語文大師就是你！ 🧠',
+    '👏 答得太漂亮了！繼續衝刺！',
+    '💫 妙筆生花！你真是天才！',
+    '🎉 全場最亮！語文小達人！',
+    '✨ 無懈可擊！老師都要鼓掌！'
+];
 
 // 格子定義
 const traps = [1, 16, 39, 48, 61, 76, 96];
 const boosts = [8, 20, 32, 51, 68, 80, 90];
 const dinosaurs = [5, 12, 27, 43, 55, 70, 86, 103];
-let words = [];
+let cellTypes = {};
 
 // 玩家位置
 const players = [{ pos: 0 }, { pos: 0 }];
@@ -103,8 +117,15 @@ const allTasks = [...fillTasks, ...reorderTasks, ...matchTasks, ...radicalTasks,
 // ========= 角色選擇系統 =========
 // ===============================
 function selectChar(element, imgPath) {
-    // 防止重覆選擇同一個角色
-    if (selectedP1 === imgPath || selectedP2 === imgPath) {
+    if (currentSelectingPlayer === 1 && selectedP1 === imgPath) {
+        resetSelection(1);
+        return;
+    }
+    if (currentSelectingPlayer === 2 && selectedP2 === imgPath) {
+        resetSelection(2);
+        return;
+    }
+    if (imgPath === selectedP1 || imgPath === selectedP2) {
         alert("這個角色已經被選走囉！");
         return;
     }
@@ -112,14 +133,21 @@ function selectChar(element, imgPath) {
     if (currentSelectingPlayer === 1) {
         selectedP1 = imgPath;
         const preview = document.getElementById('p1-big-preview');
-        preview.innerHTML = `<img src="${imgPath}" style="width:90%;height:90%;object-fit:contain;">`;
+        if (preview) {
+            preview.style.background = "linear-gradient(135deg, rgba(49, 130, 206, 0.4), rgba(255, 255, 255, 0.3))";
+            preview.innerHTML = `<img src="${imgPath}" class="pop-effect" alt="玩家1角色">`;
+        }
         currentSelectingPlayer = 2;
-        updateHint("請 玩家 2 選擇角色", "#d53f8c");
+        updateHint("請 玩家 2 選擇一個角色", "var(--p2-color)");
     } else {
         selectedP2 = imgPath;
         const preview = document.getElementById('p2-big-preview');
-        preview.innerHTML = `<img src="${imgPath}" style="width:90%;height:90%;object-fit:contain;">`;
-        updateHint("選擇完成！點擊開始遊戲", "#48bb78");
+        if (preview) {
+            preview.style.background = "linear-gradient(135deg, rgba(213, 63, 140, 0.4), rgba(255, 255, 255, 0.3))";
+            preview.innerHTML = `<img src="${imgPath}" class="pop-effect" alt="玩家2角色">`;
+            preview.style.cursor = "pointer";
+        }
+        updateHint("選擇完成！可以點擊下方按鈕開始遊戲。", "#48bb78");
     }
     updateHighlight();
 }
@@ -128,13 +156,21 @@ function resetSelection(playerNum) {
     if (playerNum === 1) {
         selectedP1 = "";
         currentSelectingPlayer = 1;
-        document.getElementById('p1-big-preview').innerHTML = `<span class="placeholder-text">P1 棋子</span>`;
-        updateHint("請 玩家 1 重新選擇角色", "#3182ce");
+        const preview = document.getElementById('p1-big-preview');
+        if (preview) {
+            preview.style.background = "rgba(255, 255, 255, 0.2)";
+            preview.innerHTML = `<span class="placeholder-text">P1 棋子</span>`;
+        }
+        updateHint("請 玩家 1 重新選擇角色", "var(--p1-color)");
     } else {
         selectedP2 = "";
         currentSelectingPlayer = 2;
-        document.getElementById('p2-big-preview').innerHTML = `<span class="placeholder-text">P2 棋子</span>`;
-        updateHint("請 玩家 2 重新選擇角色", "#d53f8c");
+        const preview = document.getElementById('p2-big-preview');
+        if (preview) {
+            preview.style.background = "rgba(255, 255, 255, 0.2)";
+            preview.innerHTML = `<span class="placeholder-text">P2 棋子</span>`;
+        }
+        updateHint("請 玩家 2 重新選擇角色", "var(--p2-color)");
     }
     updateHighlight();
 }
@@ -148,31 +184,41 @@ function updateHint(text, color) {
 }
 
 function updateHighlight() {
-    document.querySelectorAll('.char-opt').forEach(img => {
-        const path = img.getAttribute('src');
-        img.style.opacity = (path === selectedP1 || path === selectedP2) ? "0.5" : "1";
-        img.style.border = (path === selectedP1 || path === selectedP2) ? "3px solid red" : "2px solid white";
+    document.querySelectorAll('.char-opt').forEach(opt => {
+        const path = opt.getAttribute('src');
+        opt.classList.remove('selected-p1', 'selected-p2');
+        opt.style.opacity = "1";
+        if (path === selectedP1) opt.classList.add('selected-p1');
+        if (path === selectedP2) {
+            opt.classList.add('selected-p2');
+            opt.style.opacity = "0.85";
+        }
     });
 }
 
 function startGame() {
     if (!selectedP1 || !selectedP2) {
-        alert("兩位玩家都要選擇角色才能開始喔！");
+        alert("兩位玩家都必須選擇角色喔！");
         return;
     }
 
+    document.getElementById('p1').style.backgroundImage = `url('${selectedP1}')`;
+    document.getElementById('p2').style.backgroundImage = `url('${selectedP2}')`;
+
     document.getElementById('start-screen').style.display = 'none';
     document.getElementById('game-container').style.display = 'block';
+    document.body.classList.add('game-active');
 
-    const p1 = document.getElementById('p1');
-    const p2 = document.getElementById('p2');
-    p1.style.backgroundImage = `url('${selectedP1}')`;
-    p1.style.backgroundSize = "contain";
-    p1.style.backgroundRepeat = "no-repeat";
+    const ctrl = document.getElementById('controls');
+    if (ctrl) ctrl.style.setProperty('display', 'flex', 'important');
 
-    p2.style.backgroundImage = `url('${selectedP2}')`;
-    p2.style.backgroundSize = "contain";
-    p2.style.backgroundRepeat = "no-repeat";
+    const rollBtn = document.getElementById('btn-roll');
+    if (rollBtn) rollBtn.style.setProperty('display', 'inline-block', 'important');
+
+    if (audio.bgm.paused) toggleBGM();
+
+    const diceBox = document.getElementById('dice-box');
+    if (diceBox) diceBox.style.transform = 'rotateX(0deg) rotateY(0deg)';
 
     updateDisplay();
 }
@@ -190,12 +236,17 @@ audio.bgm.volume = 0.4;
 
 function toggleBGM() {
     const btn = document.getElementById('music-ctrl');
+    const icon = btn ? btn.querySelector('.music-ctrl-icon') : null;
     if (audio.bgm.paused) {
-        audio.bgm.play();
-        btn.innerText = "🎵";
+        audio.bgm.play().catch(() => {});
+        if (icon) icon.textContent = "🎶";
+        if (btn) btn.classList.remove('is-muted');
+        btn.title = "關閉背景音樂";
     } else {
         audio.bgm.pause();
-        btn.innerText = "🔇";
+        if (icon) icon.textContent = "🔇";
+        if (btn) btn.classList.add('is-muted');
+        btn.title = "開啟背景音樂";
     }
 }
 
@@ -207,6 +258,203 @@ function playSound(name) {
 }
 
 // ===============================
+// ========== 棋盤題型主題 ==========
+// ===============================
+const CHALLENGE_TYPES = ['stroke', 'radical', 'match', 'understand', 'fill', 'reorder', 'continue', 'punc'];
+
+const CELL_TYPE_THEMES = {
+    stroke: { cssClass: 'cell-theme-green', bg: 'rgba(230, 255, 250, 0.82)', border: '#276749', emojis: ['✍️', '✏️'] },
+    radical: { cssClass: 'cell-theme-green', bg: 'rgba(206, 245, 214, 0.82)', border: '#276749', emojis: ['✍️', '✏️'] },
+    match: { cssClass: 'cell-theme-blue', bg: 'rgba(235, 248, 255, 0.82)', border: '#2b6cb0', emojis: ['🖼️', '🎨'] },
+    understand: { cssClass: 'cell-theme-yellow', bg: 'rgba(254, 252, 191, 0.82)', border: '#c05621', emojis: ['📖', '🧐'] },
+    fill: { cssClass: 'cell-theme-purple', bg: 'rgba(250, 245, 255, 0.82)', border: '#553c9a', emojis: ['🧩', '🔗'] },
+    reorder: { cssClass: 'cell-theme-purple', bg: 'rgba(226, 213, 245, 0.82)', border: '#553c9a', emojis: ['🧩', '🔗'] },
+    continue: { cssClass: 'cell-theme-purple', bg: 'rgba(250, 245, 255, 0.82)', border: '#553c9a', emojis: ['🧩', '🔗'] },
+    punc: { cssClass: 'cell-theme-purple', bg: 'rgba(226, 213, 245, 0.82)', border: '#553c9a', emojis: ['🧩', '🔗'] }
+};
+
+function shuffleArray(arr) {
+    const a = arr.slice();
+    for (let i = a.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+}
+
+function buildShuffledCellTypes() {
+    const indices = [];
+    for (let i = 1; i < 109; i++) {
+        if (!traps.includes(i) && !boosts.includes(i) && !dinosaurs.includes(i)) {
+            indices.push(i);
+        }
+    }
+    const bag = [];
+    while (bag.length < indices.length) {
+        bag.push(...shuffleArray(CHALLENGE_TYPES));
+    }
+    const types = shuffleArray(bag.slice(0, indices.length));
+    const map = {};
+    indices.forEach((idx, n) => {
+        map[idx] = types[n];
+    });
+    return map;
+}
+
+function pickThemeEmoji(type) {
+    const theme = CELL_TYPE_THEMES[type];
+    if (!theme) return '🧩';
+    return theme.emojis[Math.floor(Math.random() * theme.emojis.length)];
+}
+
+function getBoardCell(pos) {
+    return document.getElementById(pos === 109 ? 'cell-finish' : 'c' + pos);
+}
+
+function buildGoalCelebrationHtml() {
+    const emojis = shuffleArray(['👏', '🌈', '🥳', '🎉', '✨', '🎊']);
+    const slots = [
+        { cls: 'goal-emoji-tl', style: 'top:2px;left:2px' },
+        { cls: 'goal-emoji-tr', style: 'top:2px;right:2px' },
+        { cls: 'goal-emoji-bl', style: 'bottom:2px;left:2px' },
+        { cls: 'goal-emoji-br', style: 'bottom:2px;right:2px' },
+        { cls: 'goal-emoji-ml', style: 'left:2px;top:50%;transform:translateY(-50%)' },
+        { cls: 'goal-emoji-mr', style: 'right:2px;top:50%;transform:translateY(-50%)' }
+    ];
+    return slots.map((slot, i) =>
+        `<span class="goal-emoji-corner ${slot.cls}" style="${slot.style}">${emojis[i]}</span>`
+    ).join('');
+}
+
+function speakNoticeText(text) {
+    if (!text || !window.speechSynthesis) return;
+    window.speechSynthesis.cancel();
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = 'zh-HK';
+    window.speechSynthesis.speak(utterance);
+}
+
+function showSpecialGridNotice(type) {
+    const configs = {
+        banana: {
+            className: 'special-notice notice-banana',
+            title: '🍌 香蕉皮！',
+            message: '哎喲！腳底一滑，後退 <strong>1</strong> 格！',
+            btnText: '好痛！',
+            btnClass: 'notice-btn notice-btn-banana',
+            speech: '踩到香蕉皮，後退一格',
+            anim: 'popup-shake 0.5s ease-in-out'
+        },
+        dino: {
+            className: 'special-notice notice-dino',
+            title: '嗷嗚！恐龍來襲！',
+            message: '🦖 大地震動！後退 <strong>3</strong> 格！',
+            btnText: '快跑！',
+            btnClass: 'notice-btn notice-btn-dino',
+            speech: '恐龍來襲，後退三格',
+            anim: 'popup-earthquake 0.6s ease-out'
+        },
+        rocket: {
+            className: 'special-notice notice-rocket',
+            title: '🚀 火箭推進！',
+            message: '點擊棋子，向前衝刺 <strong>5</strong> 格！',
+            btnText: '出發！',
+            btnClass: 'notice-btn notice-btn-rocket',
+            speech: '火箭推進，前進五格',
+            iconAnim: 'rocket-fly 1.5s ease-in-out infinite alternate'
+        },
+        finish: {
+            className: 'special-notice notice-banana',
+            title: '🏆 終點格',
+            message: '教師預覽：僅供外觀展示，<strong>不會</strong>改變棋子位置或回合。',
+            btnText: '知道了',
+            btnClass: 'notice-btn notice-btn-banana',
+            speech: '終點格預覽',
+            anim: 'popup-shake 0.35s ease-in-out'
+        }
+    };
+
+    const cfg = configs[type];
+    if (!cfg) return Promise.resolve();
+
+    return new Promise(resolve => {
+        const notice = document.createElement('div');
+        notice.className = cfg.className;
+        const iconStyle = cfg.iconAnim ? ` style="animation:${cfg.iconAnim}"` : '';
+        const iconChar = type === 'banana' ? '🍌' : type === 'dino' ? '🦖' : type === 'rocket' ? '🚀' : '🏆';
+        notice.innerHTML = `
+            <div class="notice-icon-wrap"${iconStyle}>
+                <span class="notice-icon">${iconChar}</span>
+            </div>
+            <h3 class="notice-title">${cfg.title}</h3>
+            <p class="notice-message">${cfg.message}</p>
+            <button type="button" class="${cfg.btnClass}">${cfg.btnText}</button>
+            <p class="notice-hint">（ 點擊關閉 ）</p>`;
+
+        if (cfg.anim) notice.style.animation = cfg.anim;
+
+        document.body.appendChild(notice);
+        speakNoticeText(cfg.speech);
+        requestAnimationFrame(() => notice.classList.add('show'));
+
+        const close = () => {
+            if (window.speechSynthesis) window.speechSynthesis.cancel();
+            notice.classList.remove('show');
+            setTimeout(() => {
+                notice.remove();
+                resolve();
+            }, 400);
+        };
+
+        notice.addEventListener('click', close);
+        const btn = notice.querySelector('button');
+        if (btn) btn.addEventListener('click', (e) => { e.stopPropagation(); close(); });
+    });
+}
+
+function bindTeacherSpecialCellPreviews() {
+    const board = document.getElementById('board');
+    if (!board) return;
+    const onPreview = (type) => (e) => {
+        if (!isTeacherMode) return;
+        e.preventDefault();
+        e.stopPropagation();
+        void showSpecialGridNotice(type);
+    };
+    board.querySelectorAll('.trap-cell').forEach(el => {
+        el.addEventListener('dblclick', onPreview('banana'));
+    });
+    board.querySelectorAll('.boost-cell').forEach(el => {
+        el.addEventListener('dblclick', onPreview('rocket'));
+    });
+    board.querySelectorAll('.dino-cell').forEach(el => {
+        el.addEventListener('dblclick', onPreview('dino'));
+    });
+    const finish = document.getElementById('cell-finish');
+    if (finish) {
+        finish.addEventListener('dblclick', onPreview('finish'));
+    }
+}
+
+function initSecretFlower() {
+    const flower = document.getElementById('secret-flower');
+    if (!flower) return;
+    let taps = [];
+    const windowMs = 1500;
+    flower.addEventListener('click', (ev) => {
+        ev.preventDefault();
+        const now = Date.now();
+        taps = taps.filter((t) => now - t <= windowMs);
+        taps.push(now);
+        if (taps.length >= 3) {
+            taps.length = 0;
+            isTeacherMode = !isTeacherMode;
+            document.body.classList.toggle('teacher-mode', isTeacherMode);
+        }
+    });
+}
+
+// ===============================
 // ========== 棋盤初始化 ==========
 // ===============================
 function init() {
@@ -214,41 +462,66 @@ function init() {
     if (!board) return;
     board.innerHTML = "";
     let displayIndex = 1;
-    words = [];
+    cellTypes = buildShuffledCellTypes();
 
-    for (let i = 0; i < 110; i++) {
-        if (i === 0) words.push("起點");
-        else if (i === 109) words.push("終點 🏆");
-        else if (traps.includes(i) || boosts.includes(i) || dinosaurs.includes(i)) words.push("");
-        else words.push("語文挑戰");
-    }
-
-    words.forEach((w, i) => {
+    for (let i = 0; i < 109; i++) {
         const cell = document.createElement('div');
         cell.className = 'cell';
         cell.id = 'c' + i;
 
-        if (i === 109) {
-            cell.classList.add('goal-cell');
-            cell.innerHTML = `<div class="event-icon">🏆</div><div class="cell-text">終點</div>`;
+        if (i === 0) {
+            cell.classList.add('cell-start');
+            cell.innerHTML = '<span class="cell-text cell-start-label">起點</span>';
+        } else if (traps.includes(i)) {
+            cell.classList.add('trap-cell');
+            cell.innerHTML = '<span class="event-icon">🍌</span>';
+        } else if (boosts.includes(i)) {
+            cell.classList.add('boost-cell');
+            cell.innerHTML = '<span class="event-icon">🚀</span>';
+        } else if (dinosaurs.includes(i)) {
+            cell.classList.add('dino-cell');
+            cell.innerHTML = '<span class="event-icon">🦖</span>';
         } else {
-            let icon = "";
-            if (traps.includes(i)) { icon = "🍌"; cell.classList.add("trap-cell"); }
-            else if (boosts.includes(i)) { icon = "🚀"; cell.classList.add("boost-cell"); }
-            else if (dinosaurs.includes(i)) { icon = "🦖"; cell.classList.add("dino-cell"); }
-
-            let numHtml = i === 0 ? "" : `<span class="cell-index">${displayIndex++}</span>`;
-            cell.innerHTML = `${numHtml}${w ? "<div class='cell-text'>" + w + "</div>" : ""}
-                <span class='event-icon' style='${w ? "position:absolute;bottom:5px;right:8px;font-size:22px;" : "font-size:46px;"}'>${icon}</span>`;
+            const qType = cellTypes[i];
+            const theme = CELL_TYPE_THEMES[qType];
+            const emoji = pickThemeEmoji(qType);
+            cell.classList.add('cell-challenge', theme.cssClass);
+            cell.dataset.cellType = qType;
+            cell.style.setProperty('--cell-theme-bg', theme.bg);
+            cell.style.setProperty('--cell-theme-border', theme.border);
+            cell.innerHTML = `<span class="cell-index">${displayIndex++}</span><span class="cell-challenge-emoji" aria-hidden="true">${emoji}</span>`;
         }
         board.appendChild(cell);
-    });
+    }
+
+    const finishCell = document.createElement('div');
+    finishCell.className = 'cell goal-cell cell-finish';
+    finishCell.id = 'cell-finish';
+    finishCell.innerHTML = `
+                <div class="goal-laser-cross" aria-hidden="true">
+                    <span class="goal-beam goal-beam-up"></span>
+                    <span class="goal-beam goal-beam-down"></span>
+                    <span class="goal-beam goal-beam-left"></span>
+                    <span class="goal-beam goal-beam-right"></span>
+                </div>
+                <div class="goal-edge-emoji" aria-hidden="true">${buildGoalCelebrationHtml()}</div>
+                <div class="goal-center-stage">
+                    <div class="goal-trophy-wrap">
+                        <span class="event-icon">🏆</span>
+                    </div>
+                    <div class="cell-text">終點</div>
+                </div>`;
+    board.appendChild(finishCell);
+    bindTeacherSpecialCellPreviews();
+    const diceBox = document.getElementById('dice-box');
+    if (diceBox) diceBox.style.transform = 'rotateX(0deg) rotateY(0deg)';
+
     updateDisplay();
 }
 
 function updateDisplay() {
     players.forEach((p, i) => {
-        const cell = document.getElementById('c' + p.pos);
+        const cell = getBoardCell(p.pos);
         const pEl = document.getElementById('p' + (i + 1));
         if (!cell || !pEl) return;
 
@@ -269,20 +542,36 @@ function updateDisplay() {
 // ===============================
 async function roll() {
     if (moving || waitingForClick) return;
-    playSound('dice');
-    document.getElementById('btn-roll').disabled = true;
 
-    dice = Math.floor(Math.random() * 6) + 1;
+    playSound('dice');
+    const rollBtn = document.getElementById('btn-roll');
+    if (rollBtn) rollBtn.disabled = true;
+
     const diceBox = document.getElementById('dice-box');
-    diceBox.classList.add('rolling');
+    if (!diceBox) return;
+
+    const num = Math.floor(Math.random() * 6) + 1;
+    const rotations = {
+        1: 'rotateX(0deg) rotateY(0deg)',
+        2: 'rotateX(0deg) rotateY(180deg)',
+        3: 'rotateX(0deg) rotateY(-90deg)',
+        4: 'rotateX(0deg) rotateY(90deg)',
+        5: 'rotateX(-90deg) rotateY(0deg)',
+        6: 'rotateX(90deg) rotateY(0deg)'
+    };
+
+    const randomRotate = `rotateX(${Math.random() * 360 + 720}deg) rotateY(${Math.random() * 360 + 720}deg)`;
+    diceBox.style.transform = randomRotate;
 
     await new Promise(r => setTimeout(r, 600));
-    diceBox.classList.remove('rolling');
-    diceBox.className = '';
-    diceBox.classList.add('show-' + dice);
+    diceBox.style.transform = rotations[num];
 
+    await new Promise(r => setTimeout(r, 400));
+
+    dice = num;
     waitingForClick = true;
-    document.getElementById('p' + (turn + 1)).classList.add('can-move');
+    const pEl = document.getElementById('p' + (turn + 1));
+    if (pEl) pEl.classList.add('can-move');
 }
 
 async function handlePlayerClick(pid) {
@@ -315,13 +604,13 @@ async function move(pid) {
 
     const pos = players[pid].pos;
     if (traps.includes(pos)) {
-        alert("🍌 踩到香蕉！後退 1 格");
+        await showSpecialGridNotice('banana');
         prepareSpecialStep(pid, -1);
     } else if (boosts.includes(pos)) {
-        alert("🚀 火箭！前進 5 格");
+        await showSpecialGridNotice('rocket');
         prepareSpecialStep(pid, 5);
     } else if (dinosaurs.includes(pos)) {
-        alert("🦖 恐龍！後退 3 格");
+        await showSpecialGridNotice('dino');
         prepareSpecialStep(pid, -3);
     }
 }
@@ -358,20 +647,174 @@ function checkEndOrModal(pid) {
         finishTurn();
         return;
     }
-    showModal();
+    showModalAtCell(pos);
 }
 
 // ===============================
 // ========== 題目視窗 ============
 // ===============================
-function showModal() {
-    const task = allTasks[Math.floor(Math.random() * allTasks.length)];
+const MODAL_TYPE_LABELS = {
+    fill: '【 供詞填充 】',
+    reorder: '【 重組句子 】',
+    match: '【 看圖配詞 】',
+    radical: '【 部件辨識 】',
+    punc: '【 標點符號 】',
+    continue: '【 續寫句子 】',
+    stroke: '【 筆順辨認 】',
+    understand: '【 閱讀理解 】'
+};
+
+const HORIZONTAL_OPTION_TYPES = new Set(['fill', 'punc', 'radical', 'stroke', 'understand', 'match']);
+
+function createModalTypeBadge(type) {
+    const badge = document.createElement('span');
+    badge.className = 'modal-type-badge';
+    badge.textContent = MODAL_TYPE_LABELS[type] || '';
+    return badge;
+}
+
+function createTaskPassageBox(sentence, question, options) {
+    const opts = options || {};
+    const box = document.createElement('div');
+    box.className = 'task-passage-box';
+    if (sentence) {
+        const passage = document.createElement('p');
+        passage.className = 'passage-text';
+        passage.textContent = sentence;
+        box.appendChild(passage);
+    }
+    const qEl = document.createElement('p');
+    qEl.className = sentence ? 'passage-question' : 'passage-question passage-question-only';
+    const prefix = opts.questionPrefix || '';
+    qEl.textContent = prefix + question;
+    box.appendChild(qEl);
+    return box;
+}
+
+function stopModalTimer() {
+    if (timerInterval) {
+        clearInterval(timerInterval);
+        timerInterval = null;
+    }
+}
+
+function startModalTimer() {
+    stopModalTimer();
+    let timeLeft = MODAL_TIME_SECONDS;
+    const timerDisplay = document.getElementById('timer');
+    if (timerDisplay) timerDisplay.textContent = '⏳ 剩餘時間: ' + timeLeft + 's';
+
+    timerInterval = setInterval(function () {
+        timeLeft--;
+        if (timerDisplay) timerDisplay.textContent = '⏳ 剩餘時間: ' + timeLeft + 's';
+        if (timeLeft <= 0) {
+            stopModalTimer();
+            const fb = document.getElementById('feedback-msg');
+            if (fb) {
+                fb.textContent = '⏰ 時間到！';
+                fb.style.color = '#e53e3e';
+            }
+            setTimeout(closeModal, 1200);
+        }
+    }, 1000);
+}
+
+function updateReorderSubmitHighlight() {
+    const pool = document.getElementById('reorder-options-pool');
+    const submitBtn = document.querySelector('#modal-actions .submit-btn');
+    if (!pool || !submitBtn) return;
+    const remaining = pool.querySelectorAll('.opt-btn:not(.used)').length;
+    if (remaining === 0) submitBtn.classList.add('pulse-highlight');
+    else submitBtn.classList.remove('pulse-highlight');
+}
+
+function createFeedbackEl() {
+    const fb = document.createElement('div');
+    fb.id = 'feedback-msg';
+    return fb;
+}
+
+function buildOptionsPool(task, horizontal) {
+    const pool = document.createElement('div');
+    const isMatch = task.type === 'match';
+    pool.id = isMatch ? 'match-options-pool' : 'choice-options-pool';
+    pool.className = 'choice-options-pool' + (horizontal ? ' choice-options-row' : ' choice-options-col');
+    task.options.forEach(opt => {
+        const b = document.createElement('button');
+        b.className = 'opt-btn';
+        b.innerText = opt;
+        b.onclick = () => checkUserAnswer(opt, task.answer);
+        pool.appendChild(b);
+    });
+    return pool;
+}
+
+function showModalAtCell(pos) {
+    const type = cellTypes[pos];
+    if (!type) {
+        finishTurn();
+        return;
+    }
+    const pool = TEST_TASK_MAP[type];
+    if (!pool || !pool.length) {
+        finishTurn();
+        return;
+    }
+    const task = pool[Math.floor(Math.random() * pool.length)];
     displaySpecificTask(task);
     document.getElementById('modal-overlay').style.display = 'block';
     document.getElementById('modal').style.display = 'flex';
+    startModalTimer();
+}
+
+function formatCorrectAnswer(answer) {
+    const clean = String(answer == null ? '' : answer).trim();
+    return '正確答案：' + clean;
+}
+
+function resetCelebrationUI() {
+    const modal = document.getElementById('modal');
+    const content = document.getElementById('modal-content');
+    const celebration = document.getElementById('answer-celebration');
+    if (modal) modal.classList.remove('modal-celebrating');
+    if (content) content.style.display = '';
+    if (celebration) {
+        celebration.hidden = true;
+        celebration.setAttribute('aria-hidden', 'true');
+        celebration.classList.remove('celebration-active');
+    }
+}
+
+function showAnswerCelebration(fullText) {
+    const modal = document.getElementById('modal');
+    const content = document.getElementById('modal-content');
+    const celebration = document.getElementById('answer-celebration');
+    const answerEl = document.getElementById('celebration-answer-text');
+    const praiseEl = document.getElementById('celebration-praise-text');
+    const actions = document.getElementById('modal-actions');
+    const fb = document.getElementById('feedback-msg');
+
+    if (fb) {
+        fb.textContent = '';
+        fb.className = '';
+    }
+    if (content) content.style.display = 'none';
+    if (celebration && answerEl && praiseEl) {
+        answerEl.textContent = formatCorrectAnswer(fullText);
+        praiseEl.textContent = CELEBRATION_PRAISES[Math.floor(Math.random() * CELEBRATION_PRAISES.length)];
+        celebration.hidden = false;
+        celebration.setAttribute('aria-hidden', 'false');
+        celebration.classList.add('celebration-active');
+    }
+    if (modal) modal.classList.add('modal-celebrating');
+    if (actions) {
+        actions.innerHTML = '<button type="button" onclick="closeModal()" class="finish-btn celebration-finish-btn">完成</button>';
+    }
 }
 
 function displaySpecificTask(task) {
+    currentActiveTask = task;
+    resetCelebrationUI();
     attempts = 3;
     document.getElementById('modal').className = 'type-' + task.type;
     const reorderMeta = document.getElementById('reorder-meta-header');
@@ -386,72 +829,92 @@ function displaySpecificTask(task) {
     content.innerHTML = "";
     actions.innerHTML = "";
 
-    let html = `<div class="challenge-container">`;
-    if (task.gif) html += `<img src="images/${task.gif}" class="task-img">`;
-    if (task.sentence) html += `<div class="sentence-box">${task.sentence}</div>`;
-    html += `<p class="question-text">${task.question}</p><div id="feedback-msg" style="height:24px;margin:8px 0;"></div></div>`;
-    content.innerHTML = html;
 
-    if (task.type === "reorder") {
+    content.appendChild(createModalTypeBadge(task.type));
+
+    const body = document.createElement('div');
+    body.className = 'challenge-container task-layout';
+
+    if (task.type === 'match') {
+        body.classList.add('match-layout');
+        body.appendChild(createTaskPassageBox(null, task.question));
+        if (task.gif) {
+            const img = document.createElement('img');
+            img.src = 'images/' + task.gif;
+            img.alt = '題目圖片';
+            img.className = 'task-img match-question-image';
+            body.appendChild(img);
+        }
+        body.appendChild(createFeedbackEl());
+        content.appendChild(body);
+        content.appendChild(buildOptionsPool(task, true));
+        return;
+    }
+
+    if (task.type === 'reorder') {
+        body.classList.add('reorder-layout');
+        body.appendChild(createFeedbackEl());
+
         const ansZone = document.createElement('div');
-        ansZone.id = "reorder-zone";
-        content.querySelector('.challenge-container').appendChild(ansZone);
+        ansZone.id = 'reorder-zone';
+        body.appendChild(ansZone);
 
         const pool = document.createElement('div');
-        pool.id = "reorder-options-pool";
+        pool.id = 'reorder-options-pool';
         task.words.forEach(w => {
             const b = document.createElement('button');
-            b.className = "opt-btn";
+            b.className = 'opt-btn';
             b.innerText = w;
             b.onclick = () => {
                 if (b.classList.contains('used')) return;
                 b.classList.add('used');
                 const s = document.createElement('span');
-                s.className = "word-span";
+                s.className = 'word-span';
                 s.innerText = w;
                 ansZone.appendChild(s);
+                updateReorderSubmitHighlight();
             };
             pool.appendChild(b);
         });
-        content.querySelector('.challenge-container').appendChild(pool);
+        body.appendChild(pool);
+        content.appendChild(body);
 
         const sub = document.createElement('button');
-        sub.className = "submit-btn";
-        sub.innerText = "提交";
+        sub.className = 'submit-btn';
+        sub.innerText = '提交';
         sub.onclick = () => {
             const user = Array.from(document.querySelectorAll('.word-span')).map(n => n.innerText).join('');
             checkUserAnswer(user, task.answer);
         };
-
         const reset = document.createElement('button');
-        reset.className = "submit-btn";
-        reset.innerText = "重新再來";
-        reset.style.background = "#ed8936";
+        reset.className = 'submit-btn';
+        reset.innerText = '重新再來';
+        reset.style.background = '#ed8936';
         reset.onclick = () => {
             pool.querySelectorAll('.opt-btn').forEach(b => b.classList.remove('used'));
             ansZone.querySelectorAll('.word-span').forEach(s => s.remove());
+            updateReorderSubmitHighlight();
         };
-
         actions.appendChild(sub);
         actions.appendChild(reset);
         return;
     }
 
-    task.options.forEach(opt => {
-        const b = document.createElement('button');
-        b.className = "opt-btn";
-        b.innerText = opt;
-        b.onclick = () => checkUserAnswer(opt, task.answer);
-        content.appendChild(b);
-    });
+    const sentence = task.type === 'understand' ? (task.sentence || '') : '';
+    const passageOpts = task.type === 'understand' ? { questionPrefix: '問：' } : {};
+    body.appendChild(createTaskPassageBox(sentence || null, task.question, passageOpts));
+    body.appendChild(createFeedbackEl());
+    content.appendChild(body);
+
+    const useHorizontal = HORIZONTAL_OPTION_TYPES.has(task.type);
+    content.appendChild(buildOptionsPool(task, useHorizontal));
 }
 
 function checkUserAnswer(sel, ans) {
     const fb = document.getElementById('feedback-msg');
     if (sel === ans) {
-        fb.innerText = "🎉 答對了！";
-        fb.style.color = "#38a169";
-        document.getElementById('modal-actions').innerHTML = `<button onclick="closeModal()" class="finish-btn">完成</button>`;
+        stopModalTimer();
+        showAnswerCelebration(ans);
     } else {
         attempts--;
         if (attempts > 0) {
@@ -466,6 +929,11 @@ function checkUserAnswer(sel, ans) {
 }
 
 function closeModal() {
+    stopModalTimer();
+    resetCelebrationUI();
+    currentActiveTask = null;
+    const timerDisplay = document.getElementById('timer');
+    if (timerDisplay) timerDisplay.textContent = '⏳ 剩餘時間: ' + MODAL_TIME_SECONDS + 's';
     document.getElementById('modal-overlay').style.display = 'none';
     document.getElementById('modal').style.display = 'none';
     document.getElementById('modal').className = '';
@@ -473,31 +941,89 @@ function closeModal() {
     const reorderHint = document.getElementById('reorder-structure-hint');
     if (reorderMeta) reorderMeta.setAttribute('aria-hidden', 'true');
     if (reorderHint) reorderHint.setAttribute('aria-hidden', 'true');
+    if (isDebugPreview) {
+        isDebugPreview = false;
+        return;
+    }
     finishTurn();
 }
 
 function finishTurn() {
     turn = 1 - turn;
     const name = document.getElementById('player-turn-name');
-    name.innerText = `玩家 ${turn + 1}`;
-    name.style.color = turn === 0 ? "#3182ce" : "#d53f8c";
-    document.getElementById('btn-roll').disabled = false;
+    if (name) {
+        name.innerText = `玩家 ${turn + 1}`;
+        name.style.color = turn === 0 ? "var(--p1-color)" : "var(--p2-color)";
+    }
+    const rollBtn = document.getElementById('btn-roll');
+    if (rollBtn) rollBtn.disabled = false;
 }
 
 // ========== 測試與重置 ==========
+const TEST_TASK_MAP = {
+    fill: fillTasks,
+    reorder: reorderTasks,
+    match: matchTasks,
+    radical: radicalTasks,
+    punc: puncTasks,
+    continue: continueTasks,
+    stroke: strokeTasks,
+    understand: understandTasks
+};
+
 function testModal(type) {
-    const map = { fill: fillTasks, reorder: reorderTasks, match: matchTasks, radical: radicalTasks, punc: puncTasks, continue: continueTasks, stroke: strokeTasks, understand: understandTasks };
-    if (map[type]) {
-        // 強制顯示彈窗 ← 就是少了這行才沒反應
-        document.getElementById('modal-overlay').style.display = 'block';
-        document.getElementById('modal').style.display = 'flex';
-        
-        displaySpecificTask(map[type][0]);
+    if (!isTeacherMode) return;
+    const tasks = TEST_TASK_MAP[type];
+    if (!tasks || !tasks.length) return;
+
+    isDebugPreview = true;
+    const overlay = document.getElementById('modal-overlay');
+    const modal = document.getElementById('modal');
+    if (!overlay || !modal) return;
+
+    overlay.style.display = 'block';
+    modal.style.display = 'flex';
+    displaySpecificTask(tasks[0]);
+    startModalTimer();
+}
+
+function initTestPanel() {
+    const panel = document.getElementById('test-panel');
+    if (!panel) return;
+
+    panel.querySelectorAll('[data-test-type]').forEach(btn => {
+        btn.addEventListener('click', () => testModal(btn.getAttribute('data-test-type')));
+    });
+
+    const closeBtn = document.getElementById('test-panel-close');
+    if (closeBtn) {
+        closeBtn.addEventListener('click', () => {
+            isTeacherMode = false;
+            document.body.classList.remove('teacher-mode');
+        });
+    }
+
+    const musicBtn = document.getElementById('music-ctrl');
+    if (musicBtn) {
+        musicBtn.addEventListener('click', toggleBGM);
     }
 }
 
 function restartGame() {
+    document.body.classList.remove('game-active');
     location.reload();
 }
 
-window.onload = init;
+window.testModal = testModal;
+
+function boot() {
+    try {
+        init();
+    } catch (err) {
+        console.error('init failed:', err);
+    }
+    initTestPanel();
+    initSecretFlower();
+}
+
+window.onload = boot;
