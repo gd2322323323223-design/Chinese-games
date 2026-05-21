@@ -58,6 +58,21 @@
     <!-- 遊戲容器 + 唯一的棋盤 board -->
     <div id="game-container" style="display:none;">
         <div id="board"></div>
+        <div id="game-container" style="display:none;">
+        <div id="board">
+            </div>
+        
+        <div id="cell-finish" class="cell">
+            <div class="stage-beam"></div>
+            
+            <div class="stage-trophy-body"></div>
+            
+            <div class="stage-gold-podium"></div>
+        </div>
+
+        <div id="p1" class="player" onclick="handlePlayerClick(0)"></div>
+        <div id="p2" class="player" onclick="handlePlayerClick(1)"></div>
+    </div>
         <div id="p1" class="player" onclick="handlePlayerClick(0)"></div>
         <div id="p2" class="player" onclick="handlePlayerClick(1)"></div>
     </div>
