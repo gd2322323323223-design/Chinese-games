@@ -375,7 +375,8 @@ body:has(#start-screen:not([style*="display: none"])) #game-container {
     display: grid !important; 
     grid-template-columns: repeat(10, 1fr) !important; 
     gap: 140px 15px !important; 
-    padding: 40px 40px 220px 40px !important; 
+    position: relative !important;
+    padding: 40px 40px clamp(260px, 42vw, 480px) 40px !important; 
     border-radius: 40px; 
     background: rgba(226, 210, 180, 0.7) !important; 
     backdrop-filter: none !important; 
@@ -578,30 +579,35 @@ body:has(#start-screen:not([style*="display: none"])) #game-container {
     animation: dino-roar 0.3s infinite;
 }
 
-/* 終點格：全幅華麗冠軍舞台大圖（finish-stage.jpg），無框無底色 */
+/* 終點格：巨幕全景 finish-stage.jpg，覆蓋棋盤下方空白區（無框、無固定窄寬） */
 #cell-finish.goal-cell,
 .cell.goal-cell.cell-finish {
     grid-column: 1 / -1 !important;
-    grid-row: span 3 !important;
-    justify-self: center !important;
-    align-self: end !important;
-    width: min(100%, 92vw) !important;
-    max-width: min(720px, 92vw) !important;
-    margin: 8px auto 0 !important;
+    grid-row: auto !important;
+    position: absolute !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    width: 100% !important;
+    max-width: none !important;
+    height: clamp(240px, 46%, 520px) !important;
+    min-height: clamp(220px, 38vw, 420px) !important;
+    margin: 0 !important;
     padding: 0 !important;
     box-sizing: border-box;
-    position: relative;
     display: block !important;
-    overflow: visible;
-    aspect-ratio: 2.15 / 1;
-    min-height: clamp(140px, 28vw, 240px);
-    height: auto;
+    overflow: hidden;
+    aspect-ratio: unset !important;
     border: none !important;
     border-radius: 0 !important;
-    background: transparent url('images/finish-stage.jpg') no-repeat center center !important;
-    background-size: contain !important;
     box-shadow: none !important;
-    z-index: 12;
+    background-color: transparent !important;
+    background-image: url('images/finish-stage.jpg') !important;
+    background-repeat: no-repeat !important;
+    background-position: center bottom !important;
+    background-size: cover !important;
+    z-index: 4;
+    pointer-events: auto;
 }
 
 #cell-finish.goal-cell::before,
@@ -673,7 +679,7 @@ body:has(#start-screen:not([style*="display: none"])) #game-container {
     filter: drop-shadow(0 0 15px #48bb78) brightness(1.2) !important; 
 }
 
-/* 控制列 & 骰子 & 按鈕 */
+/* 控制列 & 骰子 & 按鈕（最高層級懸浮，不被舞台遮擋） */
 #controls {
     position: fixed;
     bottom: 20px;
@@ -689,12 +695,15 @@ body:has(#start-screen:not([style*="display: none"])) #game-container {
     display: none;
     align-items: center;
     gap: 15px;
-    z-index: 1000;
+    z-index: 999;
+    pointer-events: auto;
 }
 
 body.game-active #controls {
     display: flex !important;
-    z-index: 9999 !important;
+    position: fixed !important;
+    z-index: 999 !important;
+    pointer-events: auto !important;
 }
 
 #player-turn-name {
@@ -1538,7 +1547,12 @@ body.game-active #btn-roll {
     }
     #board {
         gap: 80px 8px !important;
-        padding: 20px 10px 100px 10px !important;
+        padding: 20px 10px clamp(200px, 50vw, 320px) 10px !important;
+    }
+    #cell-finish.goal-cell,
+    .cell.goal-cell.cell-finish {
+        height: clamp(180px, 44vw, 300px) !important;
+        min-height: 180px !important;
     }
     .cell {
         --cell-size: 60px;
