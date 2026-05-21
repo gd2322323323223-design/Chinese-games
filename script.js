@@ -515,12 +515,19 @@ function init() {
         board.appendChild(cell);
     }
 
-    const finishCell = document.createElement('div');
-    finishCell.className = 'cell goal-cell cell-finish';
-    finishCell.id = 'cell-finish';
-    finishCell.setAttribute('aria-label', '終點');
+    const gameContainer = document.getElementById('game-container');
+    let finishCell = document.getElementById('cell-finish');
+    if (!finishCell) {
+        finishCell = document.createElement('div');
+        finishCell.id = 'cell-finish';
+        finishCell.className = 'finish-stage-panel goal-cell cell-finish';
+        finishCell.setAttribute('aria-label', '終點舞台');
+    }
+    if (gameContainer && finishCell.parentElement !== gameContainer) {
+        finishCell.remove();
+        gameContainer.appendChild(finishCell);
+    }
     finishCell.innerHTML = '';
-    board.appendChild(finishCell);
     bindTeacherSpecialCellPreviews();
     const diceBox = document.getElementById('dice-box');
     if (diceBox) diceBox.style.transform = 'rotateX(0deg) rotateY(0deg)';
