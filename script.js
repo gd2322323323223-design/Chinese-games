@@ -322,12 +322,11 @@ const FREESOUND_EFFECTS = {
         volume: 0.9
     },
     rocket: {
-        query: 'sci-fi powerup happy cartoon arcade level-up',
-        filter: 'tag:retro duration:[0 TO 8]',
+        query: 'level up powerup win arcade cartoon',
+        filter: 'duration:[0 TO 8]',
         fallbackFilters: [
-            'tag:arcade duration:[0 TO 6]',
-            'tag:(space OR win OR jump) duration:[0 TO 6]',
-            'duration:[0 TO 5]'
+            'tag:arcade duration:[0 TO 8]',
+            'tag:retro duration:[0 TO 8]'
         ],
         sort: 'rating_desc',
         volume: 0.92
@@ -392,6 +391,11 @@ async function fetchFreesoundPreviewUrl(effectKey) {
                     freesoundUrlCache[effectKey] = url;
                     return url;
                 }
+            }
+            const queryOnlyUrl = await searchFreesoundOnce(spec.query, '', spec.sort);
+            if (queryOnlyUrl) {
+                freesoundUrlCache[effectKey] = queryOnlyUrl;
+                return queryOnlyUrl;
             }
             throw new Error('No preview URL in search results');
         } catch (err) {
@@ -490,29 +494,25 @@ async function playFreesoundEffect(effectKey) {
         const spec = FREESOUND_EFFECTS[effectKey];
         if (!spec || !FREESOUND_TOKEN) return;
 
+        let url = freesoundUrlCache[effectKey] || null;
         const preloaded = freesoundPreloadedAudio[effectKey];
-        if (preloaded && preloaded.dataset.ready === '1' && preloaded.src) {
-            if (activeFreesoundPlayer && activeFreesoundPlayer !== preloaded) {
-                try { activeFreesoundPlayer.pause(); } catch (_) { /* ignore */ }
-            }
-            preloaded.currentTime = 0;
-            activeFreesoundPlayer = preloaded;
-            await preloaded.play();
-            return;
+        if (preloaded && preloaded.src) {
+            url = preloaded.src;
         }
-
-        const url = await fetchFreesoundPreviewUrl(effectKey);
+        if (!url) {
+            url = await fetchFreesoundPreviewUrl(effectKey);
+        }
         if (!url) return;
 
         if (activeFreesoundPlayer) {
-            try {
-                activeFreesoundPlayer.pause();
-            } catch (_) { /* ignore */ }
-            activeFreesoundPlayer = null;
+            try { activeFreesoundPlayer.pause(); } catch (_) { /* ignore */ }
         }
 
-        const player = new Audio(url);
+        const player = preloaded && preloaded.src === url
+            ? preloaded
+            : new Audio(url);
         player.volume = spec.volume ?? 0.8;
+        player.currentTime = 0;
         activeFreesoundPlayer = player;
         await player.play();
     } catch (err) {
@@ -791,13 +791,13 @@ function initSecretFlower() {
     const flower = document.getElementById('secret-flower');
     if (!flower) return;
     let taps = [];
-    const windowMs = 1500;
+    const windowMs = 500;
     flower.addEventListener('click', (ev) => {
         ev.preventDefault();
         const now = Date.now();
         taps = taps.filter((t) => now - t <= windowMs);
         taps.push(now);
-        if (taps.length >= 3) {
+        if (taps.length >= 2) {
             taps.length = 0;
             isTeacherMode = !isTeacherMode;
             document.body.classList.toggle('teacher-mode', isTeacherMode);
