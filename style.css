@@ -521,8 +521,8 @@ body:has(#start-screen:not([style*="display: none"])) #game-container {
     margin: 12px auto 0 !important;
     height: auto;
     min-height: calc(var(--cell-size) * 3 + 24px);
-    background: rgba(255, 215, 0, 0.95) !important;
-    background-color: #ffd700 !important;
+    background: #ffd700 url('images/finish-panel-complete.jpg') no-repeat center center !important;
+    background-size: cover !important;
     border: 5px solid rgba(255, 255, 255, 0.95) !important;
     box-shadow:
         0 0 22px rgba(255, 215, 0, 0.55),
