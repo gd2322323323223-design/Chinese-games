@@ -14,6 +14,7 @@ let timerInterval = null;
 const MODAL_TIME_SECONDS = 120;
 let currentActiveTask = null;
 let modalReturnPos = null;
+let turnRollStartPos = null;
 let modalTimeoutHandling = false;
 
 const CELEBRATION_PRAISES = [
@@ -1085,6 +1086,7 @@ async function roll() {
     await new Promise(r => setTimeout(r, 400));
 
     dice = num;
+    turnRollStartPos = players[turn].pos;
     waitingForClick = true;
     const pEl = document.getElementById('p' + (turn + 1));
     if (pEl) pEl.classList.add('can-move');
@@ -1098,7 +1100,9 @@ async function handlePlayerClick(pid) {
     if (!waitingForClick || pid !== turn || moving) return;
     waitingForClick = false;
     document.getElementById('p' + (turn + 1)).classList.remove('can-move');
-    modalReturnPos = players[pid].pos;
+    if (!specialEventActive) {
+        modalReturnPos = players[pid].pos;
+    }
 
     if (specialEventActive) {
         let steps = pendingSteps;
@@ -1363,6 +1367,28 @@ async function retreatPlayerTo(pid, targetPos) {
     moving = false;
 }
 
+function isSpecialCell(pos) {
+    return traps.includes(pos) || boosts.includes(pos) || dinosaurs.includes(pos);
+}
+
+function clearTurnRetreatState() {
+    modalReturnPos = null;
+    turnRollStartPos = null;
+}
+
+/** 計時歸零：回到本回合擲骰前的位置；若誤落在特殊格則再往後退 */
+function resolveModalRetreatTarget(pid) {
+    const rollStart = turnRollStartPos != null
+        ? turnRollStartPos
+        : modalReturnPos;
+    if (rollStart == null) return players[pid].pos;
+    let target = rollStart;
+    while (isSpecialCell(target) && target > 0) {
+        target--;
+    }
+    return target;
+}
+
 async function handleModalTimeout() {
     if (modalTimeoutHandling) return;
     modalTimeoutHandling = true;
@@ -1373,17 +1399,17 @@ async function handleModalTimeout() {
 
     if (isDebugPreview) {
         isDebugPreview = false;
-        modalReturnPos = null;
+        clearTurnRetreatState();
         modalTimeoutHandling = false;
         return;
     }
 
     const pid = turn;
-    const target = modalReturnPos != null ? modalReturnPos : players[pid].pos;
+    const target = resolveModalRetreatTarget(pid);
     if (players[pid].pos > target) {
         await retreatPlayerTo(pid, target);
     }
-    modalReturnPos = null;
+    clearTurnRetreatState();
     modalTimeoutHandling = false;
     finishTurn();
 }
@@ -1653,10 +1679,10 @@ function closeModal() {
     hideModalUI();
     if (isDebugPreview) {
         isDebugPreview = false;
-        modalReturnPos = null;
+        clearTurnRetreatState();
         return;
     }
-    modalReturnPos = null;
+    clearTurnRetreatState();
     finishTurn();
 }
 
