@@ -13,6 +13,8 @@ let teacherPlacementPlayer = null;
 let timerInterval = null;
 const MODAL_TIME_SECONDS = 120;
 let currentActiveTask = null;
+let modalReturnPos = null;
+let modalTimeoutHandling = false;
 
 const CELEBRATION_PRAISES = [
     '🌟 太厲害了！繼續進步！🏆',
@@ -1037,6 +1039,7 @@ async function handlePlayerClick(pid) {
     if (!waitingForClick || pid !== turn || moving) return;
     waitingForClick = false;
     document.getElementById('p' + (turn + 1)).classList.remove('can-move');
+    modalReturnPos = players[pid].pos;
 
     if (specialEventActive) {
         let steps = pendingSteps;
@@ -1179,19 +1182,68 @@ function startModalTimer() {
         if (timerDisplay) timerDisplay.textContent = '⏳ 剩餘時間: ' + timeLeft + 's';
         if (timeLeft <= 0) {
             stopModalTimer();
-            const fb = document.getElementById('feedback-msg');
-            if (fb) {
-                fb.textContent = '⏰ 時間到！';
-                fb.style.color = '#e53e3e';
-            }
-            setTimeout(closeModal, 1200);
+            void handleModalTimeout();
         }
     }, 1000);
 }
 
+function hideModalUI() {
+    stopModalTimer();
+    resetCelebrationUI();
+    currentActiveTask = null;
+    const timerDisplay = document.getElementById('timer');
+    if (timerDisplay) timerDisplay.textContent = '⏳ 剩餘時間: ' + MODAL_TIME_SECONDS + 's';
+    const overlay = document.getElementById('modal-overlay');
+    const modal = document.getElementById('modal');
+    if (overlay) overlay.style.display = 'none';
+    if (modal) {
+        modal.style.display = 'none';
+        modal.className = '';
+    }
+    const reorderMeta = document.getElementById('reorder-meta-header');
+    const reorderHint = document.getElementById('reorder-structure-hint');
+    if (reorderMeta) reorderMeta.setAttribute('aria-hidden', 'true');
+    if (reorderHint) reorderHint.setAttribute('aria-hidden', 'true');
+}
+
+async function retreatPlayerTo(pid, targetPos) {
+    moving = true;
+    while (players[pid].pos > targetPos) {
+        players[pid].pos--;
+        updateDisplay();
+        await new Promise(r => setTimeout(r, 300));
+    }
+    moving = false;
+}
+
+async function handleModalTimeout() {
+    if (modalTimeoutHandling) return;
+    modalTimeoutHandling = true;
+    stopModalTimer();
+
+    alert('對不起，時間到了。請返回原來的位置。');
+    hideModalUI();
+
+    if (isDebugPreview) {
+        isDebugPreview = false;
+        modalReturnPos = null;
+        modalTimeoutHandling = false;
+        return;
+    }
+
+    const pid = turn;
+    const target = modalReturnPos != null ? modalReturnPos : players[pid].pos;
+    if (players[pid].pos > target) {
+        await retreatPlayerTo(pid, target);
+    }
+    modalReturnPos = null;
+    modalTimeoutHandling = false;
+    finishTurn();
+}
+
 function updateReorderSubmitHighlight() {
     const pool = document.getElementById('reorder-options-pool');
-    const submitBtn = document.querySelector('#modal-actions .submit-btn');
+    const submitBtn = document.querySelector('#modal-actions .submit-btn:not(.reset-btn)');
     if (!pool || !submitBtn) return;
     const remaining = pool.querySelectorAll('.opt-btn:not(.used)').length;
     if (remaining === 0) submitBtn.classList.add('pulse-highlight');
@@ -1350,6 +1402,7 @@ function displaySpecificTask(task) {
         content.appendChild(body);
 
         const sub = document.createElement('button');
+        sub.type = 'button';
         sub.className = 'submit-btn';
         sub.innerText = '提交';
         sub.onclick = () => {
@@ -1357,7 +1410,8 @@ function displaySpecificTask(task) {
             checkUserAnswer(user, task.answer);
         };
         const reset = document.createElement('button');
-        reset.className = 'submit-btn';
+        reset.type = 'button';
+        reset.className = 'submit-btn reset-btn';
         reset.innerText = '重新再來';
         reset.style.background = '#ed8936';
         reset.onclick = () => {
@@ -1365,8 +1419,8 @@ function displaySpecificTask(task) {
             ansZone.querySelectorAll('.word-span').forEach(s => s.remove());
             updateReorderSubmitHighlight();
         };
-        actions.appendChild(sub);
         actions.appendChild(reset);
+        actions.appendChild(sub);
         return;
     }
 
@@ -1404,22 +1458,13 @@ function checkUserAnswer(sel, ans) {
 }
 
 function closeModal() {
-    stopModalTimer();
-    resetCelebrationUI();
-    currentActiveTask = null;
-    const timerDisplay = document.getElementById('timer');
-    if (timerDisplay) timerDisplay.textContent = '⏳ 剩餘時間: ' + MODAL_TIME_SECONDS + 's';
-    document.getElementById('modal-overlay').style.display = 'none';
-    document.getElementById('modal').style.display = 'none';
-    document.getElementById('modal').className = '';
-    const reorderMeta = document.getElementById('reorder-meta-header');
-    const reorderHint = document.getElementById('reorder-structure-hint');
-    if (reorderMeta) reorderMeta.setAttribute('aria-hidden', 'true');
-    if (reorderHint) reorderHint.setAttribute('aria-hidden', 'true');
+    hideModalUI();
     if (isDebugPreview) {
         isDebugPreview = false;
+        modalReturnPos = null;
         return;
     }
+    modalReturnPos = null;
     finishTurn();
 }
 

@@ -1528,7 +1528,7 @@ body.game-active #btn-roll {
     background: #38a169;
 }
 
-.submit-btn.pulse-highlight {
+.submit-btn:not(.reset-btn).pulse-highlight {
     animation: pulse-highlight 1.1s ease-in-out infinite;
 }
 
