@@ -47,7 +47,7 @@ const players = [{ pos: 0 }, { pos: 0 }];
 let allTasks = [];
 let TEST_TASK_MAP = {};
 
-const ACTIVE_PULSE_CLASSES = ['active-red', 'active-green', 'active-yellow'];
+const ACTIVE_PULSE_CLASSES = ['active-gold'];
 
 function normalizeQuestionFromJson(q) {
     if (!q || !q.type) return null;
@@ -68,6 +68,38 @@ function normalizeQuestionFromJson(q) {
     return task;
 }
 
+function isValidTask(task) {
+    if (!task || !task.type) return false;
+    if (task.type === 'reorder') {
+        return Array.isArray(task.words) && task.words.length > 0 && Boolean(task.answer);
+    }
+    if (task.type === 'match') {
+        return Boolean(task.gif && task.options?.length && task.answer);
+    }
+    if (task.type === 'understand') {
+        return Boolean(task.question && task.options?.length && task.answer);
+    }
+    return Boolean(task.question && task.options?.length && task.answer);
+}
+
+function applyQuestionsBank(data) {
+    if (!data || !Array.isArray(data.questions)) return false;
+    const parsed = data.questions.map(normalizeQuestionFromJson).filter(isValidTask);
+    if (parsed.length === 0) return false;
+    allTasks = parsed;
+    TEST_TASK_MAP = buildTestTaskMap();
+    return true;
+}
+
+let questionsReadyPromise = null;
+
+function ensureQuestionsLoaded() {
+    if (!questionsReadyPromise) {
+        questionsReadyPromise = loadQuestionsFromJson();
+    }
+    return questionsReadyPromise;
+}
+
 function buildTestTaskMap() {
     const map = {};
     allTasks.forEach((task) => {
@@ -82,14 +114,14 @@ async function loadQuestionsFromJson() {
         const res = await fetch('questions.json', { cache: 'no-store' });
         if (!res.ok) throw new Error('HTTP ' + res.status);
         const data = await res.json();
-        if (!data || !Array.isArray(data.questions)) throw new Error('題庫格式不正確');
-        const parsed = data.questions.map(normalizeQuestionFromJson).filter(Boolean);
-        if (parsed.length === 0) throw new Error('題庫為空');
-        allTasks = parsed;
-        TEST_TASK_MAP = buildTestTaskMap();
-        return true;
+        if (applyQuestionsBank(data)) return true;
+        throw new Error('題庫為空或格式不正確');
     } catch (err) {
-        console.error('載入 questions.json 失敗:', err);
+        console.warn('載入 questions.json 失敗，嘗試使用內建題庫：', err);
+        if (typeof window !== 'undefined' && window.QUESTIONS_DATA && applyQuestionsBank(window.QUESTIONS_DATA)) {
+            return true;
+        }
+        console.error('題庫載入完全失敗');
         allTasks = [];
         TEST_TASK_MAP = {};
         return false;
@@ -107,8 +139,7 @@ function updateActivePlayerPulse() {
     clearActivePlayerPulse();
     const token = document.getElementById('p' + (turn + 1));
     if (!token) return;
-    const pulseClass = turn === 0 ? 'active-red' : 'active-green';
-    token.classList.add(pulseClass);
+    token.classList.add('active-gold');
 }
 
 // ===============================
@@ -225,10 +256,27 @@ function updateHighlight() {
     });
 }
 
-function startGame() {
+async function startGame() {
     if (!selectedP1 || !selectedP2) {
         alert("兩位玩家都必須選擇角色喔！");
         return;
+    }
+
+    const loaded = await ensureQuestionsLoaded();
+    if (!loaded) {
+        alert('題庫載入失敗，無法開始遊戲。請重新整理頁面或確認 questions.json 存在。');
+        return;
+    }
+    initQuestionPool();
+
+    if (!document.getElementById('c0')) {
+        try {
+            init();
+        } catch (err) {
+            console.error('棋盤初始化失敗:', err);
+            alert('棋盤初始化失敗，請重新整理頁面。');
+            return;
+        }
     }
 
     document.getElementById('p1').style.backgroundImage = `url('${selectedP1}')`;
@@ -1057,10 +1105,10 @@ async function handlePlayerClick(pid) {
         specialEventActive = false;
         pendingSteps = 0;
         await moveSteps(pid, steps);
-        checkEndOrModal(pid);
+        await checkEndOrModal(pid);
     } else {
         await move(pid);
-        if (!specialEventActive) checkEndOrModal(pid);
+        if (!specialEventActive) await checkEndOrModal(pid);
     }
 }
 
@@ -1202,7 +1250,13 @@ function hideWinModal() {
     }
 }
 
-function checkEndOrModal(pid) {
+function isQuestionCell(pos) {
+    if (cellTypes[pos]) return true;
+    const cell = getBoardCell(pos);
+    return Boolean(cell && cell.classList.contains('cell-challenge'));
+}
+
+async function checkEndOrModal(pid) {
     if (players[pid].pos === FINISH_POS) {
         showWinModal(pid);
         return;
@@ -1213,7 +1267,7 @@ function checkEndOrModal(pid) {
         finishTurn();
         return;
     }
-    showModalAtCell(pos);
+    await showModalAtCell(pos);
 }
 
 // ===============================
@@ -1364,21 +1418,41 @@ function buildOptionsPool(task, horizontal) {
     return pool;
 }
 
-function showModalAtCell(pos) {
-    if (!cellTypes[pos]) {
+async function showModalAtCell(pos) {
+    if (!isQuestionCell(pos)) {
         finishTurn();
         return;
     }
 
+    const loaded = await ensureQuestionsLoaded();
+    if (!loaded || allTasks.length === 0) {
+        alert('題庫尚未載入，無法出題。請重新整理頁面。');
+        finishTurn();
+        return;
+    }
+
+    if (availableQuestions.length === 0) {
+        initQuestionPool();
+    }
+
     const task = drawQuestionFromPool();
     if (!task) {
+        console.error('題目池為空，無法出題');
+        alert('題目池已用盡，請重新整理頁面。');
+        finishTurn();
+        return;
+    }
+
+    const overlay = document.getElementById('modal-overlay');
+    const modal = document.getElementById('modal');
+    if (!overlay || !modal) {
         finishTurn();
         return;
     }
 
     displaySpecificTask(task);
-    document.getElementById('modal-overlay').style.display = 'block';
-    document.getElementById('modal').style.display = 'flex';
+    overlay.style.display = 'block';
+    modal.style.display = 'flex';
     startModalTimer();
 }
 
@@ -1697,11 +1771,12 @@ function restartGame() {
 window.testModal = testModal;
 
 async function boot() {
-    const loaded = await loadQuestionsFromJson();
+    const loaded = await ensureQuestionsLoaded();
     if (!loaded) {
         console.warn('題庫未載入，語文挑戰格將暫時無法出題。');
+    } else {
+        initQuestionPool();
     }
-    initQuestionPool();
     try {
         init();
     } catch (err) {
