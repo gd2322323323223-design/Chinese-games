@@ -1,0 +1,693 @@
+{
+  "version": 1,
+  "questions": [
+    {
+      "type": "fill",
+      "question": "新年快到了，我和爸媽一起______房子。",
+      "options": [
+        "換洗",
+        "打掃",
+        "乾淨"
+      ],
+      "answerIndex": 1
+    },
+    {
+      "type": "fill",
+      "question": "小朋友起得早，在______下做早操。",
+      "options": [
+        "花朵",
+        "桌子",
+        "陽光"
+      ],
+      "answerIndex": 2
+    },
+    {
+      "type": "fill",
+      "question": "雨停了，小晴______看見金色的太陽。",
+      "options": [
+        "低頭",
+        "抬頭",
+        "搖頭"
+      ],
+      "answerIndex": 1
+    },
+    {
+      "type": "fill",
+      "question": "我______：「媽媽，你喜歡吃甚麼水果？」",
+      "options": [
+        "問",
+        "說",
+        "話"
+      ],
+      "answerIndex": 0
+    },
+    {
+      "type": "fill",
+      "question": "早上，學生在學校______老師打招呼。",
+      "options": [
+        "說",
+        "向",
+        "跑"
+      ],
+      "answerIndex": 1
+    },
+    {
+      "type": "fill",
+      "question": "今天，你______沒有去學校？",
+      "options": [
+        "甚麼",
+        "怎樣",
+        "為甚麼"
+      ],
+      "answerIndex": 2
+    },
+    {
+      "type": "fill",
+      "question": "星期六，我和家人去海灘______。",
+      "options": [
+        "學校",
+        "午餐",
+        "游泳"
+      ],
+      "answerIndex": 2
+    },
+    {
+      "type": "fill",
+      "question": "我笑______說：「媽媽做的餃子最好吃！」",
+      "options": [
+        "看",
+        "着",
+        "著"
+      ],
+      "answerIndex": 1
+    },
+    {
+      "type": "reorder",
+      "question": "重組句子：",
+      "words": [
+        "操場上",
+        "在",
+        "小明",
+        "今天",
+        "跑步",
+        "，",
+        "。"
+      ],
+      "answer": "今天，小明在操場上跑步。"
+    },
+    {
+      "type": "reorder",
+      "question": "重組句子：",
+      "words": [
+        "在",
+        "禮堂",
+        "哥哥",
+        "星期一",
+        "表演跳舞",
+        "，",
+        "。"
+      ],
+      "answer": "星期一，哥哥在禮堂表演跳舞。"
+    },
+    {
+      "type": "reorder",
+      "question": "重組句子：",
+      "words": [
+        "家裏",
+        "媽媽",
+        "在",
+        "下午",
+        "看電話",
+        "，",
+        "。"
+      ],
+      "answer": "下午，媽媽在家裏看電話。"
+    },
+    {
+      "type": "reorder",
+      "question": "重組句子：",
+      "words": [
+        "吃聖誕大餐",
+        "餐廳",
+        "在",
+        "聖誕節",
+        "我和家人",
+        "，",
+        "。"
+      ],
+      "answer": "聖誕節，我和家人在餐廳吃聖誕大餐。"
+    },
+    {
+      "type": "reorder",
+      "question": "重組句子：",
+      "words": [
+        "圖書館",
+        "我和同學",
+        "小息",
+        "在",
+        "看書",
+        "，",
+        "。"
+      ],
+      "answer": "小息，我和同學在圖書館看書。"
+    },
+    {
+      "type": "reorder",
+      "question": "重組句子：",
+      "words": [
+        "晚上八時",
+        "睡房",
+        "弟弟",
+        "做功課",
+        "在",
+        "，",
+        "。"
+      ],
+      "answer": "晚上八時，弟弟在睡房做功課。"
+    },
+    {
+      "type": "reorder",
+      "question": "重組句子：",
+      "words": [
+        "抹窗戶",
+        "在",
+        "家裏",
+        "星期六",
+        "我和姐姐",
+        "，",
+        "。"
+      ],
+      "answer": "星期六，我和姐姐在家裏抹窗戶。"
+    },
+    {
+      "type": "reorder",
+      "question": "重組句子：",
+      "words": [
+        "早上七時",
+        "在",
+        "做早操",
+        "叔叔",
+        "公園",
+        "，",
+        "。"
+      ],
+      "answer": "早上七時，叔叔在公園做早操。"
+    },
+    {
+      "type": "match",
+      "question": "哪一個詞語最能形容這張圖？",
+      "gif": "swimming.png",
+      "options": [
+        "跳繩",
+        "游泳",
+        "打球"
+      ],
+      "answerIndex": 1
+    },
+    {
+      "type": "match",
+      "question": "哪一個詞語最能形容這張圖？",
+      "gif": "scared.png",
+      "options": [
+        "生氣",
+        "開心",
+        "害怕"
+      ],
+      "answerIndex": 2
+    },
+    {
+      "type": "match",
+      "question": "哪一個詞語最能形容這張圖？",
+      "gif": "boat.png",
+      "options": [
+        "飛機",
+        "船",
+        "車"
+      ],
+      "answerIndex": 1
+    },
+    {
+      "type": "match",
+      "question": "哪一個詞語最能形容這張圖？",
+      "gif": "sunshine.png",
+      "options": [
+        "陽光",
+        "彩虹",
+        "雲朵"
+      ],
+      "answerIndex": 0
+    },
+    {
+      "type": "match",
+      "question": "哪一個詞語最能形容這張圖？",
+      "gif": "like.png",
+      "options": [
+        "討厭",
+        "擔心",
+        "喜歡"
+      ],
+      "answerIndex": 2
+    },
+    {
+      "type": "match",
+      "question": "哪一個詞語最能形容這張圖？",
+      "gif": "angry.png",
+      "options": [
+        "快樂",
+        "生氣",
+        "緊張"
+      ],
+      "answerIndex": 1
+    },
+    {
+      "type": "match",
+      "question": "哪一個詞語最能形容這張圖？",
+      "gif": "rainbow.png",
+      "options": [
+        "太陽",
+        "月亮",
+        "彩虹"
+      ],
+      "answerIndex": 2
+    },
+    {
+      "type": "match",
+      "question": "哪一個詞語最能形容這張圖？",
+      "gif": "leaf.png",
+      "options": [
+        "樹木",
+        "樹葉",
+        "花朵"
+      ],
+      "answerIndex": 1
+    },
+    {
+      "type": "radical",
+      "question": "下列哪一個字有「目」字部件？",
+      "options": [
+        "清",
+        "睛",
+        "晴"
+      ],
+      "answerIndex": 1
+    },
+    {
+      "type": "radical",
+      "question": "下列哪一個字有「目」字部件？",
+      "options": [
+        "春",
+        "看",
+        "吞"
+      ],
+      "answerIndex": 1
+    },
+    {
+      "type": "radical",
+      "question": "下列哪一個字有「木」字部件？",
+      "options": [
+        "季",
+        "早",
+        "桌"
+      ],
+      "answerIndex": 2
+    },
+    {
+      "type": "radical",
+      "question": "下列哪一個字有「木」字部件？",
+      "options": [
+        "任",
+        "桃",
+        "很"
+      ],
+      "answerIndex": 1
+    },
+    {
+      "type": "radical",
+      "question": "下列哪一個字有「足」字部件（⻊）？",
+      "options": [
+        "泡",
+        "跑",
+        "炮"
+      ],
+      "answerIndex": 1
+    },
+    {
+      "type": "radical",
+      "question": "下列哪一個字有「足」字部件（⻊）？",
+      "options": [
+        "路",
+        "走",
+        "從"
+      ],
+      "answerIndex": 0
+    },
+    {
+      "type": "radical",
+      "question": "下列哪一個字有「虫」字部件？",
+      "options": [
+        "媽",
+        "嗎",
+        "螞"
+      ],
+      "answerIndex": 2
+    },
+    {
+      "type": "radical",
+      "question": "下列哪一個字有「虫」字部件？",
+      "options": [
+        "湖",
+        "蝴",
+        "糊"
+      ],
+      "answerIndex": 1
+    },
+    {
+      "type": "punc",
+      "question": "小恩，你為甚麼不開心___",
+      "options": [
+        "。",
+        "？",
+        "："
+      ],
+      "answerIndex": 1
+    },
+    {
+      "type": "punc",
+      "question": "下午三時___哥哥在公園跑步。",
+      "options": [
+        "。",
+        "，",
+        "「"
+      ],
+      "answerIndex": 1
+    },
+    {
+      "type": "punc",
+      "question": "哥哥對弟弟說___「你的新書包真好看啊！」",
+      "options": [
+        "。",
+        "？",
+        "："
+      ],
+      "answerIndex": 2
+    },
+    {
+      "type": "punc",
+      "question": "你知道小貓去了哪裏嗎___",
+      "options": [
+        "。",
+        "？",
+        "！"
+      ],
+      "answerIndex": 1
+    },
+    {
+      "type": "punc",
+      "question": "老師說：___今天沒有功課。」",
+      "options": [
+        "「",
+        "」",
+        "，"
+      ],
+      "answerIndex": 0
+    },
+    {
+      "type": "punc",
+      "question": "老師說：「今天沒有功課。___",
+      "options": [
+        "。」",
+        "」",
+        "。"
+      ],
+      "answerIndex": 1
+    },
+    {
+      "type": "punc",
+      "question": "今天，我會到商場買衣服___",
+      "options": [
+        "。",
+        "？",
+        "！"
+      ],
+      "answerIndex": 0
+    },
+    {
+      "type": "punc",
+      "question": "媽媽，我們一起到理髮店剪髮___",
+      "options": [
+        "。",
+        "？",
+        "！"
+      ],
+      "answerIndex": 0
+    },
+    {
+      "type": "continue",
+      "question": "今天，我和哥哥______________。",
+      "options": [
+        "一邊看手機",
+        "一起上學去",
+        "一會兒吃飯"
+      ],
+      "answerIndex": 1
+    },
+    {
+      "type": "continue",
+      "question": "新年，我和家人______________。",
+      "options": [
+        "一起倒數",
+        "一會兒聽音樂",
+        "一邊跑步"
+      ],
+      "answerIndex": 0
+    },
+    {
+      "type": "continue",
+      "question": "動物園裏的獅子一會兒走來走去，______________。",
+      "options": [
+        "一邊吃飯",
+        "一起游泳",
+        "一會兒睡覺"
+      ],
+      "answerIndex": 2
+    },
+    {
+      "type": "continue",
+      "question": "晚上，哥哥在房間裏一會兒做功課，______________。",
+      "options": [
+        "一會兒看手機",
+        "一直吃零食",
+        "一邊看看窗外"
+      ],
+      "answerIndex": 0
+    },
+    {
+      "type": "continue",
+      "question": "這個西瓜又香甜______________。",
+      "options": [
+        "很好吃",
+        "又多汁",
+        "又是我"
+      ],
+      "answerIndex": 1
+    },
+    {
+      "type": "continue",
+      "question": "這把雨傘又便宜______________。",
+      "options": [
+        "又買東西",
+        "我喜歡",
+        "又好看"
+      ],
+      "answerIndex": 2
+    },
+    {
+      "type": "continue",
+      "question": "中文考試開始了，同學們認真地______________。",
+      "options": [
+        "寫啊寫",
+        "跑啊跑",
+        "游啊游"
+      ],
+      "answerIndex": 0
+    },
+    {
+      "type": "continue",
+      "question": "春天到了，美麗的蝴蝶在花朵上______________。",
+      "options": [
+        "跳啊跳",
+        "讀啊讀",
+        "飛啊飛"
+      ],
+      "answerIndex": 2
+    },
+    {
+      "type": "stroke",
+      "question": "請選出「先中央後對稱」的字。",
+      "options": [
+        "湖",
+        "思",
+        "小"
+      ],
+      "answerIndex": 2
+    },
+    {
+      "type": "stroke",
+      "question": "請選出「先中央後對稱」的字。",
+      "options": [
+        "凹",
+        "山",
+        "凸"
+      ],
+      "answerIndex": 1
+    },
+    {
+      "type": "stroke",
+      "question": "請選出「中間主橫最後寫」的字。",
+      "options": [
+        "日",
+        "木",
+        "子"
+      ],
+      "answerIndex": 2
+    },
+    {
+      "type": "stroke",
+      "question": "請選出「中間主橫最後寫」的字。",
+      "options": [
+        "月",
+        "母",
+        "田"
+      ],
+      "answerIndex": 1
+    },
+    {
+      "type": "stroke",
+      "question": "請選出「中間主直最後寫」的字。",
+      "options": [
+        "休",
+        "中",
+        "女"
+      ],
+      "answerIndex": 1
+    },
+    {
+      "type": "stroke",
+      "question": "請選出「中間主橫最後寫」的字。",
+      "options": [
+        "車",
+        "下",
+        "主"
+      ],
+      "answerIndex": 0
+    },
+    {
+      "type": "stroke",
+      "question": "請選出「先進入後關門」的字。",
+      "options": [
+        "甲",
+        "口",
+        "內"
+      ],
+      "answerIndex": 1
+    },
+    {
+      "type": "stroke",
+      "question": "請選出「先進入後關門」的字。",
+      "options": [
+        "趣",
+        "區",
+        "固"
+      ],
+      "answerIndex": 2
+    },
+    {
+      "type": "understand",
+      "question": "我和爸爸去了哪裏？",
+      "sentence": "「暑假，爸爸帶我坐飛機去北京遊玩，我們一起登上了長城。」",
+      "options": [
+        "香港",
+        "上海",
+        "北京"
+      ],
+      "answerIndex": 2
+    },
+    {
+      "type": "understand",
+      "question": "媽媽在中午的時候去了哪裏？",
+      "sentence": "「早上，媽媽去了理髮店。中午，媽媽去了麵包店。晚上，媽媽去了餐廳。」",
+      "options": [
+        "理髮店",
+        "麵包店",
+        "餐廳"
+      ],
+      "answerIndex": 1
+    },
+    {
+      "type": "understand",
+      "question": "今天是誰的生日？",
+      "sentence": "「今天是小明七歲的生日。小方送了帽子，小美送了文具。」",
+      "options": [
+        "小明",
+        "小方",
+        "小美"
+      ],
+      "answerIndex": 0
+    },
+    {
+      "type": "understand",
+      "question": "池塘裏是誰在叫？",
+      "sentence": "「夏天的晚上，池塘裏有兩隻青蛙坐在荷葉上呱呱地叫着。」",
+      "options": [
+        "荷葉",
+        "魚",
+        "青蛙"
+      ],
+      "answerIndex": 2
+    },
+    {
+      "type": "understand",
+      "question": "弟弟喜歡吃甚麼？",
+      "sentence": "「弟弟喜歡吃雪糕。哥哥喜歡吃糖果。我喜歡吃餅乾。」",
+      "options": [
+        "餅乾",
+        "糖果",
+        "雪糕"
+      ],
+      "answerIndex": 2
+    },
+    {
+      "type": "understand",
+      "question": "老人家在做甚麼？",
+      "sentence": "「沙灘上有很多人。小朋友在堆沙，大人在游泳，老人家在散步。」",
+      "options": [
+        "游泳",
+        "堆沙",
+        "散步"
+      ],
+      "answerIndex": 2
+    },
+    {
+      "type": "understand",
+      "question": "我和同學在甚麼時候來到公園？",
+      "sentence": "「下午三時，我和同學一起來到公園玩溜滑梯，我們感到很快樂。」",
+      "options": [
+        "下午二時",
+        "上午三時",
+        "下午三時"
+      ],
+      "answerIndex": 2
+    },
+    {
+      "type": "understand",
+      "question": "我在甚麼時候上數學課？",
+      "sentence": "「七時半，我來到了學校。十一時半，我在上中文課。一時半，我在上數學課。三時半，我回到了家裏。」",
+      "options": [
+        "十一時半",
+        "一時半",
+        "三時半"
+      ],
+      "answerIndex": 1
+    }
+  ]
+}
