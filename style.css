@@ -1020,7 +1020,13 @@ body:has(#start-screen:not([style*="display: none"])) #game-container {
     width: 65px; 
     height: 65px; 
     position: absolute; 
-    z-index: 100; 
+    z-index: 100;
+    overflow: visible;
+    isolation: isolate;
+    --pulse-w: 94%;
+    --pulse-h: 36%;
+    --pulse-scale-min: 0.88;
+    --pulse-scale-max: 1.12;
     transition: left 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275),
                 top 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     background-size: contain;
@@ -1034,16 +1040,18 @@ body:has(#start-screen:not([style*="display: none"])) #game-container {
     content: "";
     position: absolute;
     left: 50%;
-    bottom: 6%;
-    width: 94%;
-    height: 36%;
-    transform: translateX(-50%) scale(0.9);
+    bottom: 4%;
+    width: var(--pulse-w);
+    height: var(--pulse-h);
+    transform: translateX(-50%) scale(0.9) translateZ(0);
+    -webkit-transform: translateX(-50%) scale(0.9) translateZ(0);
     transform-origin: 50% 100%;
     border-radius: 50%;
     pointer-events: none;
     z-index: -1;
     opacity: 0;
     box-sizing: border-box;
+    will-change: transform, opacity;
 }
 
 .player.active-gold::after {
@@ -1062,12 +1070,30 @@ body:has(#start-screen:not([style*="display: none"])) #game-container {
 
 @keyframes token-pulse-ring {
     0% {
-        transform: translateX(-50%) scale(0.88);
+        transform: translateX(-50%) scale(var(--pulse-scale-min)) translateZ(0);
+        -webkit-transform: translateX(-50%) scale(var(--pulse-scale-min)) translateZ(0);
         opacity: 0.95;
     }
     100% {
-        transform: translateX(-50%) scale(1.12);
-        opacity: 0.45;
+        transform: translateX(-50%) scale(var(--pulse-scale-max)) translateZ(0);
+        -webkit-transform: translateX(-50%) scale(var(--pulse-scale-max)) translateZ(0);
+        opacity: 0.55;
+    }
+}
+
+/* iPad／平板：棋子可能仍是 65px，但觸控螢幕上 % 光圈視覺偏小，單獨放大光暈 */
+@media (max-width: 1024px) {
+    .player {
+        --pulse-w: 118%;
+        --pulse-h: 48%;
+        --pulse-scale-min: 0.92;
+        --pulse-scale-max: 1.28;
+    }
+
+    .player.active-gold::after {
+        box-shadow:
+            0 0 16px 5px rgba(255, 193, 7, 0.9),
+            0 0 28px 10px rgba(255, 152, 0, 0.55);
     }
 }
 
@@ -2073,6 +2099,16 @@ body.game-active #btn-roll {
     .player {
         width: 45px;
         height: 45px;
+        --pulse-w: 130%;
+        --pulse-h: 52%;
+        --pulse-scale-min: 0.95;
+        --pulse-scale-max: 1.35;
+    }
+
+    .player.active-gold::after {
+        box-shadow:
+            0 0 14px 4px rgba(255, 193, 7, 0.95),
+            0 0 26px 9px rgba(255, 152, 0, 0.6);
     }
     .opt-btn {
         min-width: 220px !important;
