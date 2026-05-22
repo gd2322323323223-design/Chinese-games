@@ -364,7 +364,7 @@ const FREESOUND_EFFECTS = {
             'tag:retro duration:[0 TO 8]'
         ],
         sort: 'rating_desc',
-        volume: 0.92
+        volume: 0.48
     },
     cheer: {
         query: 'applause cheer short',
@@ -710,6 +710,18 @@ function buildFinishCellHtml() {
                 <span class="finish-spark s6">★</span>
             </div>
             <div class="finish-trophy-float">
+                <div class="finish-trophy-orbit-stars" aria-hidden="true">
+                    <span class="orbit-star o1">★</span>
+                    <span class="orbit-star o2">✦</span>
+                    <span class="orbit-star o3">★</span>
+                    <span class="orbit-star o4">✦</span>
+                    <span class="orbit-star o5">★</span>
+                    <span class="orbit-star o6">✦</span>
+                    <span class="orbit-star o7">★</span>
+                    <span class="orbit-star o8">✦</span>
+                    <span class="orbit-star o9">★</span>
+                    <span class="orbit-star o10">✦</span>
+                </div>
                 <div class="finish-trophy" role="img" aria-label="冠軍獎杯">
                     <div class="trophy-star">★</div>
                     <div class="trophy-cup">
@@ -1096,17 +1108,99 @@ async function moveSteps(pid, steps) {
     moving = false;
 }
 
+let winConfettiAnimId = null;
+let winConfettiPieces = [];
+
+function stopWinConfetti() {
+    if (winConfettiAnimId) {
+        cancelAnimationFrame(winConfettiAnimId);
+        winConfettiAnimId = null;
+    }
+    winConfettiPieces = [];
+    const canvas = document.getElementById('win-confetti-canvas');
+    if (canvas) {
+        const ctx = canvas.getContext('2d');
+        if (ctx) ctx.clearRect(0, 0, canvas.width, canvas.height);
+    }
+}
+
+function startWinConfetti() {
+    const canvas = document.getElementById('win-confetti-canvas');
+    const modal = document.getElementById('win-modal');
+    if (!canvas || !modal) return;
+
+    stopWinConfetti();
+
+    const colors = ['#ffd54f', '#ff8a65', '#4fc3f7', '#81c784', '#f06292', '#ba68c8', '#fff176', '#ff7043'];
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    const count = Math.min(140, Math.floor((canvas.width * canvas.height) / 10000));
+    winConfettiPieces = Array.from({ length: count }, () => ({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height - canvas.height,
+        w: 6 + Math.random() * 8,
+        h: 10 + Math.random() * 12,
+        color: colors[Math.floor(Math.random() * colors.length)],
+        rotation: Math.random() * Math.PI * 2,
+        spin: (Math.random() - 0.5) * 0.18,
+        vy: 1.2 + Math.random() * 2.8,
+        vx: (Math.random() - 0.5) * 1.4,
+        sway: Math.random() * Math.PI * 2
+    }));
+
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    const draw = () => {
+        if (canvas.width !== window.innerWidth || canvas.height !== window.innerHeight) {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        winConfettiPieces.forEach((p) => {
+            p.y += p.vy;
+            p.x += p.vx + Math.sin(p.sway) * 0.6;
+            p.sway += 0.04;
+            p.rotation += p.spin;
+
+            if (p.y > canvas.height + 20) {
+                p.y = -20;
+                p.x = Math.random() * canvas.width;
+            }
+
+            ctx.save();
+            ctx.translate(p.x, p.y);
+            ctx.rotate(p.rotation);
+            ctx.fillStyle = p.color;
+            ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
+            ctx.restore();
+        });
+        winConfettiAnimId = requestAnimationFrame(draw);
+    };
+
+    draw();
+}
+
 function showWinModal(pid) {
     playSound('win');
     const modal = document.getElementById('win-modal');
-    const playerEl = document.getElementById('win-player');
-    if (playerEl) {
-        playerEl.innerHTML = `
-            <p class="win-player-line">玩家 ${pid + 1} 成功衝到終點！</p>
-            <p class="win-praise-line">你太厲害了，中文越來越棒！</p>
-            <p class="win-praise-line">老師為你感到驕傲，繼續加油！</p>`;
+    const playerNumEl = document.getElementById('win-player-num');
+    if (playerNumEl) playerNumEl.textContent = String(pid + 1);
+    if (modal) {
+        modal.style.display = 'flex';
+        modal.setAttribute('aria-hidden', 'false');
+        startWinConfetti();
     }
-    if (modal) modal.style.display = 'flex';
+}
+
+function hideWinModal() {
+    stopWinConfetti();
+    const modal = document.getElementById('win-modal');
+    if (modal) {
+        modal.style.display = 'none';
+        modal.setAttribute('aria-hidden', 'true');
+    }
 }
 
 function checkEndOrModal(pid) {
@@ -1580,6 +1674,7 @@ function initTestPanel() {
 }
 
 function restartGame() {
+    hideWinModal();
     document.body.classList.remove('game-active');
     location.reload();
 }

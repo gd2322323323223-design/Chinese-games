@@ -90,12 +90,12 @@
     <div id="modal-actions"></div>
 </div>
 
-    <div id="win-modal" style="display:none;">
-        <div class="win-content">
-            <div class="win-emoji-bar" aria-hidden="true">🎊 🎈 🎉 🎆 🏆 🎉 🎈 🎊</div>
-            <div class="win-title">恭喜衝線！</div>
-            <div id="win-player"></div>
-            <button onclick="restartGame()" class="win-btn">再玩一局</button>
+    <div id="win-modal" style="display:none;" aria-hidden="true" role="presentation">
+        <canvas id="win-confetti-canvas" class="win-confetti-canvas" aria-hidden="true"></canvas>
+        <div class="win-content" role="dialog" aria-modal="true" aria-labelledby="win-headline">
+            <h2 id="win-headline" class="win-headline">🏆 大獲全勝！</h2>
+            <p id="win-subheadline" class="win-subheadline">👑 恭喜 玩家 <span id="win-player-num">1</span> 榮登中文棋王！</p>
+            <button type="button" onclick="restartGame()" class="win-btn">再玩一局</button>
         </div>
     </div>
 
