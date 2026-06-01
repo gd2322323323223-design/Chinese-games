@@ -83,11 +83,38 @@ function isValidTask(task) {
     return Boolean(task.question && task.options?.length && task.answer);
 }
 
+function getTaskIdentityKey(task) {
+    if (!task || !task.type) return '';
+    if (task.type === 'reorder') {
+        return `${task.type}|${(task.words || []).join('\u0001')}|${task.answer || ''}`;
+    }
+    if (task.type === 'match') {
+        return `${task.type}|${task.gif || ''}|${task.answer || ''}`;
+    }
+    return `${task.type}|${task.question || ''}|${task.sentence || ''}|${task.answer || ''}`;
+}
+
+function dedupeTasks(tasks) {
+    const seen = new Set();
+    const unique = [];
+    for (const task of tasks) {
+        const key = getTaskIdentityKey(task);
+        if (seen.has(key)) continue;
+        seen.add(key);
+        unique.push(task);
+    }
+    return unique;
+}
+
 function applyQuestionsBank(data) {
     if (!data || !Array.isArray(data.questions)) return false;
     const parsed = data.questions.map(normalizeQuestionFromJson).filter(isValidTask);
     if (parsed.length === 0) return false;
-    allTasks = parsed;
+    const unique = dedupeTasks(parsed);
+    if (unique.length < parsed.length) {
+        console.info(`題庫去重：${parsed.length} → ${unique.length} 題`);
+    }
+    allTasks = unique;
     TEST_TASK_MAP = buildTestTaskMap();
     return true;
 }
@@ -158,14 +185,7 @@ function initQuestionPool() {
     usedQuestions = [];
 }
 
-function recycleQuestionPoolIfEmpty() {
-    if (availableQuestions.length > 0) return;
-    availableQuestions = usedQuestions.map(cloneTask);
-    usedQuestions = [];
-}
-
 function drawQuestionFromPool() {
-    recycleQuestionPoolIfEmpty();
     if (availableQuestions.length === 0) return null;
 
     const index = Math.floor(Math.random() * availableQuestions.length);
@@ -1457,14 +1477,10 @@ async function showModalAtCell(pos) {
         return;
     }
 
-    if (availableQuestions.length === 0) {
-        initQuestionPool();
-    }
-
     const task = drawQuestionFromPool();
     if (!task) {
-        console.error('題目池為空，無法出題');
-        alert('題目池已用盡，請重新整理頁面。');
+        console.error('題目池已用盡，無法出題');
+        alert('本局題目已全部出過，請重新開始遊戲。');
         finishTurn();
         return;
     }
@@ -1633,18 +1649,6 @@ function handleCorrectAnswer(correctAnswer) {
     showAnswerCelebration(correctAnswer);
 }
 
-function removeTaskFromUsedPool(task) {
-    if (!task) return;
-    const idx = usedQuestions.indexOf(task);
-    if (idx !== -1) usedQuestions.splice(idx, 1);
-}
-
-function returnWrongQuestionToPool() {
-    if (!currentActiveTask) return;
-    removeTaskFromUsedPool(currentActiveTask);
-    availableQuestions.push(cloneTask(currentActiveTask));
-}
-
 function triggerWrongAnswerFeedback() {
     const modal = document.getElementById('modal');
     if (modal) {
@@ -1654,7 +1658,6 @@ function triggerWrongAnswerFeedback() {
         setTimeout(() => modal.classList.remove('modal-shake'), 480);
     }
     playFreesoundEffect('wrong');
-    returnWrongQuestionToPool();
 }
 
 function checkUserAnswer(sel, ans) {
